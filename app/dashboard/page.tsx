@@ -1,225 +1,181 @@
 'use client';
 
-import { motion } from 'motion/react';
-import { Activity, Cpu, HardDrive, Terminal, Search, FileText, CheckCircle2, Power, Globe, Server } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { CheckCircle2, Zap, Server, ShieldCheck, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-
-// Mock Data
-const activeAgents = [
-  { id: 'agt_1a2b3c', name: 'Customer Support Bot', status: 'Running', cpu: '12%', ram: '1.2GB/15GB', uptime: '14d 2h' },
-  { id: 'agt_9x8y7z', name: 'Data Scraper Alpha', status: 'Stopped', cpu: '0%', ram: '0GB/15GB', uptime: 'Offline' },
-];
-
-const mockLogs = [
-  "[INFO] Starting Docker container agt_1a2b3c...",
-  "[INFO] Pulling image openclaw/agent:latest...",
-  "[SUCCESS] Image pulled successfully.",
-  "[INFO] Initializing environment variables...",
-  "[INFO] Connecting to Supabase database...",
-  "[SUCCESS] Database connected.",
-  "[INFO] Starting agent server on port 3000...",
-  "[SUCCESS] Agent is live and listening for webhooks.",
-  "[WARN] High memory usage detected in module: memory_buffer",
-  "[INFO] Processing incoming webhook from Telegram...",
-  "[SUCCESS] Reply sent in 1.2s."
-];
+import { createClient } from '@/utils/supabase/client';
 
 export default function DashboardOverview() {
-  const [logs, setLogs] = useState<string[]>([]);
-  const [webSearchEnabled, setWebSearchEnabled] = useState(true);
-  const [fileReaderEnabled, setFileReaderEnabled] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<string | null>(null);
+  const supabase = createClient();
 
-  // Simulate typing logs
   useEffect(() => {
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      if (currentIndex < mockLogs.length) {
-        setLogs(prev => [...prev, mockLogs[currentIndex]]);
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 800);
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+      setLoading(false);
+    };
+    fetchUser();
+  }, [supabase.auth]);
 
-    return () => clearInterval(interval);
-  }, []);
+  const handleUpgrade = (plan: string) => {
+    setToast(`Stripe Payment Initializing for ${plan} Plan...`);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold font-space mb-2">Overview</h1>
-        <p className="text-zinc-400">Monitor your active agents and system health.</p>
+    <div className="space-y-8 pb-12 relative">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 py-3 rounded-full shadow-[0_0_40px_rgba(124,58,237,0.3)] flex items-center gap-3"
+          >
+            <Loader2 className="w-4 h-4 animate-spin text-purple-400" />
+            <span className="font-medium">{toast}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Top Section: Welcome */}
+      <div className="mb-12">
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-3xl md:text-4xl font-bold font-space mb-2"
+        >
+          Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">{user?.email?.split('@')[0] || 'Builder'}</span>
+        </motion.h1>
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-zinc-400 text-lg"
+        >
+          You are currently on the <span className="text-white font-medium">Free Tier</span>. Upgrade to deploy your OpenClaw agents.
+        </motion.p>
       </div>
 
-      {/* Bento Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Active Instances (Spans 2 columns on large screens) */}
-        <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold font-space flex items-center gap-2">
-              <Server className="w-5 h-5 text-purple-400" />
-              Active Instances
-            </h2>
-            <span className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-xs font-medium text-purple-400">
-              1 / 5 Agents Running
+      {/* Middle Section: PLG Paywall (Pricing Pods) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {/* Starter Pod */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col relative overflow-hidden group hover:border-white/20 transition-all"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full group-hover:bg-blue-500/10 transition-all" />
+          
+          <div className="relative z-10">
+            <h3 className="text-2xl font-bold mb-2 font-space flex items-center gap-2">
+              <Server className="w-6 h-6 text-blue-400" />
+              Starter Pod
+            </h3>
+            <p className="text-zinc-400 mb-6 h-12">Perfect for testing and small personal projects.</p>
+            <div className="flex items-baseline gap-1 mb-8">
+              <span className="text-5xl font-extrabold tracking-tighter">$9</span>
+              <span className="text-xl text-zinc-500 font-medium">/month</span>
+            </div>
+            <ul className="flex flex-col gap-4 mb-10">
+              {[
+                '1 Active Agent Container',
+                'Standard Deployment Speed',
+                'Community Plugins',
+                'Basic Analytics'
+              ].map((feature, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-zinc-500 shrink-0" />
+                  <span className="text-zinc-300">{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-auto relative z-10">
+            <button 
+              onClick={() => handleUpgrade('Starter')}
+              className="flex items-center justify-center w-full min-h-[56px] rounded-xl bg-white/10 border border-white/20 text-white font-bold hover:bg-white/20 transition-colors"
+            >
+              Activate Starter
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Pro Pod */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-b from-purple-900/40 to-[#050505] backdrop-blur-xl border border-purple-500/50 rounded-[2rem] p-8 flex flex-col relative overflow-hidden shadow-[0_0_40px_rgba(124,58,237,0.15)] group hover:shadow-[0_0_60px_rgba(124,58,237,0.25)] transition-all"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 blur-[80px] rounded-full group-hover:bg-purple-500/30 transition-all" />
+          
+          <div className="absolute top-0 right-8 -translate-y-1/2 z-20">
+            <span className="bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-[0_0_20px_rgba(124,58,237,0.5)]">
+              Most Popular
             </span>
           </div>
 
-          <div className="flex-1 overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[600px]">
-              <thead>
-                <tr className="border-b border-white/10 text-zinc-500 text-sm">
-                  <th className="pb-3 font-medium">Agent Name</th>
-                  <th className="pb-3 font-medium">Status</th>
-                  <th className="pb-3 font-medium">CPU</th>
-                  <th className="pb-3 font-medium">RAM</th>
-                  <th className="pb-3 font-medium">Uptime</th>
-                  <th className="pb-3 font-medium text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeAgents.map((agent, i) => (
-                  <tr key={i} className="border-b border-white/5 last:border-0">
-                    <td className="py-4">
-                      <div className="font-medium text-white">{agent.name}</div>
-                      <div className="text-xs text-zinc-500 font-mono mt-1">{agent.id}</div>
-                    </td>
-                    <td className="py-4">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${agent.status === 'Running' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
-                        <span className={agent.status === 'Running' ? 'text-green-400' : 'text-red-400'}>{agent.status}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-zinc-300 flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-zinc-500" /> {agent.cpu}
-                    </td>
-                    <td className="py-4 text-zinc-300">
-                      <div className="flex items-center gap-2">
-                        <HardDrive className="w-4 h-4 text-zinc-500" /> {agent.ram}
-                      </div>
-                    </td>
-                    <td className="py-4 text-zinc-300">{agent.uptime}</td>
-                    <td className="py-4 text-right">
-                      <button className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
-                        <Power className={`w-4 h-4 ${agent.status === 'Running' ? 'text-red-400' : 'text-green-400'}`} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Quick Actions / Skills Toggle */}
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md flex flex-col">
-          <h2 className="text-xl font-bold font-space flex items-center gap-2 mb-6">
-            <Activity className="w-5 h-5 text-blue-400" />
-            Quick Actions
-          </h2>
-          
-          <div className="space-y-4 flex-1">
-            {/* Toggle 1 */}
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                  <Globe className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <div className="font-medium text-white">Web Search</div>
-                  <div className="text-xs text-zinc-500">Allow agent to browse</div>
-                </div>
-              </div>
-              <button 
-                onClick={() => setWebSearchEnabled(!webSearchEnabled)}
-                className={`w-12 h-6 rounded-full transition-colors relative ${webSearchEnabled ? 'bg-blue-500' : 'bg-zinc-700'}`}
-              >
-                <motion.div 
-                  layout
-                  className="w-4 h-4 bg-white rounded-full absolute top-1"
-                  initial={false}
-                  animate={{ left: webSearchEnabled ? 'calc(100% - 1.25rem)' : '0.25rem' }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              </button>
+          <div className="relative z-10">
+            <h3 className="text-2xl font-bold mb-2 font-space text-white flex items-center gap-2">
+              <Zap className="w-6 h-6 text-purple-400" />
+              Pro Pod
+            </h3>
+            <p className="text-purple-200/70 mb-6 h-12">For serious builders and production deployments.</p>
+            <div className="flex items-baseline gap-1 mb-8">
+              <span className="text-5xl font-extrabold tracking-tighter text-white">$29</span>
+              <span className="text-xl text-purple-200/50 font-medium">/month</span>
             </div>
-
-            {/* Toggle 2 */}
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-purple-400" />
-                </div>
-                <div>
-                  <div className="font-medium text-white">File Reader</div>
-                  <div className="text-xs text-zinc-500">Parse PDF/CSV</div>
-                </div>
-              </div>
-              <button 
-                onClick={() => setFileReaderEnabled(!fileReaderEnabled)}
-                className={`w-12 h-6 rounded-full transition-colors relative ${fileReaderEnabled ? 'bg-purple-500' : 'bg-zinc-700'}`}
-              >
-                <motion.div 
-                  layout
-                  className="w-4 h-4 bg-white rounded-full absolute top-1"
-                  initial={false}
-                  animate={{ left: fileReaderEnabled ? 'calc(100% - 1.25rem)' : '0.25rem' }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              </button>
-            </div>
+            <ul className="flex flex-col gap-4 mb-10">
+              {[
+                '5 Active Agent Containers',
+                'Instant Warm-Pool Boots (<1s)',
+                'All Premium Plugins & Integrations',
+                'Advanced Analytics & Logs',
+                'Custom Domains',
+                'White-label Webhooks'
+              ].map((feature, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400 shrink-0" />
+                  <span className="text-zinc-100">{feature}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-
-        {/* Terminal Widget (Spans full width) */}
-        <div className="lg:col-span-3 bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 opacity-50" />
-          
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold font-mono text-zinc-400 flex items-center gap-2 uppercase tracking-wider">
-              <Terminal className="w-4 h-4" />
-              Live Container Logs
-            </h2>
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
-              <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50" />
-            </div>
+          <div className="mt-auto relative z-10">
+            <button 
+              onClick={() => handleUpgrade('Pro')}
+              className="flex items-center justify-center w-full min-h-[56px] rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:from-purple-500 hover:to-blue-500 transition-all shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] active:scale-[0.98]"
+            >
+              Upgrade to Boot
+            </button>
           </div>
-
-          <div className="font-mono text-sm h-64 overflow-y-auto custom-scrollbar flex flex-col gap-1">
-            {logs.map((log, i) => {
-              let colorClass = "text-zinc-300";
-              if (log?.includes("[INFO]")) colorClass = "text-blue-400";
-              if (log?.includes("[SUCCESS]")) colorClass = "text-green-400";
-              if (log?.includes("[WARN]")) colorClass = "text-yellow-400";
-              if (log?.includes("[ERROR]")) colorClass = "text-red-400";
-
-              return (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className={colorClass}
-                >
-                  <span className="text-zinc-600 mr-2">{new Date().toISOString().split('T')[1].split('.')[0]}</span>
-                  {log}
-                </motion.div>
-              );
-            })}
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-purple-500">root@clickrunclaw:~#</span>
-              <motion.div 
-                animate={{ opacity: [1, 0] }}
-                transition={{ repeat: Infinity, duration: 0.8 }}
-                className="w-2 h-4 bg-white"
-              />
-            </div>
-          </div>
-        </div>
-
+        </motion.div>
       </div>
+
+      {/* Bottom Trust Banner */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="mt-12 flex items-center justify-center gap-2 text-zinc-500 text-sm"
+      >
+        <ShieldCheck className="w-4 h-4" />
+        <span>Secure payments powered by Stripe. Cancel anytime.</span>
+      </motion.div>
     </div>
   );
 }

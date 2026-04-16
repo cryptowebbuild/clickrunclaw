@@ -8,10 +8,17 @@ import {
   Menu, X
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, [supabase]);
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden selection:bg-purple-500/30">
@@ -38,12 +45,26 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link 
-              href="/auth" 
-              className="hidden md:flex items-center justify-center min-h-[44px] px-5 text-sm font-medium text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-full transition-all backdrop-blur-md"
-            >
-              Sign In
-            </Link>
+            {user ? (
+              <div className="hidden md:flex items-center gap-3">
+                <Link 
+                  href="/dashboard" 
+                  className="flex items-center justify-center min-h-[44px] px-5 text-sm font-bold text-black bg-white hover:bg-zinc-200 rounded-full transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                >
+                  Go to Dashboard
+                </Link>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(124,58,237,0.4)] border border-white/10">
+                  {user.email?.charAt(0).toUpperCase() || 'U'}
+                </div>
+              </div>
+            ) : (
+              <Link 
+                href="/auth" 
+                className="hidden md:flex items-center justify-center min-h-[44px] px-5 text-sm font-medium text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-full transition-all backdrop-blur-md"
+              >
+                Sign In
+              </Link>
+            )}
             
             {/* Mobile Menu Toggle */}
             <button 
@@ -69,13 +90,23 @@ export default function LandingPage() {
                 <Link href="/privacy" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-300 hover:text-white transition-colors">Privacy</Link>
                 <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-300 hover:text-white transition-colors">Blog</Link>
                 <div className="pt-4 border-t border-white/10 mt-2">
-                  <Link 
-                    href="/auth" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-center min-h-[48px] w-full text-base font-medium text-white bg-purple-600 hover:bg-purple-500 rounded-xl transition-all"
-                  >
-                    Sign In
-                  </Link>
+                  {user ? (
+                    <Link 
+                      href="/dashboard" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center min-h-[48px] w-full text-base font-bold text-black bg-white hover:bg-zinc-200 rounded-xl transition-all"
+                    >
+                      Go to Dashboard
+                    </Link>
+                  ) : (
+                    <Link 
+                      href="/auth" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center min-h-[48px] w-full text-base font-medium text-white bg-purple-600 hover:bg-purple-500 rounded-xl transition-all"
+                    >
+                      Sign In
+                    </Link>
+                  )}
                 </div>
               </div>
             </motion.div>
