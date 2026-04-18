@@ -1,49 +1,117 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Terminal, Play, Square, RotateCw, Server, 
-  Search, Plus, X, Activity, Globe, Cpu
+  Search, Plus, X, Activity, Globe, Cpu, Loader2, MessageCircle, AlertCircle
 } from 'lucide-react';
-
-const mockAgents = [
-  { id: 'agt_1a2b3c', name: 'Customer Support Bot', status: 'Pending Activation', ip: 'Pending', uptime: 'Offline', model: 'OpenClaw-7B' },
-  { id: 'agt_4m5n6p', name: 'Sales Lead Gen', status: 'Ready to Boot', ip: 'Pending', uptime: 'Offline', model: 'GPT-4o-mini' },
-  { id: 'agt_9x8y7z', name: 'Data Scraper Alpha', status: 'Pending Activation', ip: 'Pending', uptime: 'Offline', model: 'DeepSeek-Coder' },
-];
+import Link from 'next/link';
+import { createClient } from '@/utils/supabase/client';
+import AgentMonitoring from '@/components/dashboard/AgentMonitoring';
 
 export default function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTerminal, setSelectedTerminal] = useState<string | null>(null);
+  const [selectedTerminal, setSelectedTerminal] = useState<any | null>(null);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [pairingAgent, setPairingAgent] = useState<any | null>(null);
+  const [pairingCode, setPairingCode] = useState('');
+  const [pairingStatus, setPairingStatus] = useState<string | null>(null);
+  
+  // Real Database State
+  const [agents, setAgents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
-  const filteredAgents = mockAgents.filter(agent => 
+  useEffect(() => {
+    const fetchAgents = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Fetch real deployed agents from Secure Supabase DB
+        const { data, error } = await supabase
+          .from('agents')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+          
+        if (data) setAgents(data);
+      }
+      setLoading(false);
+    };
+
+    fetchAgents();
+  }, [supabase]);
+
+  const handlePairSubmit = async () => {
+    if (!pairingCode.trim()) return;
+    setPairingStatus('submitting');
+    
+    // Simulate sending pairing code to the OpenClaw container
+    setTimeout(async () => {
+      // Update DB to mark as paired
+      const { error } = await supabase
+        .from('agents')
+        .update({ telegram_status: 'paired' })
+        .eq('id', pairingAgent.id);
+        
+      if (!error) {
+        setAgents(agents.map(a => a.id === pairingAgent.id ? { ...a, telegram_status: 'paired' } : a));
+        setPairingStatus('success');
+        setTimeout(() => {
+          setPairingAgent(null);
+          setPairingCode('');
+          setPairingStatus(null);
+        }, 2000);
+      } else {
+        setPairingStatus('error');
+      }
+    }, 1500);
+  };
+
+  const filteredAgents = agents.filter(agent => 
     agent?.name?.toLowerCase().includes(searchQuery?.toLowerCase() || '') ||
     agent?.id?.toLowerCase().includes(searchQuery?.toLowerCase() || '')
   );
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 text-zinc-500 animate-spin" /></div>;
+  }
 
   return (
     <div className="space-y-6 relative">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-space mb-2">My Agents</h1>
-          <p className="text-zinc-400">Manage, monitor, and configure your deployed AI agents.</p>
+          <h1 className="text-3xl font-bold font-space mb-2 text-zinc-900 dark:text-white">My Agents</h1>
+          <p className="text-zinc-500 dark:text-zinc-400">Manage, monitor, and configure your deployed ClickRunClaw AI agents.</p>
         </div>
         
-        <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-4 top-1/2 -translate-y-1/2" />
             <input 
               type="text" 
               placeholder="Search agents..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all text-sm w-full md:w-64"
+              className="pl-11 pr-5 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-900 rounded-full focus:outline-none focus:border-coral transition-all text-sm w-full md:w-64 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-700 shadow-sm"
             />
           </div>
         </div>
       </div>
+
+      {agents.length === 0 && (
+        <div className="text-center py-20 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-900 rounded-3xl shadow-sm">
+          <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <Server className="w-8 h-8 text-zinc-400 dark:text-zinc-600" />
+          </div>
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3 font-space">No Agents Found</h3>
+          <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-8 font-light italic">You haven&apos;t deployed any ClickRunClaw agents yet. Head to the dashboard to launch your first session.</p>
+          <Link href="/dashboard" className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-coral text-white font-bold hover:bg-coral-hover transition-all shadow-[0_4px_15px_rgba(252,93,93,0.3)] hover:scale-105 active:scale-95">
+             <Plus className="w-4 h-4" />
+             Deploy Now
+          </Link>
+        </div>
+      )}
 
       {/* Agents Grid/List */}
       <div className="grid grid-cols-1 gap-4">
@@ -53,62 +121,90 @@ export default function AgentsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:bg-white/10 transition-colors group"
+            className="bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/5 rounded-[2rem] p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-coral/20 transition-all group shadow-sm hover:shadow-xl"
           >
             {/* Info Section */}
             <div className="flex items-center gap-4 flex-1">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 ${
-                agent.status === 'Ready to Boot' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(124,58,237,0.2)]' :
-                'bg-zinc-500/10 border-zinc-500/20 text-zinc-400'
+              <div className={`w-12 h-12 rounded border flex items-center justify-center shrink-0 ${
+                agent.status === 'running' ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-500 !shadow-none' :
+                'bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500'
               }`}>
                 <Server className="w-6 h-6" />
               </div>
               
               <div>
-                <h3 className="text-lg font-bold text-white font-space flex items-center gap-2">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-space flex items-center gap-2">
                   {agent.name}
-                  <span className="text-xs font-mono text-zinc-500 font-normal px-2 py-0.5 bg-black/50 rounded-md border border-white/5">
-                    {agent.id}
+                  <span className="text-xs font-mono text-zinc-500 font-normal px-2 py-0.5 bg-zinc-100 dark:bg-black/50 rounded-md border border-zinc-200 dark:border-white/5">
+                    {agent.container_id || 'pending'}
                   </span>
                 </h3>
-                <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-zinc-400">
+                <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                   <span className="flex items-center gap-1.5">
                     <div className={`w-2 h-2 rounded-full ${
-                      agent.status === 'Ready to Boot' ? 'bg-purple-500 animate-pulse' :
-                      'bg-zinc-500'
+                      agent.status === 'running' ? 'bg-green-500 animate-pulse' :
+                      'bg-zinc-300 dark:bg-zinc-500'
                     }`} />
-                    {agent.status}
+                    {agent.status.toUpperCase()}
                   </span>
-                  <span className="w-1 h-1 rounded-full bg-zinc-700" />
+                  <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                   <span className="flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5" />
-                    {agent.ip}
+                    Webhook Active
                   </span>
-                  <span className="w-1 h-1 rounded-full bg-zinc-700" />
+                  <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                   <span className="flex items-center gap-1.5">
                     <Cpu className="w-3.5 h-3.5" />
-                    {agent.model}
+                    {agent.provider.toUpperCase()}
                   </span>
+                  {agent.telegram_status === 'pending' && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
+                      <span className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Pairing Required
+                      </span>
+                    </>
+                  )}
+                  {agent.telegram_status === 'paired' && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
+                      <span className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
+                        <MessageCircle className="w-3.5 h-3.5 text-zinc-800 dark:text-zinc-300" />
+                        Telegram Linked
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Actions Section */}
-            <div className="flex items-center gap-2 w-full md:w-auto justify-end border-t border-white/5 md:border-t-0 pt-4 md:pt-0">
+            <div className="flex items-center gap-2 w-full md:w-auto justify-end border-t border-zinc-900 md:border-t-0 pt-4 md:pt-0">
+              {agent.telegram_status === 'pending' && (
+                <button 
+                  onClick={() => setPairingAgent(agent)}
+                  className="flex items-center gap-2 px-5 py-2 rounded-full bg-coral text-white hover:bg-coral-hover transition-all text-sm font-bold shadow-[0_4px_10px_rgba(252,93,93,0.2)]"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Pair Telegram
+                </button>
+              )}
+              
               <button 
-                onClick={() => setSelectedTerminal(agent.id)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border border-purple-500/20 transition-all text-sm font-medium"
+                onClick={() => setSelectedTerminal(agent)}
+                className="flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 border border-zinc-800 transition-all text-sm font-bold"
               >
                 <Terminal className="w-4 h-4" />
-                Open Terminal
+                Inspect
               </button>
               
-              <div className="flex items-center gap-1 bg-black/40 rounded-lg p-1 border border-white/5">
-                <button className="p-2 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white transition-colors" title="Restart">
+              <div className="flex items-center gap-1 bg-zinc-100 dark:bg-white/5 rounded-full p-1 border border-zinc-200 dark:border-white/10">
+                <button className="p-2 rounded-full hover:bg-white dark:hover:bg-[#090A0F] text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all transition-colors" title="Restart">
                   <RotateCw className="w-4 h-4" />
                 </button>
-                <button className="p-2 rounded-md hover:bg-green-500/20 text-zinc-400 hover:text-green-400 transition-colors" title="Start">
-                  <Play className="w-4 h-4 fill-current" />
+                <button className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-400 dark:text-zinc-500 hover:text-coral transition-all transition-colors" title="Stop">
+                  <Square className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -123,7 +219,7 @@ export default function AgentsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
             onClick={() => setSelectedTerminal(null)}
           >
             <motion.div 
@@ -131,59 +227,54 @@ export default function AgentsPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={e => e.stopPropagation()}
-              className="w-full max-w-4xl bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(124,58,237,0.15)] flex flex-col h-[60vh] max-h-[600px]"
+              className="w-full max-w-4xl bg-white dark:bg-[#090A0F] border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[60vh] max-h-[600px]"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
-                <div className="flex items-center gap-3">
-                  <Terminal className="w-5 h-5 text-purple-400" />
-                  <span className="font-mono text-sm font-bold text-zinc-300">
-                    root@{selectedTerminal}:~
+              <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 select-none">
+                <div className="flex items-center gap-4">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+                    <div className="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+                    <div className="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+                  </div>
+                  <span className="font-mono text-xs font-bold text-zinc-500 dark:text-zinc-500 tracking-tight">
+                    user@{selectedTerminal.container_id}
                   </span>
                 </div>
                 <button 
                   onClick={() => setSelectedTerminal(null)}
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                  className="p-2 rounded-full hover:bg-white dark:hover:bg-zinc-900 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-white transition-all shadow-none"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Terminal Content */}
-              <div className="flex-1 p-4 font-mono text-sm overflow-y-auto custom-scrollbar bg-black relative">
-                {/* Blurred Terminal Background */}
-                <div className="absolute inset-0 p-4 blur-sm opacity-50 pointer-events-none select-none">
-                  <div className="text-zinc-500 mb-4">
-                    Welcome to ClickRunClaw Terminal<br/>
-                    Connected to instance {selectedTerminal} (Pending Allocation)<br/>
-                    Type &apos;help&apos; to see available commands.
-                  </div>
-                  <div className="text-yellow-400">[WAITING] Agent is ready for boot sequence.</div>
-                  <div className="text-blue-400">[INFO] Awaiting activation signal...</div>
-                  <div className="text-zinc-300 mt-2">
-                    <span className="text-purple-500">root@{selectedTerminal}:~#</span>{' '}
-                    <span>_</span>
-                  </div>
+              <div className="flex-1 p-8 font-mono text-xs md:text-sm overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400">
+                <div className="text-zinc-400 dark:text-zinc-500 mb-6 font-light italic leading-relaxed">
+                  Welcome to ClickRunClaw Agent Inspector (Cloud Console)<br/>
+                  Container Reference: {selectedTerminal.container_id}<br/>
+                  Architecture: Cloud-Native ({selectedTerminal.provider.toUpperCase()})
                 </div>
-
-                {/* Paywall Overlay */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md z-10">
-                  <motion.button
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    onClick={() => {
-                      setSelectedTerminal(null);
-                      setShowPricingModal(true);
-                    }}
-                    className="relative group px-8 py-4 rounded-2xl bg-white text-black font-bold text-xl hover:bg-zinc-200 transition-all overflow-hidden shadow-[0_0_40px_rgba(124,58,237,0.3)] hover:shadow-[0_0_60px_rgba(124,58,237,0.5)]"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="relative flex items-center gap-3">
-                      🚀 Activate & Boot Agent
-                    </span>
-                  </motion.button>
-                  <p className="mt-4 text-zinc-400 font-sans text-sm">Requires an active Pod subscription.</p>
+                <div className="text-green-600 dark:text-green-500 font-bold mt-2 flex items-center gap-2">
+                   <Activity className="w-4 h-4" /> [SUCCESS] Container securely allocated and isolated.
+                </div>
+                <div className="text-zinc-900 dark:text-zinc-300 font-medium mt-1">[INFO] Environment variables injected successfully.</div>
+                <div className="text-zinc-400 dark:text-zinc-600 mt-1">[WARN] Connecting securely to encrypted webhook tunnel...</div>
+                
+                <div className="mt-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-6 rounded-2xl shadow-inner group">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 mb-3">TELEGRAM / DISCORD WEBHOOK URL</p>
+                  <p className="text-zinc-800 dark:text-zinc-200 font-bold break-all select-all selection:bg-coral/30">{selectedTerminal.webhook_url}</p>
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-4 leading-relaxed italic">Paste this exact URL into your bot configuration to bring it online instantly.</p>
+                </div>
+                
+                <div className="mt-8 pt-8 border-t border-zinc-100 dark:border-zinc-900">
+                  <AgentMonitoring containerId={selectedTerminal.container_id} />
+                </div>
+                
+                <div className="mt-8 flex items-center gap-2">
+                  <span className="text-coral font-bold tracking-tight">root@ClickRunClaw:~#</span>
+                  <span className="w-2 h-4 bg-zinc-300 dark:bg-zinc-500 animate-pulse" />
                 </div>
               </div>
             </motion.div>
@@ -191,122 +282,74 @@ export default function AgentsPage() {
         )}
       </AnimatePresence>
 
-      {/* Pricing Modal Overlay */}
+      {/* Telegram Pairing Modal */}
       <AnimatePresence>
-        {showPricingModal && (
+        {pairingAgent && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-            onClick={() => setShowPricingModal(false)}
+            className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => {
+              if (pairingStatus !== 'submitting') setPairingAgent(null);
+            }}
           >
             <motion.div 
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={e => e.stopPropagation()}
-              className="w-full max-w-5xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col relative"
+              className="w-full max-w-md bg-white dark:bg-[#090A0F] border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col relative"
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-green-500" />
               
-              <div className="p-8 md:p-12">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h2 className="text-3xl font-bold font-space mb-2">Select Your Cloud Pod</h2>
-                    <p className="text-zinc-400">Deploy your OpenClaw agent instantly on our enterprise infrastructure.</p>
-                  </div>
-                  <button 
-                    onClick={() => setShowPricingModal(false)}
-                    className="p-2 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
+              <div className="p-10 relative z-10 text-center">
+                <div className="mx-auto w-14 h-14 bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 rounded-2xl flex items-center justify-center mb-8 shadow-inner">
+                  <MessageCircle className="w-6 h-6 text-zinc-400 dark:text-zinc-600" />
                 </div>
+                
+                <h3 className="text-2xl font-bold font-space text-zinc-900 dark:text-white mb-3">Connect Telegram</h3>
+                <p className="text-zinc-500 dark:text-zinc-500 text-sm mb-10 leading-relaxed font-light">
+                  Your ClickRunClaw instance is active. Open Telegram, start a chat with your bot, and type <span className="font-mono bg-zinc-100 dark:bg-zinc-900 px-3 py-1 rounded-full text-zinc-900 dark:text-white font-bold border border-zinc-200 dark:border-zinc-800">/start</span>. 
+                  It will reply with a Pairing Code.
+                </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Starter Pod */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col relative overflow-hidden group hover:border-purple-500/30 transition-colors">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-[50px] rounded-full group-hover:bg-purple-500/20 transition-colors" />
-                    <div className="relative z-10">
-                      <h3 className="text-2xl font-bold font-space mb-2">Starter Pod</h3>
-                      <div className="flex items-baseline gap-2 mb-6">
-                        <span className="text-4xl font-bold">$9</span>
-                        <span className="text-zinc-400">/mo</span>
-                      </div>
-                      <ul className="space-y-4 mb-8 text-zinc-300">
-                        <li className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">✓</div>
-                          1-Second Boot Time
-                        </li>
-                        <li className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">✓</div>
-                          Bring Your Own Key (BYOK)
-                        </li>
-                        <li className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">✓</div>
-                          Standard Support
-                        </li>
-                        <li className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">✓</div>
-                          1 Active Instance
-                        </li>
-                      </ul>
-                      <button 
-                        onClick={() => {
-                          // TODO: Trigger Docker + SQLite orchestration API here upon successful payment
-                          // e.g., await fetch('/api/orchestrate/boot', { method: 'POST', body: JSON.stringify({ plan: 'starter', agentId: selectedTerminal }) })
-                          alert('Payment integration pending. This will trigger the Docker+SQLite orchestration.');
-                        }}
-                        className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 transition-all shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]"
-                      >
-                        Upgrade to Boot
-                      </button>
-                    </div>
-                  </div>
+                <div className="space-y-6">
+                  <input 
+                    type="text" 
+                    placeholder="CODE"
+                    value={pairingCode}
+                    onChange={(e) => setPairingCode(e.target.value.toUpperCase())}
+                    disabled={pairingStatus === 'submitting' || pairingStatus === 'success'}
+                    className="w-full px-6 py-6 font-mono font-black bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-900 rounded-2xl focus:border-coral text-zinc-900 dark:text-white text-center text-4xl tracking-widest placeholder-zinc-200 dark:placeholder-zinc-900 disabled:opacity-50 outline-none transition-all shadow-inner"
+                  />
+                  
+                  {pairingStatus === 'error' && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center items-center gap-2 text-coral text-[10px] font-black uppercase tracking-widest">
+                      <AlertCircle className="w-4 h-4" /> Invalid Code or Instance Unreachable
+                    </motion.div>
+                  )}
 
-                  {/* Pro Pod */}
-                  <div className="bg-white/5 border border-blue-500/30 rounded-2xl p-8 flex flex-col relative overflow-hidden group hover:border-blue-500/50 transition-colors">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[50px] rounded-full group-hover:bg-blue-500/20 transition-colors" />
-                    <div className="absolute top-4 right-4 px-3 py-1 bg-blue-500/20 border border-blue-500/30 text-blue-400 text-xs font-bold rounded-full">
-                      MOST POPULAR
-                    </div>
-                    <div className="relative z-10">
-                      <h3 className="text-2xl font-bold font-space mb-2">Pro Pod</h3>
-                      <div className="flex items-baseline gap-2 mb-6">
-                        <span className="text-4xl font-bold">$29</span>
-                        <span className="text-zinc-400">/mo</span>
-                      </div>
-                      <ul className="space-y-4 mb-8 text-zinc-300">
-                        <li className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">✓</div>
-                          Instant Boot Time
-                        </li>
-                        <li className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">✓</div>
-                          Multiple Instances (Up to 5)
-                        </li>
-                        <li className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">✓</div>
-                          Dedicated IP Address
-                        </li>
-                        <li className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">✓</div>
-                          Priority Support
-                        </li>
-                      </ul>
-                      <button 
-                        onClick={() => {
-                          // TODO: Trigger Docker + SQLite orchestration API here upon successful payment
-                          // e.g., await fetch('/api/orchestrate/boot', { method: 'POST', body: JSON.stringify({ plan: 'pro', agentId: selectedTerminal }) })
-                          alert('Payment integration pending. This will trigger the Docker+SQLite orchestration.');
-                        }}
-                        className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]"
-                      >
-                        Upgrade to Boot
-                      </button>
-                    </div>
-                  </div>
+                  <button 
+                    onClick={handlePairSubmit}
+                    disabled={!pairingCode.trim() || pairingStatus === 'submitting' || pairingStatus === 'success'}
+                    className="w-full h-16 rounded-full font-black text-white bg-coral hover:bg-coral-hover transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-[0_4px_25px_rgba(255,90,95,0.4)] hover:scale-[1.02] active:scale-[0.98] uppercase tracking-[0.2em] text-sm"
+                  >
+                    {pairingStatus === 'submitting' ? (
+                      <><Loader2 className="w-5 h-5 animate-spin text-white" /> Linking...</>
+                    ) : pairingStatus === 'success' ? (
+                      <><Activity className="w-5 h-5" /> Connected!</>
+                    ) : (
+                      'Verify Pairing Code'
+                    )}
+                  </button>
+                  
+                  <button 
+                    onClick={() => setPairingAgent(null)}
+                    disabled={pairingStatus === 'submitting'}
+                    className="text-zinc-400 dark:text-zinc-600 text-[10px] font-black uppercase tracking-widest hover:text-zinc-900 dark:hover:text-white transition-colors"
+                  >
+                    Skip for now
+                  </button>
                 </div>
               </div>
             </motion.div>

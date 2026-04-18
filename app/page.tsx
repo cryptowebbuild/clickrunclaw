@@ -10,6 +10,7 @@ import {
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import Image from 'next/image';
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -21,27 +22,27 @@ export default function LandingPage() {
   }, [supabase]);
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden selection:bg-purple-500/30">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 overflow-x-hidden selection:bg-coral/30 selection:text-white">
       {/* Background Effects */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-grid-white bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_80%)] opacity-20" />
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/20 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/20 blur-[120px]" />
+        <div className="absolute inset-0 bg-grid-dots opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
       </div>
 
       {/* Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/40 backdrop-blur-xl">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/10 bg-[#FAFAFA]/80 dark:bg-[#090A0F]/80 backdrop-blur-xl">
         <nav className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight font-space group">
-            <TerminalSquare className="w-6 h-6 text-purple-500 group-hover:text-purple-400 transition-colors" />
-            <span>ClickRun<span className="text-purple-500">Claw</span></span>
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tighter font-space text-zinc-900 dark:text-white group">
+            <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,90,95,0.3)] group-hover:scale-110 transition-transform">
+              <TerminalSquare className="w-4 h-4" />
+            </div>
+            <span>ClickRunClaw</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-            <Link href="/security" className="hover:text-white transition-colors">Security</Link>
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+            <Link href="/security" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Security</Link>
+            <Link href="/privacy" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Privacy</Link>
+            <Link href="/blog" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Blog</Link>
           </div>
 
           <div className="flex items-center gap-3">
@@ -49,18 +50,18 @@ export default function LandingPage() {
               <div className="hidden md:flex items-center gap-3">
                 <Link 
                   href="/dashboard" 
-                  className="flex items-center justify-center min-h-[44px] px-5 text-sm font-bold text-black bg-white hover:bg-zinc-200 rounded-full transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                  className="flex items-center justify-center h-10 px-5 text-sm font-bold text-white bg-coral hover:bg-coral-hover rounded-full transition-all shadow-[0_4px_15px_rgba(252,93,93,0.25)]"
                 >
                   Go to Dashboard
                 </Link>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(124,58,237,0.4)] border border-white/10">
+                <div className="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-300 font-bold border border-zinc-800">
                   {user.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               </div>
             ) : (
               <Link 
                 href="/auth" 
-                className="hidden md:flex items-center justify-center min-h-[44px] px-5 text-sm font-medium text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-full transition-all backdrop-blur-md"
+                className="hidden md:flex items-center justify-center h-10 px-6 text-sm font-medium text-white border border-zinc-700 bg-zinc-900/50 hover:bg-zinc-900 rounded-full transition-all backdrop-blur-md"
               >
                 Sign In
               </Link>
@@ -83,18 +84,18 @@ export default function LandingPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-white/5 bg-black/90 backdrop-blur-xl overflow-hidden"
+              className="md:hidden border-t border-zinc-200 dark:border-white/5 bg-white dark:bg-[#090A0F] backdrop-blur-xl overflow-hidden"
             >
               <div className="px-4 py-6 flex flex-col gap-4">
-                <Link href="/security" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-300 hover:text-white transition-colors">Security</Link>
-                <Link href="/privacy" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-300 hover:text-white transition-colors">Privacy</Link>
-                <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-300 hover:text-white transition-colors">Blog</Link>
-                <div className="pt-4 border-t border-white/10 mt-2">
+                <Link href="/security" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">Security</Link>
+                <Link href="/privacy" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">Privacy</Link>
+                <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">Blog</Link>
+                <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 mt-2">
                   {user ? (
                     <Link 
                       href="/dashboard" 
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center min-h-[48px] w-full text-base font-bold text-black bg-white hover:bg-zinc-200 rounded-xl transition-all"
+                      className="flex items-center justify-center min-h-[48px] w-full text-base font-bold text-white bg-coral hover:bg-coral-hover rounded-full transition-all"
                     >
                       Go to Dashboard
                     </Link>
@@ -102,7 +103,7 @@ export default function LandingPage() {
                     <Link 
                       href="/auth" 
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center min-h-[48px] w-full text-base font-medium text-white bg-purple-600 hover:bg-purple-500 rounded-xl transition-all"
+                      className="flex items-center justify-center min-h-[48px] w-full text-base font-medium text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full transition-all"
                     >
                       Sign In
                     </Link>
@@ -116,94 +117,132 @@ export default function LandingPage() {
 
       <main className="relative z-10">
         {/* Hero Section */}
-        <section className="pt-32 pb-20 px-4 md:pt-48 md:pb-32 max-w-7xl mx-auto flex flex-col items-center text-center">
+        <section className="pt-32 pb-20 px-4 md:pt-40 md:pb-32 max-w-7xl mx-auto flex flex-col items-center text-center">
+          
+          {/* Mascot */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex items-center gap-3 mb-8"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-10 relative"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-zinc-300 backdrop-blur-md hover:bg-white/10 transition-colors cursor-pointer">
-              <span className="text-orange-500 font-bold">H</span>
-              <span>Featured on IndieHunt</span>
+            <div className="absolute inset-0 bg-coral rounded-full blur-[80px] opacity-10" />
+            <div className="relative w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden border border-white/10 dark:border-white/5 bg-[#0D1117] shadow-2xl flex items-center justify-center p-4">
+              <div className="w-full h-full relative">
+                <Image 
+                  src="/mascot.webp" 
+                  alt="ClickRunClaw Mascot" 
+                  fill 
+                  className="object-contain" 
+                  priority
+                />
+              </div>
             </div>
           </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-            className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter mb-6 max-w-5xl font-space leading-[1.1]"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center gap-8 mb-12"
           >
-            1-Click Cloud Deployment <br className="hidden md:block" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 animate-gradient-x">
-              for OpenClaw AI Agents
-            </span>
-          </motion.h1>
+            <h1 className="text-7xl md:text-9xl font-bold tracking-tighter font-space text-zinc-900 dark:text-white leading-[0.9] flex flex-col items-center">
+              ClickRunClaw
+            </h1>
+            
+            <div className="flex flex-col items-center gap-5">
+              <p className="text-[#FF5A5F] font-mono font-bold tracking-[0.4em] text-xs md:text-sm uppercase bg-[#FF5A5F]/5 px-6 py-2 rounded-full border border-[#FF5A5F]/10">
+                THE AI THAT ACTUALLY DOES THINGS.
+              </p>
+              
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-coral/20 bg-coral/5 text-[10px] md:text-xs text-coral font-bold tracking-wider uppercase shadow-[0_0_20px_rgba(255,90,95,0.1)]">
+                <Zap className="w-3.5 h-3.5 fill-coral" />
+                <span>Machine Learning & Artificial Intelligence</span>
+              </div>
+            </div>
+          </motion.div>
 
           <motion.p 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-            className="text-lg md:text-2xl text-zinc-400 mb-10 max-w-3xl font-light leading-relaxed"
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="text-lg md:text-xl text-zinc-500 dark:text-zinc-400 mb-12 max-w-2xl font-medium leading-relaxed"
           >
-            Skip the Mac Mini. Deploy your custom OpenClaw AI agents to Telegram, Discord, and Web instantly—in under 1 second.
+            Stop hosting locally. Run your AI Agents on our premium 24/7 cloud infrastructure. Get instant Telegram & Discord webhooks in 1-click.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
-            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0"
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0 mb-24"
           >
             <Link 
               href="/auth"
-              className="group relative flex items-center justify-center gap-2 min-h-[60px] px-10 rounded-full bg-white text-black font-bold text-lg hover:bg-zinc-200 transition-all w-full sm:w-auto overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)]"
+              className="group relative flex items-center justify-center gap-3 h-14 px-10 rounded-full bg-[#FF5A5F] text-white font-bold text-lg hover:bg-[#fa4a4a] transition-all w-full sm:w-auto shadow-[0_10px_40px_-10px_rgba(255,90,95,0.5)] hover:scale-[1.02] active:scale-[0.98]"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <span className="relative flex items-center gap-2">
-                Deploy in 1 Second (Free Setup) <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
+              Get Started
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link 
               href="#features"
-              className="flex items-center justify-center gap-2 min-h-[60px] px-10 rounded-full bg-white/5 border border-white/10 text-white font-medium text-lg hover:bg-white/10 transition-all w-full sm:w-auto backdrop-blur-md"
+              className="flex items-center justify-center gap-3 h-14 px-10 rounded-full bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-zinc-600 dark:text-white font-bold text-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-all w-full sm:w-auto shadow-sm"
             >
-              View Architecture
+              See Showcase
             </Link>
           </motion.div>
 
-          {/* Mock Terminal UI */}
+          {/* Quick Start Terminal */}
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-            className="w-full max-w-4xl mt-24 relative"
+            transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-4xl px-4"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl blur opacity-20" />
-            <div className="relative rounded-2xl bg-[#0A0A0A] border border-white/10 shadow-2xl overflow-hidden">
-              <div className="flex items-center px-4 py-3 border-b border-white/5 bg-white/[0.02]">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                </div>
-                <div className="mx-auto text-xs text-zinc-500 font-mono">agent-deploy.sh</div>
+            <div className="flex items-center gap-4 mb-6 text-left">
+              <div className="w-10 h-10 rounded-2xl bg-coral/10 border border-coral/20 flex items-center justify-center">
+                <TerminalSquare className="w-5 h-5 text-coral" />
               </div>
-              <div className="p-6 text-left font-mono text-sm md:text-base text-zinc-300 space-y-2 overflow-x-auto">
-                <p><span className="text-purple-400">~</span> $ clickrunclaw deploy --agent openclaw</p>
-                <p className="text-zinc-500">Initializing enterprise cloud instance...</p>
-                <p className="text-green-400">✓ Dedicated AI Pod allocated</p>
-                <p className="text-zinc-500">Injecting encrypted API keys...</p>
-                <p className="text-green-400">✓ Keys secured in isolated vault</p>
-                <p className="text-zinc-500">Starting OpenClaw runtime...</p>
-                <p className="text-blue-400">→ Agent is live at: https://agent-xyz.clickrunclaw.com</p>
-                <p className="text-purple-400 animate-pulse">_</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white font-space tracking-tight">Quick Start</h2>
+            </div>
+            
+            <div className="relative rounded-3xl bg-[#0D1117] border border-white/10 shadow-3xl overflow-hidden terminal-shadow">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/5 backdrop-blur-md">
+                <div className="flex gap-2.5">
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] shadow-[0_0_8px_rgba(255,95,86,0.3)]" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] shadow-[0_0_8px_rgba(255,189,46,0.3)]" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#27C93F] shadow-[0_0_8px_rgba(39,201,63,0.3)]" />
+                </div>
+                <div className="flex items-center gap-4">
+                   <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-zinc-400 font-mono">zsh</div>
+                </div>
+              </div>
+              <div className="p-8 md:p-12 font-mono text-sm md:text-base space-y-4 text-left">
+                <div className="flex gap-4">
+                  <span className="text-[#FF5A5F] shrink-0">$</span>
+                  <p className="text-zinc-300">curl -sSL <span className="text-cyan-400">https://get.clickrunclaw.com</span> | bash</p>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-zinc-500 shrink-0">#</span>
+                  <p className="text-zinc-500 italic">Initializing one-click cloud container...</p>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-green-400 shrink-0">✓</span>
+                  <p className="text-zinc-300">Environment provisioned (Hetzner Cloud)</p>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-green-400 shrink-0">✓</span>
+                  <p className="text-zinc-300">Connected to <span className="text-[#FF5A5F] font-bold">@OpenClawAgent_Bot</span></p>
+                </div>
+                <div className="pt-4 flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <p className="text-green-500 font-bold text-xs uppercase tracking-widest">System Live & Operational</p>
+                </div>
               </div>
             </div>
           </motion.div>
         </section>
-
+ 
         {/* Bento Grid Features Section */}
         <section id="features" className="py-24 px-4 relative">
           <div className="max-w-7xl mx-auto">
@@ -212,24 +251,24 @@ export default function LandingPage() {
               <p className="text-xl text-zinc-400 max-w-2xl mx-auto font-light">We handle the complex cloud infrastructure, routing, and security. You just focus on your agent&apos;s logic.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[300px]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[340px]">
               {/* Feature 1: Large Bento Box */}
               <motion.article 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="md:col-span-2 bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-purple-500/30 transition-colors"
+                transition={{ duration: 0.8 }}
+                className="md:col-span-2 bg-white dark:bg-[#111318] border border-gray-200 dark:border-white/5 hover:border-coral/20 rounded-3xl p-10 relative overflow-hidden transition-all group shadow-sm hover:shadow-2xl hover:shadow-coral/5"
               >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[80px] rounded-full group-hover:bg-purple-500/20 transition-colors" />
+                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(255,90,95,0.05),transparent_60%)] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative z-10 h-full flex flex-col justify-between">
-                  <div className="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center border border-purple-500/30 mb-6">
-                    <Server className="w-7 h-7 text-purple-400" />
+                  <div className="w-16 h-16 rounded-2xl bg-[#FF5A5F]/10 flex items-center justify-center mb-8 border border-coral/20">
+                    <Server className="w-7 h-7 text-[#FF5A5F]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold mb-3 font-space">Zero-Ops Serverless Architecture</h3>
-                    <p className="text-zinc-400 leading-relaxed max-w-md">
-                      Every OpenClaw agent runs in its own dedicated, military-grade sandboxed environment. Enjoy lightning-fast 1-second boot times with our premium Enterprise-Grade Cloud Instances.
+                    <h3 className="text-3xl font-bold mb-4 font-space text-zinc-900 dark:text-white tracking-tight">Dedicated Cloud Containers</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-lg text-lg">
+                      Isolation is at our core. Every agent instance runs in a strictly partitioned environment, ensuring your data stays yours. Zero hardware overhead for you.
                     </p>
                   </div>
                 </div>
@@ -240,18 +279,17 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-blue-500/30 transition-colors"
+                transition={{ duration: 0.8, delay: 0.1 }}
+                className="bg-white dark:bg-[#111318] border border-gray-200 dark:border-white/5 hover:border-coral/20 rounded-3xl p-10 relative overflow-hidden transition-all shadow-sm group hover:shadow-2xl hover:shadow-zinc-500/5 text-left"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[50px] rounded-full group-hover:bg-blue-500/20 transition-colors" />
                 <div className="relative z-10 h-full flex flex-col justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30 mb-6">
-                    <Webhook className="w-6 h-6 text-blue-400" />
+                  <div className="w-16 h-16 rounded-2xl bg-[#FF5A5F]/10 flex items-center justify-center mb-6 border border-coral/20">
+                    <Webhook className="w-7 h-7 text-[#FF5A5F]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-2 font-space">Instant Skill Integration</h3>
-                    <p className="text-zinc-400 text-sm leading-relaxed">
-                      Connect your OpenClaw agents to the Web, Telegram, and Discord seamlessly. Extend their capabilities instantly without writing a single line of integration code.
+                    <h3 className="text-xl font-bold mb-3 font-space text-zinc-900 dark:text-white tracking-tight">Auto-Pairing</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+                      Drop in your Telegram or Discord Bot Token and we handle the connectivity, webhooks, and long-polling instantly.
                     </p>
                   </div>
                 </div>
@@ -262,18 +300,17 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-green-500/30 transition-colors"
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="bg-white dark:bg-[#111318] border border-gray-200 dark:border-white/5 hover:border-coral/20 rounded-3xl p-10 relative overflow-hidden transition-all shadow-sm group hover:shadow-2xl hover:shadow-zinc-500/5 text-left"
               >
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-green-500/10 blur-[50px] rounded-full group-hover:bg-green-500/20 transition-colors" />
                 <div className="relative z-10 h-full flex flex-col justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-green-500/20 flex items-center justify-center border border-green-500/30 mb-6">
-                    <Key className="w-6 h-6 text-green-400" />
+                  <div className="w-16 h-16 rounded-2xl bg-[#FF5A5F]/10 flex items-center justify-center mb-6 border border-coral/20">
+                    <Key className="w-7 h-7 text-[#FF5A5F]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-2 font-space">Unrestricted API Access (BYOK)</h3>
-                    <p className="text-zinc-400 text-sm leading-relaxed">
-                      Bring Your Own Key to use OpenRouter or Gemini APIs directly with your OpenClaw instance. Maintain full control over your billing and models with zero platform markup.
+                    <h3 className="text-xl font-bold mb-3 font-space text-zinc-900 dark:text-white tracking-tight">BYO Keys</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+                      Bring Your Own Key to use OpenRouter, Gemini, or OpenAI directly with your ClickRunClaw instance. Maintain full control.
                     </p>
                   </div>
                 </div>
@@ -284,18 +321,17 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="md:col-span-2 bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-purple-500/30 transition-colors"
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="md:col-span-2 bg-white dark:bg-[#111318] border border-gray-200 dark:border-white/5 hover:border-coral/20 rounded-3xl p-10 relative overflow-hidden transition-all group shadow-sm hover:shadow-2xl shadow-[#FF5A5F]/5"
               >
-                <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-500/10 blur-[80px] rounded-full group-hover:bg-purple-500/20 transition-colors" />
                 <div className="relative z-10 h-full flex flex-col justify-between">
-                  <div className="w-14 h-14 rounded-2xl bg-zinc-800 flex items-center justify-center border border-zinc-700 mb-6">
-                    <ShieldCheck className="w-7 h-7 text-white" />
+                  <div className="w-16 h-16 rounded-2xl bg-[#FF5A5F]/10 flex items-center justify-center mb-8 border border-coral/20 text-left">
+                    <ShieldCheck className="w-7 h-7 text-[#FF5A5F]" />
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold mb-3 font-space">Bank-Grade Security</h3>
-                    <p className="text-zinc-400 leading-relaxed max-w-md">
-                      API keys are encrypted at rest using AES-256. Containers are ephemeral and destroyed upon termination. Your data never trains our models.
+                  <div className="text-left">
+                    <h3 className="text-3xl font-bold mb-4 font-space text-zinc-900 dark:text-white tracking-tight">Bank-Grade Security</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-lg text-lg">
+                      API keys are encrypted at rest using AES-256. Containers are ephemeral and strictly isolated. Your private conversational data never trains our models.
                     </p>
                   </div>
                 </div>
@@ -305,20 +341,20 @@ export default function LandingPage() {
         </section>
 
         {/* Platform Deployment Grid */}
-        <section className="py-24 px-4 relative border-t border-white/5">
+        <section className="py-24 px-4 relative border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#090A0F]">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 font-space tracking-tight">One-click deploy across 6 platforms.</h2>
-              <p className="text-xl text-zinc-400 font-light">Your agent, everywhere your users are.</p>
+              <h2 className="text-3xl md:text-5xl font-bold mb-4 font-space tracking-tight text-zinc-900 dark:text-white">One-click deploy across 6 platforms.</h2>
+              <p className="text-xl text-zinc-500 dark:text-zinc-400 font-light">Your agent, everywhere your users are.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { name: 'Web Chat', icon: MessageSquare, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
-                { name: 'Telegram', icon: Send, color: 'text-sky-400', bg: 'bg-sky-500/10', border: 'border-sky-500/20' },
-                { name: 'WhatsApp', icon: Phone, color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/20' },
-                { name: 'Discord', icon: MessageCircle, color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
-                { name: 'Feishu', icon: Globe, color: 'text-teal-400', bg: 'bg-teal-500/10', border: 'border-teal-500/20' },
-                { name: 'WeChat', icon: Smartphone, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+                { name: 'Web Chat', icon: MessageSquare },
+                { name: 'Telegram', icon: Send },
+                { name: 'WhatsApp', icon: Phone },
+                { name: 'Discord', icon: MessageCircle },
+                { name: 'Feishu', icon: Globe },
+                { name: 'WeChat', icon: Smartphone },
               ].map((platform, i) => (
                 <motion.div
                   key={i}
@@ -326,15 +362,15 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex items-center justify-between group hover:bg-white/10 transition-colors"
+                className="bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/5 rounded-[2rem] p-6 flex items-center justify-between group hover:border-coral/40 transition-all shadow-sm hover:shadow-xl"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl ${platform.bg} ${platform.border} border flex items-center justify-center`}>
-                      <platform.icon className={`w-6 h-6 ${platform.color}`} />
+                  <div className="flex items-center gap-4 text-left">
+                    <div className="w-14 h-14 rounded-2xl bg-[#FF5A5F]/5 border border-coral/10 flex items-center justify-center group-hover:bg-[#FF5A5F]/10 transition-colors">
+                      <platform.icon className="w-6 h-6 text-[#FF5A5F]" />
                     </div>
-                    <span className="text-lg font-medium text-white font-space">{platform.name}</span>
+                    <span className="text-lg font-bold text-zinc-900 dark:text-white font-space tracking-tight">{platform.name}</span>
                   </div>
-                  <div className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
+                  <div className="px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 text-[10px] font-black uppercase tracking-widest">
                     Included
                   </div>
                 </motion.div>
@@ -344,9 +380,9 @@ export default function LandingPage() {
         </section>
 
         {/* Integrations & Tools */}
-        <section className="py-24 px-4 relative border-t border-white/5 bg-black/50">
+        <section className="py-24 px-4 relative border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#090A0F]">
           <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-16 font-space tracking-tight">Connect Your Favorite Apps.</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-16 font-space tracking-tight text-zinc-900 dark:text-white">Connect Your Favorite Apps.</h2>
             
             <div className="flex flex-wrap justify-center gap-8 mb-20">
               {[
@@ -362,15 +398,15 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer"
+                  className="w-16 h-16 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center hover:border-coral/40 transition-all cursor-pointer shadow-md"
                 >
-                  <app.icon className="w-8 h-8 text-zinc-300" />
+                  <app.icon className="w-7 h-7 text-zinc-800 dark:text-zinc-300" />
                 </motion.div>
               ))}
             </div>
 
             <div className="max-w-3xl mx-auto">
-              <h3 className="text-xl text-zinc-400 mb-8 font-space">Extend with Open-Source Tools</h3>
+              <h3 className="text-xs text-zinc-400 dark:text-zinc-500 mb-8 font-mono uppercase tracking-[0.3em] font-black">Extend with Open-Source Tools</h3>
               <div className="flex flex-wrap justify-center gap-4">
                 {['Firecrawl', 'Playwright', 'yt-dlp', 'Puppeteer', 'FFmpeg', 'LangChain'].map((tool, i) => (
                   <motion.div
@@ -379,7 +415,7 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.05 }}
-                    className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-zinc-300 font-medium hover:border-purple-500/50 hover:text-white hover:shadow-[0_0_15px_rgba(124,58,237,0.3)] transition-all cursor-default"
+                    className="px-6 py-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-sm font-bold hover:border-coral/40 dark:hover:border-coral/40 transition-all cursor-default shadow-sm"
                   >
                     {tool}
                   </motion.div>
@@ -390,32 +426,33 @@ export default function LandingPage() {
         </section>
 
         {/* Comparison Section */}
-        <section className="py-24 px-4 relative border-t border-white/5">
+        <section className="py-24 px-4 relative border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#090A0F]">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 font-space tracking-tight">Skip the DevOps. Ship your AI Agent.</h2>
-              <p className="text-xl text-zinc-400 font-light">Why spend weeks building infrastructure when you can deploy in seconds?</p>
+              <h2 className="text-3xl md:text-5xl font-bold mb-4 font-space tracking-tight text-zinc-900 dark:text-white">Skip the VDS Setup. Host in the Cloud.</h2>
+              <p className="text-xl text-zinc-500 dark:text-zinc-400 font-light leading-relaxed">Why risk exposing your home network or leaving a PC on 24/7?</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
               {/* DIY Card */}
-              <div className="bg-white/5 border border-white/10 rounded-3xl p-8 relative overflow-hidden opacity-80">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-[50px] rounded-full" />
-                <h3 className="text-2xl font-bold mb-6 text-zinc-300 font-space flex items-center gap-2">
-                  <XCircle className="w-6 h-6 text-red-400" />
-                  DIY Hosting
+              <div className="bg-white dark:bg-[#111318] border border-gray-200 dark:border-white/5 rounded-[2.5rem] p-10 relative overflow-hidden shadow-sm">
+                <h3 className="text-2xl font-bold mb-8 text-zinc-900 dark:text-white font-space flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+                    <XCircle className="w-6 h-6 text-zinc-400" />
+                  </div>
+                  Local AI (DIY)
                 </h3>
-                <ul className="space-y-4">
+                <ul className="space-y-6">
                   {[
-                    'Provision VPS & configure Linux',
-                    'Setup Docker & networking',
-                    'Manage SSL certificates',
-                    'Build CI/CD pipelines',
-                    'Monitor uptime & logs',
-                    'Handle security patches'
+                    'Requires keeping PC on 24/7',
+                    'Manual port-forwarding required',
+                    'Exposes your home IP address',
+                    'Agent fails if network drops',
+                    'High hardware wear and tear',
+                    'Zero mobile accessibility'
                   ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-zinc-400">
-                      <XCircle className="w-5 h-5 text-red-500/50 shrink-0 mt-0.5" />
+                    <li key={i} className="flex items-start gap-4 text-zinc-500 dark:text-zinc-400 text-base">
+                      <XCircle className="w-5 h-5 text-zinc-200 dark:text-zinc-800 shrink-0 mt-0.5" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -423,23 +460,25 @@ export default function LandingPage() {
               </div>
 
               {/* ClickRunClaw Card */}
-              <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-500/30 rounded-3xl p-8 relative overflow-hidden shadow-[0_0_50px_rgba(124,58,237,0.1)]">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 blur-[80px] rounded-full" />
-                <h3 className="text-2xl font-bold mb-6 text-white font-space flex items-center gap-2">
-                  <CheckCircle2 className="w-6 h-6 text-green-400" />
-                  ClickRunClaw
+              <div className="bg-white dark:bg-[#111318] border border-coral/30 dark:border-coral/20 rounded-[2.5rem] p-10 relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(255,90,95,0.05),transparent_70%)] pointer-events-none" />
+                <h3 className="text-2xl font-bold mb-8 text-zinc-900 dark:text-white font-space flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-coral/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-coral" />
+                  </div>
+                  ClickRunClaw Cloud
                 </h3>
-                <ul className="space-y-4 relative z-10">
+                <ul className="space-y-6 relative z-10">
                   {[
-                    '1-Click deployment',
-                    'Instant secure webhook URL',
-                    'Pre-configured Docker environment',
-                    'Automatic SSL & routing',
-                    'Built-in monitoring',
-                    'Zero maintenance required'
+                    '1-Click Agent Deployment',
+                    'Instant secure HTTPS webhooks',
+                    '100% Mobile-first infrastructure',
+                    'Guaranteed 24/7 Uptime',
+                    'Isolated Docker security',
+                    'Pay-as-you-grow pricing'
                   ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-zinc-200">
-                      <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+                    <li key={i} className="flex items-start gap-4 text-zinc-800 dark:text-zinc-200 text-base font-semibold">
+                      <CheckCircle2 className="w-5 h-5 text-coral shrink-0 mt-0.5" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -450,12 +489,11 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-24 px-4 relative border-t border-white/5 bg-black/50">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 to-transparent pointer-events-none" />
+        <section className="py-24 px-4 relative border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#090A0F]">
           <div className="max-w-5xl mx-auto relative z-10">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 font-space tracking-tight">Simple pricing. <br/>Scale infinitely.</h2>
-              <p className="text-xl text-zinc-400 font-light">Start small, grow massive. Cancel anytime.</p>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 font-space tracking-tight text-zinc-900 dark:text-white">Simple pricing. <br/>Scale infinitely.</h2>
+              <p className="text-xl text-zinc-500 dark:text-zinc-400 font-light">Start small, grow massive. Cancel anytime.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -464,30 +502,32 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col"
+                className="bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/10 rounded-[2.5rem] p-12 flex flex-col shadow-xl"
               >
-                <h3 className="text-2xl font-bold mb-2 font-space">Starter</h3>
-                <p className="text-zinc-400 mb-6">Perfect for testing and small projects.</p>
-                <div className="flex items-baseline gap-1 mb-8">
-                  <span className="text-5xl font-extrabold tracking-tighter">$9</span>
-                  <span className="text-xl text-zinc-400 font-medium">/month</span>
+                <h3 className="text-2xl font-bold mb-2 font-space text-zinc-900 dark:text-zinc-100">Starter</h3>
+                <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-sm">Perfect for testing and small projects.</p>
+                <div className="flex items-baseline gap-1 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
+                  <span className="text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$9</span>
+                  <span className="text-base text-zinc-500 font-medium">/month</span>
                 </div>
-                <ul className="flex flex-col gap-4 mb-10 flex-grow">
+                <ul className="flex flex-col gap-5 mb-10 flex-grow">
                   {[
                     '1 Active Agent',
                     'Standard Support',
                     'Community Plugins',
                     'Basic Analytics'
                   ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-zinc-500 shrink-0" />
-                      <span className="text-zinc-300">{feature}</span>
+                    <li key={i} className="flex items-center gap-4">
+                      <div className="w-5 h-5 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-zinc-300 dark:text-zinc-500" />
+                      </div>
+                      <span className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 <Link 
                   href="/auth"
-                  className="flex items-center justify-center w-full min-h-[56px] rounded-full bg-white/10 border border-white/20 text-white font-bold hover:bg-white/20 transition-colors"
+                  className="flex items-center justify-center w-full h-14 rounded-full bg-zinc-900 dark:bg-zinc-800 border border-zinc-800 dark:border-zinc-700 text-white font-bold text-base hover:bg-zinc-800 dark:hover:bg-zinc-700 transition-all hover:scale-[1.02] shadow-lg"
                 >
                   Get Started
                 </Link>
@@ -499,20 +539,20 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
-                className="relative bg-gradient-to-b from-purple-900/40 to-black backdrop-blur-xl border border-purple-500/50 rounded-[2rem] p-8 flex flex-col shadow-[0_0_40px_rgba(124,58,237,0.15)]"
+                className="relative bg-white dark:bg-[#111318] border border-coral/40 dark:border-coral/20 rounded-[2.5rem] p-12 flex flex-col shadow-[0_15px_60px_rgba(255,90,95,0.15)]"
               >
                 <div className="absolute top-0 right-8 -translate-y-1/2">
-                  <span className="bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  <span className="bg-coral text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-[0_4px_10px_rgba(255,90,95,0.4)]">
                     Most Popular
                   </span>
                 </div>
-                <h3 className="text-2xl font-bold mb-2 font-space text-white">Pro</h3>
-                <p className="text-purple-200/70 mb-6">For serious builders and agencies.</p>
-                <div className="flex items-baseline gap-1 mb-8">
-                  <span className="text-5xl font-extrabold tracking-tighter text-white">$29</span>
-                  <span className="text-xl text-purple-200/50 font-medium">/month</span>
+                <h3 className="text-2xl font-bold mb-2 font-space text-zinc-900 dark:text-white">Pro</h3>
+                <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-sm">For serious builders and agencies.</p>
+                <div className="flex items-baseline gap-1 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
+                  <span className="text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$29</span>
+                  <span className="text-base text-zinc-500 font-medium">/month</span>
                 </div>
-                <ul className="flex flex-col gap-4 mb-10 flex-grow">
+                <ul className="flex flex-col gap-5 mb-10 flex-grow">
                   {[
                     '5 Active Agents',
                     'Priority 24/7 Support',
@@ -521,15 +561,17 @@ export default function LandingPage() {
                     'Custom Domains',
                     'White-label Webhooks'
                   ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-purple-400 shrink-0" />
-                      <span className="text-zinc-100">{feature}</span>
+                    <li key={i} className="flex items-center gap-4">
+                      <div className="w-5 h-5 rounded-full bg-coral/10 flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-coral" />
+                      </div>
+                      <span className="text-zinc-800 dark:text-zinc-200 text-sm font-semibold">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 <Link 
                   href="/auth"
-                  className="flex items-center justify-center w-full min-h-[56px] rounded-full bg-white text-black font-bold hover:bg-zinc-200 transition-colors hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+                  className="flex items-center justify-center w-full h-14 rounded-full bg-coral text-white font-bold text-base hover:bg-coral-hover transition-all shadow-[0_4px_25px_rgba(255,90,95,0.4)] hover:scale-[1.02]"
                 >
                   Go Pro
                 </Link>
@@ -539,31 +581,35 @@ export default function LandingPage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-24 px-4 relative border-t border-white/5">
-          <div className="max-w-3xl mx-auto">
+        <section className="py-24 px-4 relative border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#090A0F]">
+          <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 font-space tracking-tight">Frequently Asked Questions</h2>
+              <h2 className="text-3xl md:text-5xl font-bold mb-4 font-space tracking-tight text-zinc-900 dark:text-white">Frequently Asked Questions</h2>
+              <p className="text-zinc-500 dark:text-zinc-400 font-light">Everything you need to know about ClickRunClaw.</p>
             </div>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
                 {
-                  q: "Do I need to know how to use Docker?",
-                  a: "Not at all. We handle all the containerization, networking, and deployment behind the scenes. You just click deploy."
+                  q: "What is ClickRunClaw, and how does it help?",
+                  a: "ClickRunClaw provides a 1-Click Cloud Hosting solution for AI agents. We spin up your agent instantly in the cloud so you don't need any technical knowledge."
                 },
                 {
-                  q: "Can I use my own API keys?",
-                  a: "Yes! You bring your own API keys for LLMs (OpenAI, Anthropic, DeepSeek, etc.). We don&apos;t mark up your AI usage."
+                  q: "How does it compare to local hosting?",
+                  a: "Running locally means keeping your PC on 24/7. ClickRunClaw handles all containerization and server management. You get guaranteed 24/7 uptime and secure HTTPS webhooks out-of-the-box."
                 },
                 {
-                  q: "How fast is the deployment?",
-                  a: "Thanks to our warm-pooling technology, your agent is typically live and ready to receive webhooks in under 30 seconds."
+                  q: "Is my data and API key safe in the cloud?",
+                  a: "Absolutely. Every agent runs in a strictly isolated Docker container. Your API keys are encrypted at rest using AES-256."
                 },
                 {
-                  q: "Is my data secure?",
-                  a: "Absolutely. Each agent runs in an isolated container. API keys are encrypted at rest, and we never use your data for training."
+                  q: "Can I cancel my subscription anytime?",
+                  a: "Yes. We offer no-contract monthly billing. You can upgrade, downgrade, or cancel your subscription directly from your dashboard at any time."
                 }
               ].map((faq, i) => (
-                <FAQItem key={i} question={faq.q} answer={faq.a} />
+                <div key={i} className="bg-zinc-50 dark:bg-[#111318] border border-zinc-100 dark:border-zinc-900 rounded-3xl p-8 shadow-sm">
+                  <h4 className="font-bold text-zinc-900 dark:text-zinc-200 mb-4 font-space text-lg">{faq.q}</h4>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">{faq.a}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -571,19 +617,51 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-white/10 bg-black relative z-10">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 font-bold text-lg font-space">
-            <TerminalSquare className="w-5 h-5 text-purple-500" />
-            <span>ClickRunClaw</span>
+      <footer className="py-20 border-t border-zinc-100 dark:border-white/5 bg-white dark:bg-[#090A0F] relative z-10 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-12 relative z-10">
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <Link href="/" className="flex items-center gap-3 font-bold text-2xl font-space text-zinc-900 dark:text-white group">
+              <div className="w-10 h-10 rounded-full bg-coral flex items-center justify-center text-white shadow-[0_4px_15px_rgba(255,90,95,0.3)] group-hover:rotate-12 transition-transform">
+                <TerminalSquare className="w-5 h-5" />
+              </div>
+              <span className="tracking-tighter">ClickRunClaw</span>
+            </Link>
+            <p className="text-zinc-400 dark:text-zinc-500 text-sm font-medium max-w-xs text-center md:text-left">
+              The premium 1-Click cloud hosting for OpenClaw AI agents. Fast, secure, and infinitely scalable.
+            </p>
           </div>
-          <p className="text-zinc-500 text-sm">
-            &copy; {new Date().getFullYear()} ClickRunClaw. All rights reserved.
+          
+          <div className="flex flex-wrap justify-center gap-10 md:gap-16">
+            <div className="flex flex-col gap-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-300 dark:text-zinc-700">Platform</span>
+              <div className="flex flex-col gap-2 text-sm font-bold">
+                <Link href="/dashboard" className="text-zinc-500 hover:text-coral transition-colors">Dashboard</Link>
+                <Link href="#features" className="text-zinc-500 hover:text-coral transition-colors">Infrastructure</Link>
+                <Link href="#pricing" className="text-zinc-500 hover:text-coral transition-colors">Pricing</Link>
+              </div>
+            </div>
+            <div className="flex flex-col gap-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-300 dark:text-zinc-700">Legal</span>
+              <div className="flex flex-col gap-2 text-sm font-bold">
+                <Link href="/privacy" className="text-zinc-500 hover:text-coral transition-colors">Privacy Policy</Link>
+                <Link href="/terms" className="text-zinc-500 hover:text-coral transition-colors">Terms of Service</Link>
+                <Link href="/security" className="text-zinc-500 hover:text-coral transition-colors">Security</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 mt-20 pt-8 border-t border-zinc-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+          <p className="text-zinc-400 dark:text-zinc-600 text-xs font-bold uppercase tracking-widest">
+            &copy; {new Date().getFullYear()} ClickRunClaw. Made with precision.
           </p>
-          <div className="flex gap-6 text-sm text-zinc-500">
-            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-white transition-colors">Contact</Link>
+          <div className="flex gap-6">
+            <button className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
+              <Github className="w-5 h-5" />
+            </button>
+            <button className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
+              <X className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </footer>
@@ -595,13 +673,15 @@ function FAQItem({ question, answer }: { question: string, answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border border-white/10 bg-white/5 rounded-2xl overflow-hidden">
+    <div className="border border-zinc-200 dark:border-zinc-900 bg-white dark:bg-zinc-950/50 rounded-2xl overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-800 transition-colors shadow-sm">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+        className="w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none group"
       >
-        <span className="font-medium text-lg font-space">{question}</span>
-        <ChevronDown className={`w-5 h-5 text-zinc-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <span className="font-bold text-lg font-space text-zinc-900 dark:text-zinc-200 group-hover:text-coral transition-colors">{question}</span>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center border border-zinc-200 dark:border-zinc-800 transition-all ${isOpen ? 'bg-coral border-coral rotate-180 text-white' : 'bg-transparent text-zinc-400'}`}>
+          <ChevronDown className="w-4 h-4" />
+        </div>
       </button>
       <AnimatePresence>
         {isOpen && (
@@ -611,7 +691,7 @@ function FAQItem({ question, answer }: { question: string, answer: string }) {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="px-6 pb-5 text-zinc-400 leading-relaxed">
+            <div className="px-8 pb-6 text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
               {answer}
             </div>
           </motion.div>

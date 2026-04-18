@@ -3,62 +3,76 @@
 import { motion } from 'motion/react';
 import { TerminalSquare, ArrowLeft, Calendar, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const blogPosts = [
   {
     id: 1,
-    title: "How to Deploy OpenClaw in 10 Seconds without a Mac Mini",
-    excerpt: "Skip the expensive hardware. Learn how our warm-pooling Docker architecture lets you spin up OpenClaw instantly from your smartphone.",
-    date: "April 14, 2026",
+    title: "How to Deploy AI Agents in 10 Seconds",
+    excerpt: "Skip the complex hardware setups. Learn how our one-click cloud architecture lets you spin up OpenClaw agents instantly.",
+    date: "April 18, 2026",
     category: "Tutorial",
-    gradient: "from-purple-600/40 to-blue-600/40"
+    image: "https://picsum.photos/seed/cloud/800/600"
   },
   {
     id: 2,
-    title: "Securing your AI Agents: Why Docker Isolation Matters",
-    excerpt: "Dive deep into the security architecture of ClickRunClaw. Discover how namespace jails and AES-256-GCM encryption keep your API keys safe.",
-    date: "April 10, 2026",
+    title: "Securing Your Keys: AES-256-GCM Deep Dive",
+    excerpt: "Discover how namespace jails and high-grade encryption keep your sensitive API credentials safe from prying eyes.",
+    date: "April 15, 2026",
     category: "Security",
-    gradient: "from-blue-600/40 to-emerald-600/40"
+    image: "https://picsum.photos/seed/security/800/600"
   },
   {
     id: 3,
-    title: "The Future of OpenClaw: Integrating Telegram and Discord Bots",
-    excerpt: "Explore the upcoming webhook integrations that will allow your OpenClaw agents to communicate seamlessly across major messaging platforms.",
-    date: "April 5, 2026",
-    category: "Product Updates",
-    gradient: "from-orange-600/40 to-purple-600/40"
+    title: "The Roadmap: Telegram & Discord Hub",
+    excerpt: "Explore the upcoming integrations that will allow your ClickRunClaw agents to dominate major messaging platforms.",
+    date: "April 10, 2026",
+    category: "Product",
+    image: "https://picsum.photos/seed/ai/800/600"
   }
 ];
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-purple-500/30 font-sans relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-purple-900/20 to-transparent pointer-events-none -z-10" />
-      
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 selection:bg-coral selection:text-white font-sans relative overflow-x-hidden">
+      {/* Background Dots Overlay */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.4]">
+        <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
+      </div>
+
       {/* Header */}
-      <header className="px-6 py-6 border-b border-white/5 relative z-10 flex items-center justify-between max-w-7xl mx-auto">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl font-space hover:opacity-80 transition-opacity">
-          <TerminalSquare className="w-6 h-6 text-purple-500" />
-          <span>ClickRunClaw</span>
-        </Link>
-        <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> Back to Home
-        </Link>
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 dark:border-white/5 bg-[#FAFAFA]/80 dark:bg-[#090A0F]/80 backdrop-blur-xl">
+        <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tighter font-space text-zinc-900 dark:text-white group">
+            <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,90,95,0.3)] group-hover:scale-110 transition-transform">
+              <TerminalSquare className="w-4 h-4" />
+            </div>
+            <span>ClickRunClaw</span>
+          </Link>
+          <Link href="/" className="text-xs font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 hover:text-coral transition-colors flex items-center gap-2 group">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Home</span>
+          </Link>
+        </nav>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-20 relative z-10">
+      <main className="max-w-7xl mx-auto px-6 pt-40 pb-20 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-20"
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-24"
         >
-          <h1 className="text-4xl md:text-6xl font-bold font-space mb-6 tracking-tight">
-            The ClickRunClaw <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Journal</span>
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-coral/20 bg-coral/5 text-[10px] md:text-xs text-coral font-bold tracking-wider uppercase mb-8">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Latest Updates</span>
+          </div>
+          <h1 className="text-5xl md:text-8xl font-black font-space mb-8 tracking-tighter text-zinc-900 dark:text-white leading-[0.9]">
+            The Engineering <br className="hidden md:block" />
+            <span className="text-coral">Journal.</span>
           </h1>
-          <p className="text-xl text-zinc-400 max-w-2xl mx-auto font-light">
-            Insights, tutorials, and updates from the engineering team at CryptoWebBuild.
+          <p className="text-xl text-zinc-500 dark:text-zinc-500 max-w-2xl mx-auto font-light leading-relaxed">
+            Insights, technical deep dives, and platform news from the ClickRunClaw team.
           </p>
         </motion.div>
 
@@ -66,39 +80,48 @@ export default function BlogPage() {
           {blogPosts.map((post, i) => (
             <motion.article 
               key={post.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden group hover:border-purple-500/30 transition-colors flex flex-col"
+              transition={{ delay: i * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-white dark:bg-[#111318] border border-gray-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden group hover:border-coral/20 transition-all flex flex-col shadow-sm hover:shadow-2xl hover:shadow-coral/5"
             >
-              {/* Mock Image Area */}
-              <div className={`h-48 w-full bg-gradient-to-br ${post.gradient} relative overflow-hidden`}>
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
-                <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle at center, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+              {/* Image Area */}
+              <div className="h-60 w-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                <div className="absolute inset-0 bg-coral opacity-0 group-hover:opacity-10 transition-opacity z-10" />
+                <Image 
+                  src={post.image} 
+                  alt={post.title} 
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  priority={i < 2}
+                  referrerPolicy="no-referrer"
+                />
               </div>
               
-              <div className="p-8 flex flex-col flex-1">
-                <div className="flex items-center gap-4 mb-4 text-xs font-medium">
-                  <span className="text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+              <div className="p-10 flex flex-col flex-1">
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#FF5A5F] bg-[#FF5A5F]/5 border border-[#FF5A5F]/10 px-4 py-1.5 rounded-full">
                     {post.category}
                   </span>
-                  <span className="text-zinc-500 flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
                     {post.date}
                   </span>
                 </div>
                 
-                <h2 className="text-2xl font-bold font-space mb-4 group-hover:text-purple-300 transition-colors">
+                <h2 className="text-2xl font-bold font-space mb-4 text-zinc-900 dark:text-white group-hover:text-coral transition-colors tracking-tight">
                   {post.title}
                 </h2>
                 
-                <p className="text-zinc-400 leading-relaxed mb-8 flex-1">
+                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed mb-10 flex-1 font-light text-base">
                   {post.excerpt}
                 </p>
                 
-                <Link href="#" className="inline-flex items-center gap-2 text-sm font-bold text-white group-hover:text-purple-400 transition-colors mt-auto">
-                  Read Article <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <Link href="#" className="inline-flex items-center gap-3 text-sm font-bold text-zinc-900 dark:text-white group/btn">
+                  <span>Read Article</span>
+                  <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center group-hover/btn:bg-coral group-hover/btn:text-white transition-all shadow-sm">
+                    <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+                  </div>
                 </Link>
               </div>
             </motion.article>
@@ -106,9 +129,12 @@ export default function BlogPage() {
         </div>
       </main>
 
-      <footer className="py-8 border-t border-white/5 text-center text-zinc-500 text-sm relative z-10 mt-12">
-        <p>Engineered with precision by <span className="text-zinc-300 font-medium">CryptoWebBuild</span>.</p>
-        <p className="mt-2">&copy; {new Date().getFullYear()} ClickRunClaw. All rights reserved.</p>
+      <footer className="py-20 border-t border-zinc-200 dark:border-white/5 bg-white dark:bg-[#090A0F] relative z-10">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-zinc-400 dark:text-zinc-500 text-sm font-bold uppercase tracking-[0.4em]">
+            &copy; {new Date().getFullYear()} ClickRunClaw. Made with precision.
+          </p>
+        </div>
       </footer>
     </div>
   );

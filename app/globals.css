@@ -3,11 +3,53 @@
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-space: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  /* Brand Color: Soft Coral Red */
+  --color-coral: #FF5A5F;
+  --color-coral-hover: #fa4a4a;
+  --color-zinc-950: #0a0a0a;
+}
+
+@layer base {
+  * {
+    @apply border-zinc-900;
+  }
+  body {
+    @apply bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 antialiased;
+  }
+  
+  /* Global Scrollbar Stability */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #090A0F;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #181920;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #27272a;
+  }
 }
 
 @layer utilities {
-  .bg-grid-white {
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  .bg-grid-dots {
+    background-image: radial-gradient(circle, rgba(255, 90, 95, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  
+  .text-glow-coral {
+    text-shadow: 0 0 20px rgba(255, 90, 95, 0.4);
+  }
+  
+  .glass-card {
+    @apply bg-white/50 dark:bg-[#111318]/50 backdrop-blur-xl border border-gray-200 dark:border-white/5 shadow-2xl;
+  }
+
+  .terminal-shadow {
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
   }
 }
