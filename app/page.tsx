@@ -44,7 +44,7 @@ export default function LandingPage() {
             className="mb-10 relative"
           >
             <div className="absolute inset-0 bg-coral rounded-full blur-[80px] opacity-10" />
-            <div className="relative w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden border border-white/10 dark:border-white/5 bg-[#0D1117] shadow-2xl flex items-center justify-center p-4">
+            <div className="relative w-44 h-44 md:w-64 md:h-64 rounded-full overflow-hidden border border-white/10 dark:border-white/5 bg-[#0D1117] shadow-2xl flex items-center justify-center p-2 md:p-3">
               <div className="w-full h-full relative">
                 <Image 
                   src="/mascot.webp" 
