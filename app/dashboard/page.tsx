@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon } from 'lucide-react';
