@@ -1,0 +1,4 @@
+## 2024-05-20 - Unauthenticated Webhooks Allowing Unauthorized Account Upgrades
+**Vulnerability:** The Whop webhook handler (`app/api/whop/route.ts`) accepted payment success events without verifying their authenticity, allowing attackers to spoof webhooks and arbitrarily upgrade accounts to "pro" status without making an actual payment.
+**Learning:** Webhooks, especially those related to payments and authorizations, must always be verified using cryptographic signatures to ensure they originate from the expected service provider. The absence of this check can lead to severe business logic bypasses.
+**Prevention:** Implement signature validation for all incoming webhooks using libraries provided by the service (e.g., `svix` for Whop) or manual HMAC verification. Ensure the secret keys used for verification are securely stored as environment variables.
