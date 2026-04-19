@@ -7,6 +7,7 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://clickrunclaw.com'),
   title: "ClickRunClaw | The #1 OpenClaw AI Agent Cloud Hosting",
   description: "Deploy, run, and scale OpenClaw AI agents in 1-click. Stop local hosting—use ClickRunClaw for 24/7 uptime, secure webhooks, and instant Telegram/Discord integration.",
   keywords: ['OpenClaw', 'AI Agent Hosting', '1-Click OpenClaw Deployment', 'Cloud Infrastructure for Agents', 'OpenClaw AI', 'OpenClaw Agent', 'Deploy OpenClaw', 'ClickRunClaw'],
@@ -17,6 +18,9 @@ export const metadata: Metadata = {
     email: false,
     address: false,
     telephone: false,
+  },
+  alternates: {
+    canonical: 'https://clickrunclaw.com',
   },
   openGraph: {
     title: 'ClickRunClaw | The #1 OpenClaw AI Agent Hosting',
@@ -73,12 +77,12 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
               "operatingSystem": "Web",
               "offers": {
                 "@type": "Offer",
-                "price": "9.00",
+                "price": "9.99",
                 "priceCurrency": "USD"
               },
               "description": "Deploy and host your OpenClaw and Web3 AI agents instantly with our zero-configuration cloud infrastructure.",
               "url": "https://clickrunclaw.com",
-              "keywords": "openclaw, openclaw ai agent, deploy openclaw, openclaw cloud hosting, openclawd alternative"
+              "keywords": "openclaw, openclaw ai agent, deploy openclaw, openclaw cloud hosting, openclaw alternative"
             })
           }}
         />

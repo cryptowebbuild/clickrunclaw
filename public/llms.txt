@@ -1,0 +1,23 @@
+# ClickRunClaw - LLM Documentation
+
+> Enterprise-Grade Cloud Hosting for OpenClaw AI Agents. 1-Click Deployment.
+
+ClickRunClaw is a BYOK (Bring Your Own Key) SaaS platform designed to host OpenClaw AI agents effortlessly. Users can deploy OpenClaw agents in seconds without managing Linux VPS instances, dealing with Ngrok, or keeping their local PCs running 24/7.
+
+## Key Features
+- **1-Click Deploy:** Spin up an agent instantly.
+- **BYOK Identity:** Securely use your own LLM API keys (OpenAI, Anthropic, DeepSeek). No markups.
+- **Automated Webhooks:** Instant integration with Telegram bots and Discord without Ngrok.
+- **Isolated Containers:** Enterprise security with SQLite auto-backups.
+
+## Pricing Tiers
+- **Starter Node ($9.99/mo):** 1 Active Agent, 24/7 Uptime, Standard Support, AES-256 Key Vault.
+- **Pro Core ($29.99/mo):** Up to 5 Active Agents, Premium Plugins, Custom Domains, White-label Support.
+
+## Technical Details
+The platform manages SQLite databases intrinsically, runs on edge and containerized infrastructure, and automatically connects endpoints to external chat applications.
+
+## External Links
+- Main Website: https://clickrunclaw.com
+- User Dashboard: https://clickrunclaw.com/dashboard
+- Authentication: https://clickrunclaw.com/auth

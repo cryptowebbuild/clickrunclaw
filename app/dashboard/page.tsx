@@ -71,8 +71,8 @@ export default function DashboardOverview() {
       const data = await res.json();
       
       if (!res.ok) {
-        if (data.error === 'PAYWALL') {
-           setShowUpgradeModal(true);
+        if (data.error === 'PAYWALL' || data.error === 'PAYWALL_MAX') {
+           if (data.error === 'PAYWALL') setShowUpgradeModal(true);
            throw new Error(data.message);
         }
         throw new Error(data.error || 'Deployment failed');
@@ -255,9 +255,15 @@ export default function DashboardOverview() {
               Starter Pod
             </h3>
             <p className="text-zinc-500 dark:text-zinc-400 mb-6 h-12">Perfect for testing and small personal projects.</p>
-            <div className="flex items-baseline gap-1 mb-8">
-              <span className="text-5xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$9</span>
-              <span className="text-xl text-zinc-500 font-medium">/month</span>
+            <div className="flex flex-col gap-2 mb-8">
+              <div className="flex items-center gap-3">
+                <span className="text-xl text-zinc-400 dark:text-zinc-600 line-through font-medium">$12.49</span>
+                <span className="text-[10px] sm:text-xs font-bold bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-full uppercase tracking-wider">Save 20%</span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-5xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$9.99</span>
+                <span className="text-xl text-zinc-500 font-medium">/month</span>
+              </div>
             </div>
             <ul className="flex flex-col gap-4 mb-10">
               {[
@@ -301,9 +307,15 @@ export default function DashboardOverview() {
               Pro Pod
             </h3>
             <p className="text-zinc-500 dark:text-zinc-400 mb-8 h-12 text-sm leading-relaxed">For serious builders and production deployments.</p>
-            <div className="flex items-baseline gap-1 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
-              <span className="text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$29</span>
-              <span className="text-base text-zinc-500 font-medium">/month</span>
+            <div className="flex flex-col gap-2 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
+              <div className="flex items-center gap-3">
+                <span className="text-xl text-zinc-400 dark:text-zinc-600 line-through font-medium">$49.98</span>
+                <span className="text-[10px] sm:text-xs font-bold bg-coral text-white px-2 py-0.5 rounded-full uppercase tracking-wider shadow-[0_2px_10px_rgba(255,90,95,0.4)]">Save 40%</span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$29.99</span>
+                <span className="text-base text-zinc-500 font-medium">/month</span>
+              </div>
             </div>
             <ul className="flex flex-col gap-5 mb-10">
               {[
@@ -383,7 +395,7 @@ export default function DashboardOverview() {
                     target="_blank" rel="noreferrer"
                     className="block w-full py-5 px-8 bg-zinc-50 dark:bg-zinc-950 hover:bg-white dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-900 rounded-full text-zinc-900 dark:text-white font-bold transition-all flex items-center justify-between group shadow-sm"
                   >
-                    <span className="flex items-center gap-3 text-base"><Server className="w-5 h-5 text-coral/60" /> Starter Pod ($9/mo)</span>
+                    <span className="flex items-center gap-3 text-base"><Server className="w-5 h-5 text-coral/60" /> Starter Pod ($9.99/mo)</span>
                     <span className="text-[10px] bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-white px-4 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 uppercase tracking-widest font-black group-hover:bg-zinc-900 dark:group-hover:bg-coral transition-all">Select</span>
                   </a>
                   
@@ -392,7 +404,7 @@ export default function DashboardOverview() {
                     target="_blank" rel="noreferrer"
                     className="block w-full py-5 px-8 bg-coral hover:bg-coral-hover rounded-full text-white font-bold transition-all flex items-center justify-between group shadow-[0_4px_25px_rgba(255,90,95,0.4)]"
                   >
-                    <span className="flex items-center gap-3 text-base"><Zap className="w-5 h-5 text-white" /> Pro Pod ($29/mo)</span>
+                    <span className="flex items-center gap-3 text-base"><Zap className="w-5 h-5 text-white" /> Pro Pod ($29.99/mo)</span>
                     <span className="text-[10px] bg-white text-coral px-4 py-1.5 rounded-full uppercase tracking-widest font-black shadow-lg">Best Value</span>
                   </a>
                 </div>

@@ -23,14 +23,18 @@ export async function POST(req: Request) {
       // Whop payload structures can vary safely extract the email
       const email = body.data?.user?.email || body.data?.email || body.email;
       
-      // Update the user's profile to 'Pro' based on their email
+      // Attempt to identify if they bought the Pro pack by looking for 'pro' in the payload details
+      const payloadString = JSON.stringify(body).toLowerCase();
+      const assignedTier = payloadString.includes('pro') ? 'pro' : 'starter';
+
+      // Update the user's profile to their new tier based on their email
       if (email) {
         // 1. Find the user ID from the email (requires checking auth users or profiles)
         // Since we are using Supabase, we can update the profile where email matches,
         // or we expect the user to have added their email to the profile table.
         const { error } = await supabaseAdmin
           .from('profiles')
-          .update({ plan_tier: 'Pro' })
+          .update({ plan_tier: assignedTier })
           .eq('email', email);
 
         if (error) {
@@ -38,8 +42,8 @@ export async function POST(req: Request) {
           return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
         }
 
-        console.log(`Successfully upgraded user ${email} to Pro tier via Whop.`);
-        return NextResponse.json({ success: true, message: "User upgraded to Pro" });
+        console.log(`Successfully upgraded user ${email} to ${assignedTier} tier via Whop.`);
+        return NextResponse.json({ success: true, message: `User upgraded to ${assignedTier}` });
       }
     }
 

@@ -46,7 +46,7 @@ export default function BillingPage() {
               </span>
             </div>
             <div className="flex items-end gap-2 mb-10">
-              <span className="text-5xl font-black text-zinc-900 dark:text-white tracking-tighter">$29</span>
+              <span className="text-5xl font-black text-zinc-900 dark:text-white tracking-tighter">$29.99</span>
               <span className="text-zinc-500 dark:text-zinc-500 mb-2 font-bold text-lg">/ per month</span>
             </div>
             
@@ -94,8 +94,8 @@ export default function BillingPage() {
             </thead>
             <tbody>
               {[
-                { date: 'Apr 12, 2026', desc: 'Secure Pro Hosting - Monthly', amount: '$29.00', status: 'Paid' },
-                { date: 'Mar 12, 2026', desc: 'Secure Pro Hosting - Monthly', amount: '$29.00', status: 'Paid' },
+                { date: 'Apr 12, 2026', desc: 'Secure Pro Hosting - Monthly', amount: '$29.99', status: 'Paid' },
+                { date: 'Mar 12, 2026', desc: 'Secure Pro Hosting - Monthly', amount: '$29.99', status: 'Paid' },
                 { date: 'Feb 12, 2026', desc: 'Advanced Credit Recharge', amount: '$50.00', status: 'Paid' },
               ].map((invoice, i) => (
                 <tr key={i} className="border-b border-zinc-50 dark:border-white/5 last:border-0 text-sm group">

@@ -20,12 +20,37 @@ export async function POST(req: Request) {
       .eq('id', user.id)
       .single();
 
-    const planTier = profile?.plan_tier || 'free';
+    const planTier = profile?.plan_tier?.toLowerCase() || 'free';
     
     if (planTier === 'free') {
       return NextResponse.json({ 
         error: 'PAYWALL', 
         message: 'You are on the Free Tier. Please upgrade your plan to deploy OpenClaw Agents.' 
+      }, { status: 403 });
+    }
+
+    // --- AGENT LIMIT LOGIC ---
+    // Count how many agents the user currently has
+    const { count, error: countError } = await supabase
+      .from('agents')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    const currentAgentCount = count || 0;
+
+    // Enforce Starter Limit (1 Agent)
+    if (planTier === 'starter' && currentAgentCount >= 1) {
+      return NextResponse.json({ 
+        error: 'PAYWALL', 
+        message: 'Starter plan limit reached (1/1 Agents). Please upgrade to Pro to deploy up to 5 agents.' 
+      }, { status: 403 });
+    }
+
+    // Enforce Pro Limit (5 Agents)
+    if (planTier === 'pro' && currentAgentCount >= 5) {
+      return NextResponse.json({ 
+        error: 'PAYWALL_MAX', 
+        message: 'Pro plan limit reached (5/5 Agents). Contact support for Enterprise.' 
       }, { status: 403 });
     }
 

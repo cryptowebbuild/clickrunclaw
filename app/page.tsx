@@ -34,23 +34,23 @@ export default function LandingPage() {
 
       <main className="relative z-10">
         {/* Hero Section */}
-        <section className="pt-32 pb-20 px-4 md:pt-40 md:pb-32 max-w-7xl mx-auto flex flex-col items-center text-center">
+        <section className="pt-20 pb-16 px-4 md:pt-40 md:pb-32 max-w-7xl mx-auto flex flex-col items-center text-center">
           
           {/* Mascot */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-10 relative"
+            className="mb-6 md:mb-10 relative"
           >
             <div className="absolute inset-0 bg-coral rounded-full blur-[80px] opacity-10" />
-            <div className="relative w-44 h-44 md:w-64 md:h-64 rounded-full overflow-hidden border border-white/10 dark:border-white/5 bg-[#0D1117] shadow-2xl flex items-center justify-center p-2 md:p-3">
+            <div className="relative w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden border border-white/10 dark:border-white/5 bg-[#0D1117] shadow-2xl flex items-center justify-center p-0">
               <div className="w-full h-full relative">
                 <Image 
                   src="/mascot.webp" 
                   alt="ClickRunClaw Mascot" 
                   fill 
-                  className="object-contain" 
+                  className="object-cover scale-110" 
                   priority
                 />
               </div>
@@ -61,18 +61,18 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center gap-8 mb-12"
+            className="flex flex-col items-center gap-6 md:gap-8 mb-8 md:mb-12"
           >
-            <h1 className="text-5xl md:text-8xl font-black tracking-tighter font-space text-zinc-900 dark:text-white leading-[1.1] flex flex-col items-center">
+            <h1 className="text-[2.75rem] md:text-8xl font-black tracking-tighter font-space text-zinc-900 dark:text-white leading-[1.1] flex flex-col items-center">
               Deploy Your <span className="text-coral">OpenClaw Agent</span> in 1 Second.
             </h1>
             
-            <div className="flex flex-col items-center gap-5">
-              <h2 className="text-[#FF5A5F] font-mono font-bold tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs uppercase bg-[#FF5A5F]/5 px-6 py-2 rounded-full border border-[#FF5A5F]/10">
+            <div className="flex flex-col items-center gap-4 md:gap-5">
+              <h2 className="text-[#FF5A5F] font-mono font-bold tracking-[0.2em] md:tracking-[0.4em] text-[9px] md:text-xs uppercase bg-[#FF5A5F]/5 px-6 py-2 rounded-full border border-[#FF5A5F]/10">
                 SCALABLE CLOUD FOR OPENCLAW
               </h2>
               
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-coral/20 bg-coral/5 text-[10px] md:text-xs text-coral font-bold tracking-wider uppercase shadow-[0_0_20px_rgba(255,90,95,0.1)]">
+              <div className="inline-flex items-center gap-2 px-4 md:px-5 py-2 rounded-full border border-coral/20 bg-coral/5 text-[9px] md:text-xs text-coral font-bold tracking-wider uppercase shadow-[0_0_20px_rgba(255,90,95,0.1)]">
                 <Zap className="w-3.5 h-3.5 fill-coral" />
                 <span>Zero Config • 24/7 Uptime • Auto-Webhooks</span>
               </div>
@@ -83,7 +83,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-lg md:text-xl text-zinc-500 dark:text-zinc-400 mb-12 max-w-2xl font-medium leading-relaxed"
+            className="text-base md:text-xl text-zinc-500 dark:text-zinc-400 mb-8 md:mb-12 max-w-2xl font-medium leading-relaxed"
           >
             Stop hosting OpenClaw locally. Run your AI Agents on our premium 24/7 cloud infrastructure. Get instant Telegram & Discord webhooks in 1-click.
           </motion.p>
@@ -92,7 +92,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0 mb-24"
+            className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto px-4 sm:px-0 mb-16 md:mb-24"
           >
             <Link 
               href="/auth"
@@ -423,9 +423,15 @@ export default function LandingPage() {
               >
                 <h3 className="text-2xl font-bold mb-2 font-space text-zinc-900 dark:text-zinc-100">Starter</h3>
                 <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-sm">Perfect for testing and small projects.</p>
-                <div className="flex items-baseline gap-1 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
-                  <span className="text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$9</span>
-                  <span className="text-base text-zinc-500 font-medium">/month</span>
+                <div className="flex flex-col gap-2 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl text-zinc-400 dark:text-zinc-600 line-through font-medium">$12.49</span>
+                    <span className="text-[10px] sm:text-xs font-bold bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-full uppercase tracking-wider">Save 20%</span>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$9.99</span>
+                    <span className="text-base text-zinc-500 font-medium">/month</span>
+                  </div>
                 </div>
                 <ul className="flex flex-col gap-5 mb-10 flex-grow">
                   {[
@@ -466,9 +472,15 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-2xl font-bold mb-2 font-space text-zinc-900 dark:text-white">Pro</h3>
                 <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-sm">For serious builders and agencies.</p>
-                <div className="flex items-baseline gap-1 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
-                  <span className="text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$29</span>
-                  <span className="text-base text-zinc-500 font-medium">/month</span>
+                <div className="flex flex-col gap-2 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl text-zinc-400 dark:text-zinc-600 line-through font-medium">$49.98</span>
+                    <span className="text-[10px] sm:text-xs font-bold bg-coral text-white px-2 py-0.5 rounded-full uppercase tracking-wider shadow-[0_2px_10px_rgba(255,90,95,0.4)]">Save 40%</span>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-white">$29.99</span>
+                    <span className="text-base text-zinc-500 font-medium">/month</span>
+                  </div>
                 </div>
                 <ul className="flex flex-col gap-5 mb-10 flex-grow">
                   {[
@@ -509,20 +521,20 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
                 {
-                  q: "What is ClickRunClaw, and how does it help?",
-                  a: "ClickRunClaw provides a 1-Click Cloud Hosting solution for AI agents. We spin up your agent instantly in the cloud so you don't need any technical knowledge."
+                  q: "What exactly is ClickRunClaw?",
+                  a: "ClickRunClaw is a 1-Click Cloud Hosting infrastructure explicitly built for OpenClaw AI Agents. Instead of keeping a Windows/Mac PC running 24/7 or renting complicated Linux VPS servers, you just click 'Deploy' and we instantly host your agent in a secure, isolated container."
                 },
                 {
-                  q: "How does it compare to local hosting?",
-                  a: "Running locally means keeping your PC on 24/7. ClickRunClaw handles all containerization and server management. You get guaranteed 24/7 uptime and secure HTTPS webhooks out-of-the-box."
+                  q: "Do I need my own API Key? (BYOK)",
+                  a: "Yes. ClickRunClaw is a BYOK (Bring Your Own Key) platform. You bring your own LLM API keys (OpenAI, Anthropic, or DeepSeek). This means you only pay us for the server hosting, and you pay the AI provider exactly for what you use without any hidden markup."
                 },
                 {
-                  q: "Is my data and API key safe in the cloud?",
-                  a: "Absolutely. Every agent runs in a strictly isolated Docker container. Your API keys are encrypted at rest using AES-256."
+                  q: "How many agents can I deploy?",
+                  a: "Our Starter node ($9/mo) allows you to run 1 active 24/7 Agent. The Pro Core ($29/mo) unlocks the ability to run up to 5 independent OpenClaw agents simultaneously for agencies and heavy automation."
                 },
                 {
-                  q: "Can I cancel my subscription anytime?",
-                  a: "Yes. We offer no-contract monthly billing. You can upgrade, downgrade, or cancel your subscription directly from your dashboard at any time."
+                  q: "How do Telegram and Discord Webhooks work?",
+                  a: "When you deploy an agent, we automatically generate a secure HTTPS webhook endpoint. You just paste this URL into Telegram's @BotFather or Discord's Developer portal, and your agent connects instantly. No local port-forwarding or Ngrok needed."
                 }
               ].map((faq, i) => (
                 <div key={i} className="bg-zinc-50 dark:bg-[#111318] border border-zinc-100 dark:border-zinc-900 rounded-3xl p-8 shadow-sm">
