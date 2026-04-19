@@ -1,8 +1,9 @@
+export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
+
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Webhook } from 'svix';
-
-
 
 export async function POST(req: Request) {
   try {
