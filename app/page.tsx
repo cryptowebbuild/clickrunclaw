@@ -8,7 +8,7 @@ import {
   Menu, X
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 
@@ -17,7 +17,7 @@ import Footer from './components/Footer';
 
 export default function LandingPage() {
   const [user, setUser] = useState<any>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
