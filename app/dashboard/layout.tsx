@@ -7,6 +7,7 @@ import {
   CreditCard, Settings, LogOut, Menu, X, Plus, ChevronRight, Zap
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
@@ -30,10 +31,10 @@ const SidebarContent = ({
 }) => (
     <div className="flex flex-col h-full relative z-10">
       <div className="p-8 flex items-center gap-3 font-bold text-xl font-space">
-        <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center text-white shadow-[0_0_15px_rgba(252,93,93,0.3)]">
-          <TerminalSquare className="w-4 h-4" />
+        <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden flex items-center justify-center bg-[#090A0F]">
+          <Image src="/mascot.webp" alt="ClickRunClaw Mascot" width={32} height={32} className="object-contain" />
         </div>
-        <span className="text-white tracking-tighter">ClickRunClaw</span>
+        <span className="text-zinc-900 dark:text-white tracking-tighter">ClickRunClaw</span>
       </div>
 
       <nav className="flex-1 px-4 space-y-1.5 mt-4">

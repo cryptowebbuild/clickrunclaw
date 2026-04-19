@@ -5,10 +5,13 @@ import { TerminalSquare, ArrowLeft, Calendar, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
 const blogPosts = [
   {
     id: 1,
-    title: "How to Deploy AI Agents in 10 Seconds",
+    title: "How to Deploy AI Agents in A Second",
     excerpt: "Skip the complex hardware setups. Learn how our one-click cloud architecture lets you spin up OpenClaw agents instantly.",
     date: "April 18, 2026",
     category: "Tutorial",
@@ -40,21 +43,7 @@ export default function BlogPage() {
         <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
       </div>
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 dark:border-white/5 bg-[#FAFAFA]/80 dark:bg-[#090A0F]/80 backdrop-blur-xl">
-        <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tighter font-space text-zinc-900 dark:text-white group">
-            <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,90,95,0.3)] group-hover:scale-110 transition-transform">
-              <TerminalSquare className="w-4 h-4" />
-            </div>
-            <span>ClickRunClaw</span>
-          </Link>
-          <Link href="/" className="text-xs font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 hover:text-coral transition-colors flex items-center gap-2 group">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Home</span>
-          </Link>
-        </nav>
-      </header>
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6 pt-40 pb-20 relative z-10">
         <motion.div 
@@ -129,13 +118,7 @@ export default function BlogPage() {
         </div>
       </main>
 
-      <footer className="py-20 border-t border-zinc-200 dark:border-white/5 bg-white dark:bg-[#090A0F] relative z-10">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-zinc-400 dark:text-zinc-500 text-sm font-bold uppercase tracking-[0.4em]">
-            &copy; {new Date().getFullYear()} ClickRunClaw. Made with precision.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

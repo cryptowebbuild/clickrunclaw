@@ -12,8 +12,10 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 
+import Header from './components/Header';
+import Footer from './components/Footer';
+
 export default function LandingPage() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
 
@@ -28,98 +30,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-grid-dots opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
       </div>
 
-      {/* Top Banner */}
-      <div className="bg-zinc-900 dark:bg-black text-white text-center py-2 text-xs font-bold tracking-widest uppercase border-b border-zinc-800 z-50 relative">
-        <span className="text-coral mr-2">🚀</span> New: Deploy OpenClaw Agents in 10 Seconds Flat
-      </div>
-
-      {/* Navbar */}
-      <header className="sticky top-0 left-0 right-0 z-50 border-b border-zinc-800/10 bg-[#FAFAFA]/80 dark:bg-[#090A0F]/80 backdrop-blur-xl">
-        <nav className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tighter font-space text-zinc-900 dark:text-white group">
-            <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,90,95,0.3)] group-hover:scale-110 transition-transform">
-              <TerminalSquare className="w-4 h-4" />
-            </div>
-            <span>ClickRunClaw</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-zinc-600 dark:text-zinc-400">
-            <Link href="#features" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Features</Link>
-            <Link href="#pricing" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Pricing</Link>
-            <Link href="/blog" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Docs & Blog</Link>
-            <Link href="mailto:support@clickrunclaw.com" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Contact</Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {user ? (
-              <div className="hidden md:flex items-center gap-3">
-                <Link 
-                  href="/dashboard" 
-                  className="flex items-center justify-center h-10 px-5 text-sm font-bold text-white bg-coral hover:bg-coral-hover rounded-full transition-all shadow-[0_4px_15px_rgba(252,93,93,0.25)]"
-                >
-                  Go to Dashboard
-                </Link>
-                <div className="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-300 font-bold border border-zinc-800">
-                  {user.email?.charAt(0).toUpperCase() || 'U'}
-                </div>
-              </div>
-            ) : (
-              <Link 
-                href="/auth" 
-                className="hidden md:flex items-center justify-center h-10 px-6 text-sm font-medium text-white border border-zinc-700 bg-zinc-900/50 hover:bg-zinc-900 rounded-full transition-all backdrop-blur-md"
-              >
-                Sign In
-              </Link>
-            )}
-            
-            {/* Mobile Menu Toggle */}
-            <button 
-              className="md:hidden p-2 text-zinc-400 hover:text-white transition-colors"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-        </nav>
-
-        {/* Mobile Navigation */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-zinc-200 dark:border-white/5 bg-white dark:bg-[#090A0F] backdrop-blur-xl overflow-hidden"
-            >
-              <div className="px-4 py-6 flex flex-col gap-4">
-                <Link href="/security" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">Security</Link>
-                <Link href="/privacy" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">Privacy</Link>
-                <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">Blog</Link>
-                <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 mt-2">
-                  {user ? (
-                    <Link 
-                      href="/dashboard" 
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center min-h-[48px] w-full text-base font-bold text-white bg-coral hover:bg-coral-hover rounded-full transition-all"
-                    >
-                      Go to Dashboard
-                    </Link>
-                  ) : (
-                    <Link 
-                      href="/auth" 
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center min-h-[48px] w-full text-base font-medium text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full transition-all"
-                    >
-                      Sign In
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
+      <Header />
 
       <main className="relative z-10">
         {/* Hero Section */}
@@ -153,13 +64,13 @@ export default function LandingPage() {
             className="flex flex-col items-center gap-8 mb-12"
           >
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter font-space text-zinc-900 dark:text-white leading-[1.1] flex flex-col items-center">
-              Deploy <span className="text-coral">OpenClaw</span> Instantly.
+              Deploy Your <span className="text-coral">OpenClaw Agent</span> in 1 Second.
             </h1>
             
             <div className="flex flex-col items-center gap-5">
-              <p className="text-[#FF5A5F] font-mono font-bold tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs uppercase bg-[#FF5A5F]/5 px-6 py-2 rounded-full border border-[#FF5A5F]/10">
-                THE #1 CLOUD HOSTING FOR OPENCLAW AGENTS
-              </p>
+              <h2 className="text-[#FF5A5F] font-mono font-bold tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs uppercase bg-[#FF5A5F]/5 px-6 py-2 rounded-full border border-[#FF5A5F]/10">
+                SCALABLE CLOUD FOR OPENCLAW
+              </h2>
               
               <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-coral/20 bg-coral/5 text-[10px] md:text-xs text-coral font-bold tracking-wider uppercase shadow-[0_0_20px_rgba(255,90,95,0.1)]">
                 <Zap className="w-3.5 h-3.5 fill-coral" />
@@ -531,12 +442,13 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link 
-                  href="/auth"
+                <a 
+                  href="https://whop.com/clickrunclaws/clickrunclaw-starter-node/"
+                  target="_blank" rel="noreferrer"
                   className="flex items-center justify-center w-full h-14 rounded-full bg-zinc-900 dark:bg-zinc-800 border border-zinc-800 dark:border-zinc-700 text-white font-bold text-base hover:bg-zinc-800 dark:hover:bg-zinc-700 transition-all hover:scale-[1.02] shadow-lg"
                 >
                   Get Started
-                </Link>
+                </a>
               </motion.div>
 
               {/* Pro Tier */}
@@ -575,12 +487,13 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link 
-                  href="/auth"
+                <a 
+                  href="https://whop.com/clickrunclaws/clickrun-procore/"
+                  target="_blank" rel="noreferrer"
                   className="flex items-center justify-center w-full h-14 rounded-full bg-coral text-white font-bold text-base hover:bg-coral-hover transition-all shadow-[0_4px_25px_rgba(255,90,95,0.4)] hover:scale-[1.02]"
                 >
                   Go Pro
-                </Link>
+                </a>
               </motion.div>
             </div>
           </div>
@@ -622,69 +535,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="py-20 border-t border-zinc-100 dark:border-white/5 bg-white dark:bg-[#090A0F] relative z-10 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-start justify-between gap-12 relative z-10">
-          
-          <div className="flex flex-col items-start gap-4">
-            <Link href="/" className="flex items-center gap-3 font-bold text-2xl font-space text-zinc-900 dark:text-white group">
-              <div className="w-10 h-10 rounded-full bg-coral flex items-center justify-center text-white shadow-[0_4px_15px_rgba(255,90,95,0.3)] group-hover:rotate-12 transition-transform">
-                <TerminalSquare className="w-5 h-5" />
-              </div>
-              <span className="tracking-tighter">ClickRunClaw</span>
-            </Link>
-            <p className="text-zinc-400 dark:text-zinc-500 text-sm font-medium max-w-xs text-left">
-              The premium 1-Click cloud hosting for OpenClaw AI agents. Fast, secure, and infinitely scalable.
-            </p>
-            <div className="mt-4 flex items-center gap-2">
-               <Mail className="w-4 h-4 text-zinc-400" />
-               <a href="mailto:support@clickrunclaw.com" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-coral transition-colors">support@clickrunclaw.com</a>
-            </div>
-          </div>
-          
-          <div className="flex gap-16 md:gap-24 flex-wrap">
-            <div className="flex flex-col gap-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-300 dark:text-zinc-700">Product</span>
-              <div className="flex flex-col gap-4 text-sm font-bold text-zinc-600 dark:text-zinc-400">
-                <Link href="#features" className="hover:text-coral transition-colors">Host OpenClaw</Link>
-                <Link href="#pricing" className="hover:text-coral transition-colors">Zero-Config Pricing</Link>
-                <Link href="/dashboard" className="hover:text-coral transition-colors">Client Dashboard</Link>
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-300 dark:text-zinc-700">Resources</span>
-              <div className="flex flex-col gap-4 text-sm font-bold text-zinc-600 dark:text-zinc-400">
-                <Link href="/blog" className="hover:text-coral transition-colors">Blog & Tutorials</Link>
-                <a href="mailto:support@clickrunclaw.com" className="hover:text-coral transition-colors">Help & Support</a>
-                <Link href="/security" className="hover:text-coral transition-colors">Architecture Security</Link>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-300 dark:text-zinc-700">Legal</span>
-              <div className="flex flex-col gap-4 text-sm font-bold text-zinc-600 dark:text-zinc-400">
-                <Link href="/privacy" className="hover:text-coral transition-colors">Privacy Policy</Link>
-                <Link href="/terms" className="hover:text-coral transition-colors">Terms of Service</Link>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 mt-20 pt-8 border-t border-zinc-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-          <p className="text-zinc-400 dark:text-zinc-600 text-xs font-bold uppercase tracking-widest">
-            &copy; {new Date().getFullYear()} ClickRunClaw. Host OpenClaw AI Agents Instantly.
-          </p>
-          <div className="flex gap-6">
-            <button className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-              <Github className="w-5 h-5" />
-            </button>
-            <button className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-              <MessageSquare className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

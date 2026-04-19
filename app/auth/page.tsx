@@ -135,7 +135,7 @@ export default function AuthPage() {
             </h1>
             <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-base">
               {authMode === 'login' && 'Enter your credentials to access your workspace.'}
-              {authMode === 'signup' && 'Start deploying AI agents in seconds.'}
+              {authMode === 'signup' && 'Start deploying AI agents in a second.'}
               {authMode === 'magic' && "We'll email you a secure, passwordless link."}
             </p>
           </motion.div>

@@ -44,8 +44,8 @@ export default function DashboardOverview() {
 
   const handleUpgrade = (plan: string) => {
     const link = plan === 'Pro' 
-      ? 'https://whop.com/checkout/plan_YOUR_PRO_LINK_HERE'
-      : 'https://whop.com/checkout/plan_YOUR_STARTER_LINK_HERE';
+      ? 'https://whop.com/clickrunclaws/clickrun-procore/'
+      : 'https://whop.com/clickrunclaws/clickrunclaw-starter-node/';
     window.open(link, '_blank');
   };
 
@@ -379,7 +379,7 @@ export default function DashboardOverview() {
 
                 <div className="space-y-4">
                   <a 
-                    href="https://whop.com/checkout/plan_YOUR_STARTER_LINK_HERE" 
+                    href="https://whop.com/clickrunclaws/clickrunclaw-starter-node/" 
                     target="_blank" rel="noreferrer"
                     className="block w-full py-5 px-8 bg-zinc-50 dark:bg-zinc-950 hover:bg-white dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-900 rounded-full text-zinc-900 dark:text-white font-bold transition-all flex items-center justify-between group shadow-sm"
                   >
@@ -388,7 +388,7 @@ export default function DashboardOverview() {
                   </a>
                   
                   <a 
-                    href="https://whop.com/checkout/plan_YOUR_PRO_LINK_HERE" 
+                    href="https://whop.com/clickrunclaws/clickrun-procore/" 
                     target="_blank" rel="noreferrer"
                     className="block w-full py-5 px-8 bg-coral hover:bg-coral-hover rounded-full text-white font-bold transition-all flex items-center justify-between group shadow-[0_4px_25px_rgba(255,90,95,0.4)]"
                   >
