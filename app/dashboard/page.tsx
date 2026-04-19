@@ -1,9 +1,8 @@
 'use client';
-export const dynamic = 'force-dynamic';
 
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
 export default function DashboardOverview() {
@@ -23,7 +22,7 @@ export default function DashboardOverview() {
   const [deploying, setDeploying] = useState(false);
   const [deployedAgent, setDeployedAgent] = useState<any>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const fetchUser = async () => {

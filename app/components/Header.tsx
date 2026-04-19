@@ -67,6 +67,8 @@ export default function Header() {
             <button 
               className="md:hidden p-2 text-zinc-400 hover:text-[#FF5A5F] transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Toggle navigation menu"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>

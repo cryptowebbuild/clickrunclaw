@@ -68,9 +68,9 @@ export default function LandingPage() {
             </h1>
             
             <div className="flex flex-col items-center gap-4 md:gap-5">
-              <h2 className="text-[#FF5A5F] font-mono font-bold tracking-[0.2em] md:tracking-[0.4em] text-[9px] md:text-xs uppercase bg-[#FF5A5F]/5 px-6 py-2 rounded-full border border-[#FF5A5F]/10">
+              <span className="text-[#FF5A5F] font-mono font-bold tracking-[0.2em] md:tracking-[0.4em] text-[9px] md:text-xs uppercase bg-[#FF5A5F]/5 px-6 py-2 rounded-full border border-[#FF5A5F]/10">
                 SCALABLE CLOUD FOR OPENCLAW
-              </h2>
+              </span>
               
               <div className="inline-flex items-center gap-2 px-4 md:px-5 py-2 rounded-full border border-coral/20 bg-coral/5 text-[9px] md:text-xs text-coral font-bold tracking-wider uppercase shadow-[0_0_20px_rgba(255,90,95,0.1)]">
                 <Zap className="w-3.5 h-3.5 fill-coral" />

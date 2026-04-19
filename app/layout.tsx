@@ -69,21 +69,33 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              "name": "ClickRunClaw - OpenClaw Cloud Hosting",
-              "applicationCategory": "DeveloperApplication",
-              "operatingSystem": "Web",
-              "offers": {
-                "@type": "Offer",
-                "price": "9.99",
-                "priceCurrency": "USD"
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                "name": "ClickRunClaw - OpenClaw Cloud Hosting",
+                "applicationCategory": "DeveloperApplication",
+                "operatingSystem": "Web",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "9.99",
+                  "priceCurrency": "USD"
+                },
+                "description": "Deploy and host your OpenClaw and Web3 AI agents instantly with our zero-configuration cloud infrastructure.",
+                "url": "https://clickrunclaw.com",
+                "keywords": "openclaw, openclaw ai agent, deploy openclaw, openclaw cloud hosting, openclaw alternative"
               },
-              "description": "Deploy and host your OpenClaw and Web3 AI agents instantly with our zero-configuration cloud infrastructure.",
-              "url": "https://clickrunclaw.com",
-              "keywords": "openclaw, openclaw ai agent, deploy openclaw, openclaw cloud hosting, openclaw alternative"
-            })
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "ClickRunClaw",
+                "url": "https://clickrunclaw.com",
+                "logo": "https://clickrunclaw.com/favicon.webp",
+                "sameAs": [
+                  "https://twitter.com/clickrunclaw"
+                ]
+              }
+            ])
           }}
         />
         {/* Crisp Live Chat Script */}

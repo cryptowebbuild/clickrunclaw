@@ -58,6 +58,7 @@ export default function BlogIndexClient({ blogPosts }: BlogIndexClientProps) {
                   src={`https://picsum.photos/seed/${post.slug}/800/600`}
                   alt={post.title} 
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                   priority={i < 2}
                   referrerPolicy="no-referrer"

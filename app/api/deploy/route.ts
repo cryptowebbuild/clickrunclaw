@@ -90,13 +90,19 @@ export async function POST(req: Request) {
     // We send a request to your actual Coolify instance at your Contabo IP (37.60.252.51)
     // Coolify gives you a Webhook URL for each project. You will place that in your .env
     const coolifyWebhook = process.env.COOLIFY_DEPLOY_WEBHOOK_URL;
+    let deploymentSuccess = true;
     
     if (coolifyWebhook) {
       try {
         // Trigger the deployment on Coolify
-        await fetch(coolifyWebhook, { method: 'POST' });
+        const res = await fetch(coolifyWebhook, { method: 'POST' });
+        if (!res.ok) {
+           deploymentSuccess = false;
+           throw new Error("Coolify responded with a non-200 status code.");
+        }
         console.log("Coolify deployment triggered successfully.");
       } catch (err) {
+        deploymentSuccess = false;
         console.error("Warning: Could not trigger Coolify webhook. Is it correct?", err);
       }
     } else {
@@ -105,6 +111,11 @@ export async function POST(req: Request) {
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
     
+    if (!deploymentSuccess) {
+       await supabase.from('agents').update({ status: 'failed' }).eq('id', dbAgent.id);
+       return NextResponse.json({ error: 'Failed to deploy container to cloud infrastructure.' }, { status: 500 });
+    }
+
     // Generate a secure, unique Webhook URL that users can use for their bot
     const userHookUrl = `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
     const containerIdTag = `openclaw-${dbAgent.id.split('-')[0]}`;

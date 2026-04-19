@@ -20,7 +20,7 @@
   }
   
   /* Global Scrollbar Stability */
-  ::-webkit-scrollbar {
+  /* ::-webkit-scrollbar {
     width: 6px;
   }
   ::-webkit-scrollbar-track {
@@ -32,7 +32,7 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: #27272a;
-  }
+  } */
 }
 
 @layer utilities {

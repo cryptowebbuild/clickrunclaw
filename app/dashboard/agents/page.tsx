@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Terminal, Play, Square, RotateCw, Server, 
@@ -24,7 +24,7 @@ export default function AgentsPage() {
   // Real Database State
   const [agents, setAgents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const fetchAgents = async () => {

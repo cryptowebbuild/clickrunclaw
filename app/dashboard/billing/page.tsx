@@ -78,10 +78,14 @@ export default function BillingPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/5 rounded-[2rem] p-10 shadow-sm"
+        className="bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/5 rounded-[2rem] p-10 shadow-sm relative overflow-hidden"
       >
         <h2 className="text-2xl font-black font-space mb-10 text-zinc-900 dark:text-white uppercase tracking-tight">Invoice History</h2>
-        <div className="overflow-x-auto">
+        
+        {/* Added overlay gradient to indicate scrollability on mobile */}
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#111318] to-transparent z-10 pointer-events-none md:hidden" />
+        
+        <div className="overflow-x-auto relative">
           <table className="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr className="border-b border-zinc-100 dark:border-white/5 text-zinc-400 dark:text-zinc-600 text-[10px] font-black uppercase tracking-widest">

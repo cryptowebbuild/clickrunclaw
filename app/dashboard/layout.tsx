@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   TerminalSquare, LayoutDashboard, Blocks, 
@@ -86,7 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const getUser = async () => {
