@@ -7,9 +7,9 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
 export const metadata: Metadata = {
-  title: "ClickRunClaw | 1-Click AI Agent Cloud Hosting",
-  description: "Deploy and host your OpenClaw and Web3 AI agents instantly with our zero-configuration cloud infrastructure.",
-  keywords: ['OpenClaw AI Agent', 'Deploy OpenClaw', 'OpenClaw Cloud Hosting', 'OpenClaw Telegram Bot', 'OpenClaw Discord Bot', 'Openclawd Alternative', 'Open Source AI Agent', 'Mac mini AI alternative', 'AI Agent Hosting', 'Run OpenClaw', 'ClickRunClaw', 'AI VPS'],
+  title: "ClickRunClaw | The #1 OpenClaw AI Agent Cloud Hosting",
+  description: "Deploy, run, and scale OpenClaw AI agents in 1-click. Stop local hosting—use ClickRunClaw for 24/7 uptime, secure webhooks, and instant Telegram/Discord integration.",
+  keywords: ['OpenClaw', 'OpenClaw AI', 'OpenClaw Agent', 'Deploy OpenClaw', 'Host OpenClaw', 'Run OpenClaw', 'OpenClaw Cloud Hosting', 'OpenClaw Telegram Bot', 'ClickRunClaw'],
   authors: [{ name: 'ClickRunClaw' }],
   creator: 'ClickRunClaw',
   publisher: 'ClickRunClaw',
@@ -19,8 +19,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: 'ClickRunClaw | 1-Click AI Agent Cloud Hosting',
-    description: 'Deploy and host your OpenClaw and Web3 AI agents instantly with our zero-configuration cloud infrastructure.',
+    title: 'ClickRunClaw | The #1 OpenClaw AI Agent Hosting',
+    description: 'Deploy, run, and scale OpenClaw AI agents in 1-click. Stop local hosting—use ClickRunClaw for 24/7 uptime.',
     url: 'https://clickrunclaw.com',
     siteName: 'ClickRunClaw',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ClickRunClaw | 1-Click AI Agent Cloud Hosting',
-    description: 'Deploy OpenClaw AI Agents in 30 seconds. No terminal, Mac mini, or Linux setups required.',
+    title: 'ClickRunClaw | Host OpenClaw Agents in Seconds',
+    description: 'Deploy OpenClaw AI Agents in seconds. No terminal, Mac mini, or Linux setups required.',
     creator: '@clickrunclaw',
   },
   robots: {
@@ -82,6 +82,10 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
             })
           }}
         />
+        {/* Crisp Live Chat Script */}
+        <script type="text/javascript" dangerouslySetInnerHTML={{
+          __html: `window.$crisp=[];window.CRISP_WEBSITE_ID="8d6eee13-c0a2-4089-85fd-9757256fac32";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`
+        }} />
         {children}
       </body>
     </html>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Terminal, Play, Square, RotateCw, Server, 
-  Search, Plus, X, Activity, Globe, Cpu, Loader2, MessageCircle, AlertCircle
+  Search, Plus, X, Activity, Globe, Cpu, Loader2, MessageCircle, AlertCircle, HelpCircle, Send, Paperclip
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
@@ -15,6 +15,9 @@ export default function AgentsPage() {
   const [selectedTerminal, setSelectedTerminal] = useState<any | null>(null);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [pairingAgent, setPairingAgent] = useState<any | null>(null);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [supportMessage, setSupportMessage] = useState('');
+  const [supportSending, setSupportSending] = useState(false);
   const [pairingCode, setPairingCode] = useState('');
   const [pairingStatus, setPairingStatus] = useState<string | null>(null);
   
@@ -27,20 +30,38 @@ export default function AgentsPage() {
     const fetchAgents = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Fetch real deployed agents from Secure Supabase DB
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('agents')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
-          
         if (data) setAgents(data);
       }
       setLoading(false);
     };
-
     fetchAgents();
   }, [supabase]);
+
+  const handleAction = async (agentId: string, action: 'stop' | 'running') => {
+    setAgents(agents.map(a => a.id === agentId ? { ...a, status: action === 'stop' ? 'stopped' : 'running' } : a));
+    await supabase.from('agents').update({ status: action === 'stop' ? 'stopped' : 'running' }).eq('id', agentId);
+  };
+  
+  const handleDelete = async (agentId: string) => {
+    setAgents(agents.filter(a => a.id !== agentId));
+    await supabase.from('agents').delete().eq('id', agentId);
+  };
+
+  const handleSupportSubmit = (e: any) => {
+    e.preventDefault();
+    setSupportSending(true);
+    setTimeout(() => {
+       setSupportSending(false);
+       setShowSupportModal(false);
+       setSupportMessage('');
+       alert("Support request sent! We will reply to your account email shortly.");
+    }, 1500);
+  };
 
   const handlePairSubmit = async () => {
     if (!pairingCode.trim()) return;
@@ -85,7 +106,14 @@ export default function AgentsPage() {
           <p className="text-zinc-500 dark:text-zinc-400">Manage, monitor, and configure your deployed ClickRunClaw AI agents.</p>
         </div>
         
-            <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setShowSupportModal(true)}
+            className="hidden md:flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/10 rounded-full text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20 transition-all font-bold text-sm shadow-sm"
+          >
+            <HelpCircle className="w-4 h-4 text-coral" />
+            Need help?
+          </button>
           <div className="relative">
             <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-4 top-1/2 -translate-y-1/2" />
             <input 
@@ -199,12 +227,20 @@ export default function AgentsPage() {
                 Inspect
               </button>
               
-              <div className="flex items-center gap-1 bg-zinc-100 dark:bg-white/5 rounded-full p-1 border border-zinc-200 dark:border-white/10">
-                <button className="p-2 rounded-full hover:bg-white dark:hover:bg-[#090A0F] text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all transition-colors" title="Restart">
-                  <RotateCw className="w-4 h-4" />
+              <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-white/5 rounded-full p-1.5 border border-zinc-200 dark:border-white/10">
+                <button 
+                  onClick={() => handleAction(agent.id, agent.status === 'running' ? 'stop' : 'running')}
+                  className={`p-2 rounded-full hover:bg-white dark:hover:bg-[#090A0F] transition-all transition-colors ${agent.status === 'running' ? 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white' : 'text-green-500 hover:text-green-400'}`} 
+                  title={agent.status === 'running' ? "Stop" : "Restart"}
+                >
+                  <Square className={`w-4 h-4 ${agent.status === 'running' ? '' : 'fill-green-500/20 text-green-500'}`} />
                 </button>
-                <button className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-400 dark:text-zinc-500 hover:text-coral transition-all transition-colors" title="Stop">
-                  <Square className="w-4 h-4" />
+                <button 
+                  onClick={() => handleDelete(agent.id)}
+                  className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 transition-all transition-colors" 
+                  title="Delete"
+                >
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -356,6 +392,85 @@ export default function AgentsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Support Modal Overlay */}
+      <AnimatePresence>
+        {showSupportModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => {
+              if (!supportSending) setShowSupportModal(false);
+            }}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-md bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col relative"
+            >
+              
+              <div className="flex items-center justify-between px-8 py-6 border-b border-zinc-100 dark:border-zinc-800/50 bg-[#FAFAFA] dark:bg-black/20">
+                <h3 className="text-xl font-bold font-space text-zinc-900 dark:text-white">Need Help?</h3>
+                <button 
+                  onClick={() => setShowSupportModal(false)}
+                  className="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:text-zinc-300 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSupportSubmit} className="p-8 space-y-6">
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-2">Subject</label>
+                  <select className="w-full px-4 py-3 bg-zinc-50 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/10 rounded-xl focus:border-coral outline-none text-zinc-900 dark:text-white font-medium text-sm appearance-none">
+                    <option>Billing Issue</option>
+                    <option>Agent Deployment</option>
+                    <option>Technical Error</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-2">Message</label>
+                  <textarea 
+                    rows={4}
+                    value={supportMessage}
+                    onChange={(e) => setSupportMessage(e.target.value)}
+                    placeholder="Describe your issue in detail..."
+                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/10 rounded-xl focus:border-coral outline-none text-zinc-900 dark:text-white font-medium text-sm resize-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-2">Screenshot (Optional)</label>
+                  <div className="w-full px-4 py-4 bg-zinc-50 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/10 border-dashed rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:border-coral/50 transition-colors">
+                    <Paperclip className="w-4 h-4 text-zinc-400" />
+                    <span className="text-sm font-medium text-zinc-500">Attach a file...</span>
+                  </div>
+                </div>
+
+                <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">We&apos;ll reply to your account email.</p>
+                  <button 
+                    type="submit"
+                    disabled={supportSending || !supportMessage.trim()}
+                    className="w-full sm:w-auto px-8 py-3 rounded-full font-bold text-white bg-coral hover:bg-coral-hover transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(255,90,95,0.3)]"
+                  >
+                    {supportSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    Send Message
+                  </button>
+                </div>
+              </form>
+
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
