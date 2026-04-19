@@ -1,10 +1,102 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 export const runtime = 'edge';
 
+// Convert a hex string to an ArrayBuffer
+function hexToArrayBuffer(hex: string) {
+  if (hex.length % 2 !== 0) {
+    throw new Error('Invalid hex string');
+  }
+  const view = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    view[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+  }
+  return view.buffer;
+}
+
+// Base64 decode to Uint8Array (since Edge runtime doesn't have Buffer, and atob works for base64 strings)
+function base64ToUint8Array(base64: string) {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
 export async function POST(req: Request) {
   try {
+    const webhookSecret = process.env.WHOP_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.error("Missing WHOP_WEBHOOK_SECRET environment variable.");
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    const svixId = req.headers.get('x-svix-id');
+    const svixTimestamp = req.headers.get('x-svix-timestamp');
+    const svixSignatureHeader = req.headers.get('x-svix-signature');
+
+    if (!svixId || !svixTimestamp || !svixSignatureHeader) {
+      return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 });
+    }
+
+    // svix signature header is usually formatted as "v1,signature_base64 v1,signature_base64..."
+    const signatures = svixSignatureHeader.split(' ').map(s => s.split(',')[1]).filter(Boolean);
+    if (signatures.length === 0) {
+      return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 });
+    }
+
+    const rawBody = await req.text();
+    const signedContent = `${svixId}.${svixTimestamp}.${rawBody}`;
+
+    const encoder = new TextEncoder();
+
+    // Process webhook secret (usually starts with "whsec_")
+    let secretBytes;
+    if (webhookSecret.startsWith('whsec_')) {
+      secretBytes = base64ToUint8Array(webhookSecret.split('_')[1]);
+    } else {
+      secretBytes = encoder.encode(webhookSecret);
+    }
+
+    const key = await crypto.subtle.importKey(
+      'raw',
+      secretBytes,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+
+    const dataBuffer = encoder.encode(signedContent);
+
+    let isValid = false;
+    for (const signatureBase64 of signatures) {
+      try {
+        const signatureBytes = base64ToUint8Array(signatureBase64);
+        const verified = await crypto.subtle.verify(
+          'HMAC',
+          key,
+          signatureBytes,
+          dataBuffer
+        );
+        if (verified) {
+          isValid = true;
+          break;
+        }
+      } catch (err) {
+        // Continue checking other signatures if verification throws
+      }
+    }
+
+    if (!isValid) {
+      return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 });
+    }
+
+    const body = JSON.parse(rawBody);
+
     // Lazy initialization of Supabase admin client
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error("Missing Supabase environment variables for Webhook.");
@@ -15,8 +107,6 @@ export async function POST(req: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
-
-    const body = await req.json();
 
     // Verify it's a Whop webhook event (Subscription Active / Payment Success)
     if (body.action === 'payment_succeeded' || body.action === 'membership_activated') {
