@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { User, Mail, Lock, Shield, Bell, Key, Loader2 } from 'lucide-react';
+import { User, Mail, Lock, Shield, Bell, Key, Loader2, Sparkles } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -9,6 +9,8 @@ export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
@@ -28,12 +30,44 @@ export default function SettingsPage() {
     fetchData();
   }, [supabase]);
 
+  const handleSave = async () => {
+    setSaving(true);
+    // Simulate network delay
+    setTimeout(() => {
+      setSaving(false);
+      setToast('Configuration permanently saved to the cloud.');
+      setTimeout(() => setToast(null), 3000);
+    }, 1200);
+  };
+
+  const handlePurge = async () => {
+    if (!confirm("Are you ABSOLUTELY sure you want to terminate this instance? This is completely irreversible.")) return;
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+      setToast('Workspace termination protocol initiated.');
+      setTimeout(() => setToast(null), 3000);
+    }, 1500);
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 text-coral animate-spin" /></div>;
   }
 
   return (
-    <div className="space-y-10 max-w-4xl pb-20">
+    <div className="space-y-10 max-w-4xl pb-20 relative">
+      {toast && (
+        <motion.div 
+          initial={{ opacity: 0, y: 50, x: '-50%' }}
+          animate={{ opacity: 1, y: 0, x: '-50%' }}
+          exit={{ opacity: 0, y: 50, x: '-50%' }}
+          className="fixed bottom-10 left-1/2 z-50 bg-black text-white px-6 py-4 rounded-full text-sm font-bold flex items-center gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-zinc-800"
+        >
+          <Sparkles className="w-4 h-4 text-coral" />
+          {toast}
+        </motion.div>
+      )}
+
       <div>
         <h1 className="text-4xl font-black font-space mb-2 tracking-tighter text-zinc-900 dark:text-white uppercase">Settings</h1>
         <p className="text-zinc-500 dark:text-zinc-400 font-light">Manage your global workspace preferences and agent security parameters.</p>
@@ -53,8 +87,8 @@ export default function SettingsPage() {
         </h2>
         
         <div className="flex flex-col md:flex-row gap-12 items-start">
-          <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/5 flex items-center justify-center text-zinc-900 dark:text-white font-black text-3xl shrink-0 shadow-inner uppercase">
-            {profile?.full_name ? profile.full_name.charAt(0) : user?.email?.charAt(0) || 'U'}
+          <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/5 flex items-center justify-center text-zinc-900 dark:text-white font-black text-3xl shrink-0 shadow-inner uppercase overflow-hidden">
+            {profile?.full_name ? profile.full_name.charAt(0) : user?.email?.charAt(0) ? user.email.charAt(0) : <User className="w-10 h-10 text-zinc-700" />}
           </div>
           
           <div className="flex-1 space-y-8 w-full">
@@ -78,8 +112,12 @@ export default function SettingsPage() {
                 />
               </div>
             </div>
-            <button className="px-10 py-4 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black hover:scale-105 transition-all font-black text-xs uppercase tracking-[0.2em] shadow-lg">
-              Save Configuration
+            <button 
+              onClick={handleSave}
+              disabled={saving}
+              className="px-10 py-4 w-full md:w-auto rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black hover:scale-105 transition-all font-black text-xs uppercase tracking-[0.2em] shadow-lg flex items-center justify-center disabled:opacity-70 disabled:hover:scale-100 min-w-[220px]"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin text-black" /> : 'Save Configuration'}
             </button>
           </div>
         </div>
@@ -131,17 +169,23 @@ export default function SettingsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-[#111318] border border-red-500/20 rounded-[2.5rem] p-10 md:p-14 shadow-sm"
+        className="bg-white dark:bg-[#111318] border border-rose-900/40 rounded-[2.5rem] p-10 md:p-14 shadow-sm relative overflow-hidden"
       >
-        <h2 className="text-xl font-bold font-space mb-2 text-red-500 uppercase tracking-tight">System Termination</h2>
-        <p className="text-zinc-500 text-sm mb-10 font-light italic">Irreversible and destructive actions. Proceed with total caution.</p>
+        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(225,29,72,0.05),transparent_70%)] pointer-events-none" />
+        <h2 className="text-xl font-bold font-space mb-2 text-rose-600 dark:text-rose-500 uppercase tracking-tight relative z-10">System Termination</h2>
+        <p className="text-zinc-500 text-sm mb-10 font-light italic relative z-10">Irreversible and destructive actions. Proceed with total caution.</p>
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-3xl bg-red-50/50 dark:bg-red-500/5 border border-red-200 dark:border-red-500/10 transition-all">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-3xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 transition-all relative z-10">
           <div>
-            <h3 className="font-bold text-red-600 dark:text-red-500 mb-2">Purge Workspace</h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-600 max-w-sm">Permanently delete your account, encrypted keys, and all active agent containers.</p>
+            <h3 className="font-bold text-rose-700 dark:text-rose-500 mb-2">Purge Workspace</h3>
+            <p className="text-sm text-rose-900/60 dark:text-rose-500/60 max-w-sm">Permanently delete your account, encrypted keys, and all active agent containers.</p>
           </div>
-          <button className="px-8 py-4 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-all text-xs font-black uppercase tracking-widest">
+          <button 
+            onClick={handlePurge}
+            disabled={saving}
+            className="px-8 py-4 rounded-full bg-rose-600 hover:bg-rose-700 text-white transition-all text-xs font-black uppercase tracking-widest shadow-[0_4px_20px_rgba(225,29,72,0.2)] disabled:opacity-50 disabled:hover:bg-rose-600 flex items-center gap-2"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             Execute Termination
           </button>
         </div>

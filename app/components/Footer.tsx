@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Github, Twitter, Linkedin } from 'lucide-react';
+import { Facebook, Twitter, Send } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -25,7 +25,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-1 space-y-6">
             <h4 className="text-white font-bold font-space">Product</h4>
             <ul className="space-y-4">
-              <li><Link href="/#features" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Features</Link></li>
+              <li><a href="/#features" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Features</a></li>
               <li><Link href="/blog" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Documentation</Link></li>
               <li><Link href="/blog" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Status</Link></li>
             </ul>
@@ -35,31 +35,31 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-1 space-y-6">
             <h4 className="text-white font-bold font-space">Legal</h4>
             <ul className="space-y-4">
-              <li><Link href="/privacy" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Privacy</Link></li>
-              <li><Link href="/security" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Security</Link></li>
-              <li><Link href="/privacy" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Terms of Service</Link></li>
+              <li><Link href="/" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Privacy</Link></li>
+              <li><Link href="/" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Security</Link></li>
+              <li><Link href="/" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
 
           {/* Col 4 */}
           <div className="col-span-1 md:col-span-1 space-y-6">
-            <h4 className="text-white font-bold font-space">Connect</h4>
+            <h4 className="text-white font-bold font-space uppercase tracking-widest text-xs">Identity</h4>
             <ul className="space-y-4">
               <li>
-                <Link href="mailto:support@clickrunclaw.com" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">
-                  support@clickrunclaw.com
+                <Link href="mailto:support@clickrunclaw.com" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors flex items-center gap-2">
+                  <span className="text-zinc-600">Email:</span> support@clickrunclaw.com
                 </Link>
               </li>
             </ul>
             <div className="flex items-center gap-4 pt-2">
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#FF5A5F] hover:text-white transition-colors duration-300">
+              <a href="https://x.com/clickrunclaw" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#FF5A5F] hover:text-white transition-colors duration-300" title="Follow us on X">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#FF5A5F] hover:text-white transition-colors duration-300">
-                <Linkedin className="w-4 h-4" />
+              <a href="https://www.facebook.com/ClickRunClaw" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#FF5A5F] hover:text-white transition-colors duration-300" title="Join us on Facebook">
+                <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#FF5A5F] hover:text-white transition-colors duration-300">
-                <Github className="w-4 h-4" />
+              <a href="https://t.me/ClickRunClaw" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#FF5A5F] hover:text-white transition-colors duration-300" title="Join our Telegram Channel">
+                <Send className="w-4 h-4" />
               </a>
             </div>
           </div>

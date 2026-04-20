@@ -50,7 +50,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           Back to Journal
         </Link>
         
-        <article className="px-1 md:px-0">
+        <article className="px-4 md:px-0">
           <header className="mb-14">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight font-space text-zinc-900 dark:text-white mb-6 leading-[1.1]">
               {post.title}

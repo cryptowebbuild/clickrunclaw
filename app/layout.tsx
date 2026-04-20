@@ -65,7 +65,7 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`dark ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`} style={{ colorScheme: 'dark' }}>
-      <body className="bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 antialiased selection:bg-coral selection:text-white font-sans" suppressHydrationWarning>
+      <body className="bg-[#090A0F] text-zinc-100 antialiased selection:bg-coral selection:text-white font-sans" suppressHydrationWarning>
         {/* Google Analytics */}
         <Script
           async

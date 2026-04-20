@@ -183,9 +183,9 @@ export default function LandingPage() {
                     <Server className="w-7 h-7 text-[#FF5A5F]" />
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold mb-4 font-space text-zinc-900 dark:text-white tracking-tight">Dedicated Cloud Containers</h3>
-                    <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-lg text-lg">
-                      Isolation is at our core. Every agent instance runs in a strictly partitioned environment, ensuring your data stays yours. Zero hardware overhead for you.
+                    <h3 className="text-3xl font-bold mb-4 font-space text-zinc-900 dark:text-white tracking-tight">Federated Instance Architecture</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xl text-md">
+                      Isolation is at our core. Every agent instance runs in a strictly partitioned environment mapping to isolated local SQLite databases. It means 0 latency responses, infinitely scalable infrastructure, and zero hardware overhead for you.
                     </p>
                   </div>
                 </div>
@@ -406,7 +406,7 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-24 px-4 relative border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#090A0F]">
+        <section id="pricing" className="py-24 px-4 relative border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#090A0F]">
           <div className="max-w-5xl mx-auto relative z-10">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold mb-6 font-space tracking-tight text-zinc-900 dark:text-white">Simple pricing. <br/>Scale infinitely.</h2>
@@ -448,13 +448,12 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <a 
-                  href="https://whop.com/clickrunclaws/clickrunclaw-starter-node/"
-                  target="_blank" rel="noreferrer"
+                <Link
+                  href="/auth"
                   className="flex items-center justify-center w-full h-14 rounded-full bg-zinc-900 dark:bg-zinc-800 border border-zinc-800 dark:border-zinc-700 text-white font-bold text-base hover:bg-zinc-800 dark:hover:bg-zinc-700 transition-all hover:scale-[1.02] shadow-lg"
                 >
                   Get Started
-                </a>
+                </Link>
               </motion.div>
 
               {/* Pro Tier */}
@@ -499,13 +498,12 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <a 
-                  href="https://whop.com/clickrunclaws/clickrun-procore/"
-                  target="_blank" rel="noreferrer"
+                <Link 
+                  href="/auth"
                   className="flex items-center justify-center w-full h-14 rounded-full bg-coral text-white font-bold text-base hover:bg-coral-hover transition-all shadow-[0_4px_25px_rgba(255,90,95,0.4)] hover:scale-[1.02]"
                 >
                   Go Pro
-                </a>
+                </Link>
               </motion.div>
             </div>
           </div>

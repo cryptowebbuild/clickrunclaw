@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   TerminalSquare, LayoutDashboard, Blocks, 
-  CreditCard, Settings, LogOut, Menu, X, Plus, ChevronRight, Zap
+  CreditCard, Settings, LogOut, Menu, X, Plus, ChevronRight, Zap, Key, MousePointerClick
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,7 +14,10 @@ import { createClient } from '@/utils/supabase/client';
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'My Agents', href: '/dashboard/agents', icon: Blocks },
-  { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
+  { name: 'Integrations', href: '/dashboard/integrations', icon: MousePointerClick },
+  { name: 'Skills', href: '/dashboard/skills', icon: TerminalSquare },
+  { name: 'API Keys', href: '/dashboard/keys', icon: Key },
+  { name: 'Credits', href: '/dashboard/billing', icon: CreditCard },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 

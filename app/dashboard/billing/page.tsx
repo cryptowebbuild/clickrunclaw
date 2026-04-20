@@ -4,6 +4,18 @@ import { motion } from 'motion/react';
 import { CreditCard, Zap, CheckCircle2, AlertCircle, Download } from 'lucide-react';
 
 export default function BillingPage() {
+  const handleWhopCheckout = (planId: string) => {
+    // 1. You would normally grab the logged in user's ID from Supabase here
+    const mockUserId = "usr_123456789"; // Replace with actual user.id
+    
+    // 2. We append the user_id as a custom parameter.
+    // The Webhook we built above will extract this and upgrade the exact account!
+    const whopCheckoutUrl = `https://whop.com/checkout/${planId}?custom_user_id=${mockUserId}`;
+    
+    // 3. Redirect user to secure hosted Whop checkout (or open iframe)
+    window.location.href = whopCheckoutUrl;
+  };
+
   return (
     <div className="space-y-10 pb-20">
       <div>
@@ -25,8 +37,11 @@ export default function BillingPage() {
             </h2>
             <div className="text-5xl font-black font-space text-zinc-900 dark:text-white mb-6 tracking-tighter">$45.50</div>
             <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-10 leading-relaxed italic">Auto-recharge is active when balance drops below $10.00.</p>
-            <button className="w-full py-4 rounded-full bg-zinc-900 dark:bg-zinc-900 text-white hover:bg-zinc-800 transition-all font-bold text-sm shadow-lg mt-auto">
-              Add Credits
+            <button 
+              onClick={() => handleWhopCheckout('plan_5credits')}
+              className="w-full py-4 rounded-full bg-zinc-900 dark:bg-zinc-900 text-white hover:bg-zinc-800 transition-all font-bold text-sm shadow-lg mt-auto"
+            >
+              Add Credits via Whop
             </button>
           </div>
         </motion.div>
@@ -63,8 +78,11 @@ export default function BillingPage() {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="px-8 py-4 rounded-full bg-coral text-white font-bold hover:bg-coral-hover transition-all text-sm shadow-[0_4px_15px_rgba(252,93,93,0.3)]">
-              Manage Subscription
+            <button 
+              onClick={() => handleWhopCheckout('plan_pro_monthly')}
+              className="px-8 py-4 rounded-full bg-coral text-white font-bold hover:bg-coral-hover transition-all text-sm shadow-[0_4px_15px_rgba(252,93,93,0.3)]"
+            >
+              Upgrade Subscription
             </button>
             <button className="px-8 py-4 rounded-full bg-transparent border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/5 transition-all font-bold text-sm">
               View Billing Portal

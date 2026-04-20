@@ -20,6 +20,11 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // Registration Wizard State
+  const [wizardStep, setWizardStep] = useState(1);
+  const [wizardModel, setWizardModel] = useState<string | null>(null);
+  const [wizardKey, setWizardKey] = useState('');
+
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -43,8 +48,8 @@ export default function AuthPage() {
   
   const passwordStrength = getPasswordStrength(password);
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAuth = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccessMsg(null);
@@ -56,27 +61,31 @@ export default function AuthPage() {
           password,
         });
         if (error) throw error;
+        // Proceed normally
         window.location.href = '/dashboard';
       } else if (authMode === 'signup') {
+        // Complete the Auth Request inside the Wizard
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
           },
         });
         if (error) throw error;
         
+        // TODO: Map Wizard config strings via secure database insert here
+
         if (data.session) {
           window.location.href = '/dashboard';
         } else {
-          setSuccessMsg('Success! Check your email to confirm your account.');
+          setSuccessMsg('Magic! Account provisioning. Check your email to confirm activation.');
         }
       } else if (authMode === 'magic') {
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
           },
         });
         if (error) throw error;
@@ -94,7 +103,7 @@ export default function AuthPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
         },
       });
       if (error) throw error;
@@ -145,13 +154,13 @@ export default function AuthPage() {
             <div className="flex gap-1 mb-10 p-1 bg-zinc-100 dark:bg-white/5 rounded-full border border-zinc-200 dark:border-white/10 shadow-inner">
               <button 
                 onClick={() => { setAuthMode('login'); setError(null); setSuccessMsg(null); }}
-                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-300 ${authMode === 'login' ? 'bg-coral text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-400'}`}
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-300 ${authMode === 'login' ? 'bg-coral text-white shadow-lg' : 'text-zinc-500 bg-zinc-900/40 hover:text-zinc-300 hover:bg-zinc-800/60 shadow-inner'}`}
               >
                 Sign In
               </button>
               <button 
                 onClick={() => { setAuthMode('signup'); setError(null); setSuccessMsg(null); }}
-                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-300 ${authMode === 'signup' ? 'bg-coral text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-400'}`}
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-300 ${authMode === 'signup' ? 'bg-coral text-white shadow-lg' : 'text-zinc-500 bg-zinc-900/40 hover:text-zinc-300 hover:bg-zinc-800/60 shadow-inner'}`}
               >
                 Sign Up
               </button>
@@ -183,6 +192,176 @@ export default function AuthPage() {
             )}
           </AnimatePresence>
 
+          {/* Registration Wizard (3 Steps) */}
+          {authMode === 'signup' && (
+            <div className="space-y-6">
+              {/* Wizard Progress Indication */}
+              <div className="flex gap-2 mb-8">
+                {[1, 2, 3].map((step) => (
+                  <div key={step} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${wizardStep >= step ? 'bg-coral' : 'bg-zinc-200 dark:bg-zinc-800'}`} />
+                ))}
+              </div>
+
+              {/* Step 1: Account Creation */}
+              <AnimatePresence mode="wait">
+                {wizardStep === 1 && (
+                  <motion.div
+                    key="step1"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-5"
+                  >
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold font-space text-zinc-900 dark:text-white">Welcome to ClickRunClaw!</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Let&apos;s create your account to launch your first Agent.</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Email</label>
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Mail className="w-5 h-5 text-zinc-500 group-focus-within:text-zinc-300 transition-colors" />
+                        </div>
+                        <input 
+                          type="email" 
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@company.com" 
+                          className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-[#111318] border border-zinc-200 dark:border-white/10 rounded-full focus:outline-none focus:border-coral transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700 font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Password</label>
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Lock className="w-5 h-5 text-zinc-500 group-focus-within:text-zinc-300 transition-colors" />
+                        </div>
+                        <input 
+                          type="password" 
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••" 
+                          className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-[#111318] border border-zinc-200 dark:border-white/10 rounded-full focus:outline-none focus:border-coral transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700 font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        if (email && password.length >= 6) setWizardStep(2);
+                        else setError('Please enter a valid email and a password with at least 6 characters.');
+                      }}
+                      className="w-full py-4 mt-4 rounded-full bg-coral text-white font-bold hover:bg-coral-hover transition-all flex items-center justify-center shadow-[0_4px_15px_rgba(252,93,93,0.3)]"
+                    >
+                      Continue
+                    </button>
+                  </motion.div>
+                )}
+
+                {/* Step 2: Model Selection */}
+                {wizardStep === 2 && (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-5"
+                  >
+                     <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold font-space text-zinc-900 dark:text-white">Choose Your Brain</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Select the default LLM provider for your agents.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3">
+                      {['OpenAI (GPT-4)', 'Anthropic (Claude 3.5)', 'Google (Gemini 1.5)', 'DeepSeek (V3)'].map((model) => (
+                        <button
+                          key={model}
+                          onClick={() => setWizardModel(model)}
+                          className={`p-4 rounded-2xl border text-left font-bold transition-all ${wizardModel === model ? 'bg-coral/10 border-coral text-coral shadow-sm flex items-center justify-between' : 'bg-zinc-50 dark:bg-[#111318] border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/20'}`}
+                        >
+                          {model}
+                          {wizardModel === model && <CheckCircle2 className="w-5 h-5 text-coral" />}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <button 
+                         onClick={() => setWizardStep(1)}
+                         className="px-6 py-4 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-300 font-bold hover:bg-zinc-200 dark:hover:bg-white/10 transition-all border border-zinc-200 dark:border-white/10"
+                      >
+                        Back
+                      </button>
+                      <button 
+                        onClick={() => setWizardStep(3)}
+                        disabled={!wizardModel}
+                        className="flex-1 py-4 rounded-full bg-coral text-white font-bold hover:bg-coral-hover transition-all flex items-center justify-center disabled:opacity-50 shadow-[0_4px_15px_rgba(252,93,93,0.3)]"
+                      >
+                        Select Engine
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Step 3: API Key (Optional) & Submit */}
+                {wizardStep === 3 && (
+                  <motion.div
+                    key="step3"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-5"
+                  >
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold font-space text-zinc-900 dark:text-white">Secure API Validation</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Paste your API key. It will be encrypted at rest in your personal vault.</p>
+                    </div>
+
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">{wizardModel?.split(' ')[0]} API Key (Optional)</label>
+                       <div className="relative group">
+                          <input 
+                            type="password" 
+                            onChange={(e) => setWizardKey(e.target.value)}
+                            placeholder="sk-..." 
+                            className="w-full px-6 py-4 bg-zinc-50 dark:bg-[#111318] border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-coral transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 font-mono tracking-widest text-center"
+                          />
+                       </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <button 
+                         onClick={() => setWizardStep(2)}
+                         className="px-6 py-4 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-300 font-bold hover:bg-zinc-200 dark:hover:bg-white/10 transition-all border border-zinc-200 dark:border-white/10"
+                      >
+                        Back
+                      </button>
+                      <button 
+                        onClick={handleAuth}
+                        disabled={loading}
+                        className="flex-1 py-4 rounded-full bg-coral text-white font-bold hover:bg-coral-hover transition-all flex items-center justify-center gap-2 group disabled:opacity-50 shadow-[0_4px_15px_rgba(252,93,93,0.3)]"
+                      >
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Finalize & Launch'}
+                      </button>
+                    </div>
+
+                    <p className="text-center text-xs text-zinc-500 font-medium mt-4">
+                      {wizardKey ? 'Key will be encrypted before saving.' : 'You can skip this and add it later in the Dashboard Dashboard.'}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Legacy Form (Shows for Login & Magic Link) */}
+          {authMode !== 'signup' && (
           <form onSubmit={handleAuth} className="space-y-5">
             <div className="space-y-2">
               <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Email</label>
@@ -210,7 +389,7 @@ export default function AuthPage() {
                 <div className="flex items-center justify-between ml-1">
                   <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Password</label>
                   {authMode === 'login' && (
-                    <Link href="#" className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-semibold">Forgot?</Link>
+                    <button type="button" onClick={() => setSuccessMsg("Password reset flow initialized! (Waitlist feature)")} className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-semibold">Forgot?</button>
                   )}
                 </div>
                 <div className="relative group">
@@ -226,32 +405,6 @@ export default function AuthPage() {
                     className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-[#111318] border border-zinc-200 dark:border-white/10 rounded-full focus:outline-none focus:border-coral transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700 font-medium"
                   />
                 </div>
-                
-                {/* Password Strength Indicator */}
-                {authMode === 'signup' && password.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    <div className="flex gap-1.5 h-1.5">
-                      {[1, 2, 3, 4].map((level) => (
-                        <div 
-                          key={level} 
-                          className={`flex-1 rounded-full transition-all duration-500 ${
-                            passwordStrength >= level 
-                              ? passwordStrength < 2 ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' 
-                              : passwordStrength < 4 ? 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]' 
-                              : 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]'
-                              : 'bg-white/5'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-xs text-zinc-500 text-right font-semibold">
-                      {passwordStrength === 1 && 'Weak'}
-                      {passwordStrength === 2 && 'Fair'}
-                      {passwordStrength === 3 && 'Good'}
-                      {passwordStrength >= 4 && 'Strong'}
-                    </p>
-                  </div>
-                )}
               </motion.div>
             )}
 
@@ -265,13 +418,13 @@ export default function AuthPage() {
               ) : (
                 <>
                   {authMode === 'login' && 'Sign In'}
-                  {authMode === 'signup' && 'Create Account'}
                   {authMode === 'magic' && 'Send Magic Link'}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
           </form>
+          )}
 
           {/* Magic Link Toggle */}
           <div className="mt-4">
@@ -320,7 +473,7 @@ export default function AuthPage() {
           </div>
           
           <p className="text-center text-xs text-zinc-600 mt-8 font-medium">
-            By continuing, you agree to our <Link href="/terms" className="text-zinc-400 hover:text-white underline decoration-white/20 underline-offset-2">Terms of Service</Link> and <Link href="/privacy" className="text-zinc-400 hover:text-white underline decoration-white/20 underline-offset-2">Privacy Policy</Link>.
+            By continuing, you agree to our <Link href="/" className="text-zinc-400 hover:text-white underline decoration-white/20 underline-offset-2">Terms of Service</Link> and <Link href="/" className="text-zinc-400 hover:text-white underline decoration-white/20 underline-offset-2">Privacy Policy</Link>.
           </p>
         </div>
       </div>

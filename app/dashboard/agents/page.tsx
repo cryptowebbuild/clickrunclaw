@@ -149,7 +149,7 @@ export default function AgentsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/5 rounded-[2rem] p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-coral/20 transition-all group shadow-sm hover:shadow-xl"
+            className="bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/5 rounded-[2rem] p-6 flex flex-col items-start gap-4 hover:border-coral/20 transition-all group shadow-sm hover:shadow-xl"
           >
             {/* Info Section */}
             <div className="flex items-center gap-4 flex-1">
@@ -181,8 +181,7 @@ export default function AgentsPage() {
                     Webhook Active
                   </span>
                   <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-                  <span className="flex items-center gap-1.5">
-                    <Cpu className="w-3.5 h-3.5" />
+                  <span className="flex items-center gap-1.5 uppercase font-bold text-[10px] tracking-wider bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
                     {agent.provider.toUpperCase()}
                   </span>
                   {agent.telegram_status === 'pending' && (
@@ -207,43 +206,60 @@ export default function AgentsPage() {
               </div>
             </div>
 
-            {/* Actions Section */}
-            <div className="flex items-center gap-2 w-full md:w-auto justify-end border-t border-zinc-900 md:border-t-0 pt-4 md:pt-0">
-              {agent.telegram_status === 'pending' && (
-                <button 
-                  onClick={() => setPairingAgent(agent)}
-                  className="flex items-center gap-2 px-5 py-2 rounded-full bg-coral text-white hover:bg-coral-hover transition-all text-sm font-bold shadow-[0_4px_10px_rgba(252,93,93,0.2)]"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Pair Telegram
-                </button>
-              )}
-              
-              <button 
-                onClick={() => setSelectedTerminal(agent)}
-                className="flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 border border-zinc-800 transition-all text-sm font-bold"
-              >
-                <Terminal className="w-4 h-4" />
-                Inspect
-              </button>
-              
-              <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-white/5 rounded-full p-1.5 border border-zinc-200 dark:border-white/10">
-                <button 
-                  onClick={() => handleAction(agent.id, agent.status === 'running' ? 'stop' : 'running')}
-                  className={`p-2 rounded-full hover:bg-white dark:hover:bg-[#090A0F] transition-all transition-colors ${agent.status === 'running' ? 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white' : 'text-green-500 hover:text-green-400'}`} 
-                  title={agent.status === 'running' ? "Stop" : "Restart"}
-                >
-                  <Square className={`w-4 h-4 ${agent.status === 'running' ? '' : 'fill-green-500/20 text-green-500'}`} />
-                </button>
-                <button 
-                  onClick={() => handleDelete(agent.id)}
-                  className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 transition-all transition-colors" 
-                  title="Delete"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+              <div className="w-full mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/50 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="flex w-full md:w-auto items-center gap-4 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                   <div className="flex items-center gap-2">
+                     <span className="text-zinc-400 dark:text-zinc-600">Model</span>
+                     <div className="px-3 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-md font-mono text-zinc-900 dark:text-zinc-300">
+                       {agent.provider === 'openai' ? 'gpt-4-turbo' : agent.provider === 'anthropic' ? 'claude-3-opus' : 'gemini-1.5-pro'}
+                     </div>
+                   </div>
+                   <div className="flex items-center gap-2">
+                     <span className="text-zinc-400 dark:text-zinc-600">Search</span>
+                     <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/5 border border-green-500/20 text-green-600 dark:text-green-500 rounded-md">
+                       <Globe className="w-3 h-3" /> Enabled
+                     </div>
+                   </div>
+                </div>
+
+                {/* Actions Section */}
+                <div className="flex items-center justify-end gap-2 w-full md:w-auto">
+                  {agent.telegram_status === 'pending' && (
+                    <button 
+                      onClick={() => setPairingAgent(agent)}
+                      className="flex items-center gap-2 px-5 py-2 rounded-full bg-coral text-white hover:bg-coral-hover transition-all text-sm font-bold shadow-[0_4px_10px_rgba(252,93,93,0.2)]"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Pair Telegram
+                    </button>
+                  )}
+                  
+                  <button 
+                    onClick={() => setSelectedTerminal(agent)}
+                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 border border-zinc-800 transition-all text-sm font-bold"
+                  >
+                    <Terminal className="w-4 h-4" />
+                    Inspect
+                  </button>
+                  
+                  <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-white/5 rounded-full p-1.5 border border-zinc-200 dark:border-white/10">
+                    <button 
+                      onClick={() => handleAction(agent.id, agent.status === 'running' ? 'stop' : 'running')}
+                      className={`p-2 rounded-full hover:bg-white dark:hover:bg-[#090A0F] transition-all transition-colors ${agent.status === 'running' ? 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white' : 'text-green-500 hover:text-green-400'}`} 
+                      title={agent.status === 'running' ? "Stop" : "Restart"}
+                    >
+                      <Square className={`w-4 h-4 ${agent.status === 'running' ? '' : 'fill-green-500/20 text-green-500'}`} />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(agent.id)}
+                      className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 transition-all transition-colors" 
+                      title="Delete"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
           </motion.div>
         ))}
       </div>

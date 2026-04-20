@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-space: var(--font-space), ui-sans-serif, system-ui, sans-serif;
@@ -12,11 +14,14 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   * {
-    @apply border-zinc-900;
+    @apply border-zinc-800;
   }
   body {
-    @apply bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 antialiased;
+    @apply bg-[#090A0F] text-zinc-100 antialiased;
   }
   
   /* Global Scrollbar Stability */

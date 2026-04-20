@@ -27,6 +27,7 @@ export default function DashboardOverview() {
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await supabase.auth.getUser();
+      let currentProfile = { plan_tier: 'free' };
       if (data.user) {
         setUser(data.user);
         const { data: profData, error } = await supabase
@@ -35,9 +36,29 @@ export default function DashboardOverview() {
           .eq('id', data.user.id)
           .single();
         // If table doesn't exist yet, fallback to 'free'
-        setProfile(profData && !error ? profData : { plan_tier: 'free' });
+        currentProfile = profData && !error ? profData : { plan_tier: 'free' };
+        setProfile(currentProfile);
       }
       setLoading(false);
+
+      // Check for pending onboarding deployment
+      const pendingDeployStr = localStorage.getItem('CR_PENDING_DEPLOY');
+      if (pendingDeployStr) {
+        try {
+          const pending = JSON.parse(pendingDeployStr);
+          setAgentName(pending.name || '');
+          setProvider(pending.provider || 'openai');
+          setApiKey(pending.apiKey || '');
+          localStorage.removeItem('CR_PENDING_DEPLOY');
+          
+          setTimeout(() => {
+            if (currentProfile.plan_tier === 'free') {
+              setShowUpgradeModal(true);
+              setToast("Setup complete! Activate a node to deploy.");
+            }
+          }, 500);
+        } catch(e) {}
+      }
     };
     fetchUser();
   }, [supabase]);
@@ -161,7 +182,7 @@ export default function DashboardOverview() {
                 required
                 value={agentName}
                 onChange={(e) => setAgentName(e.target.value)}
-                placeholder="e.g. SalesBot-Alpha" 
+                placeholder="e.g. SalesBot-Alpha, Support-Agent, Web3-Analyst" 
                 className="w-full px-4 py-3 bg-zinc-50 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/10 rounded-full focus:border-coral transition-all text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-700 outline-none"
               />
             </div>
@@ -175,6 +196,7 @@ export default function DashboardOverview() {
                 <option value="openai">OpenAI (GPT-4)</option>
                 <option value="anthropic">Anthropic (Claude)</option>
                 <option value="deepseek">DeepSeek (V3)</option>
+                <option value="gemini">Google Gemini</option>
               </select>
             </div>
           </div>
