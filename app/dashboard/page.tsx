@@ -122,7 +122,7 @@ export default function DashboardOverview() {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl md:text-4xl font-bold font-space mb-2 text-zinc-900 dark:text-white"
         >
-          Welcome back, <span className="text-zinc-500 dark:text-zinc-400">{user?.email?.split('@')[0] || 'Builder'}</span>
+          Welcome back, <span className="text-zinc-500 dark:text-zinc-400 capitalize">{profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Builder'}</span>
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
@@ -210,7 +210,7 @@ export default function DashboardOverview() {
           <button 
             type="submit" 
             disabled={deploying}
-            className="w-full md:w-auto min-h-[56px] px-10 bg-coral hover:bg-coral-hover text-white font-black rounded-full transition-all shadow-[0_4px_25px_rgba(255,90,95,0.4)] disabled:opacity-50 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] uppercase tracking-widest text-sm"
+            className="w-full md:w-auto min-h-[56px] px-10 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-black rounded-full transition-all shadow-[0_4px_25px_rgba(37,99,235,0.4)] disabled:opacity-50 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] uppercase tracking-widest text-sm"
           >
             {deploying && <Loader2 className="w-5 h-5 animate-spin" />}
             {deploying ? 'Allocating Container...' : 'Deploy Agent Instantly'}

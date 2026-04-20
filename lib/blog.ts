@@ -10,6 +10,7 @@ export interface BlogPost {
   description: string;
   date: string;
   author: string;
+  image: string;
   content: string;
 }
 
@@ -31,6 +32,7 @@ export function getAllPosts(): BlogPost[] {
         description: matterResult.data.description || '',
         date: matterResult.data.date || 'Unknown Date',
         author: matterResult.data.author || 'Anonymous',
+        image: matterResult.data.image || `https://picsum.photos/seed/${slug}/800/600`,
         content: matterResult.content,
       };
     });

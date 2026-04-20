@@ -41,7 +41,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 selection:bg-coral selection:text-white font-sans">
       <Header />
       
-      <main className="pt-32 pb-24 px-4 max-w-3xl mx-auto relative z-10">
+      <main className="pt-32 pb-24 px-6 md:px-8 max-w-3xl mx-auto relative z-10">
         <Link 
           href="/blog" 
           className="inline-flex items-center text-sm font-bold text-zinc-500 hover:text-coral mb-12 transition-colors group"
@@ -50,7 +50,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           Back to Journal
         </Link>
         
-        <article>
+        <article className="px-1 md:px-0">
           <header className="mb-14">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight font-space text-zinc-900 dark:text-white mb-6 leading-[1.1]">
               {post.title}

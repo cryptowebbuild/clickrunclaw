@@ -17,6 +17,7 @@ export default function BlogPage() {
     description: post.description,
     date: post.date,
     author: post.author,
+    image: post.image,
     content: ''
   }));
 

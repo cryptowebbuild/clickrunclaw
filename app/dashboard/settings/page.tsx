@@ -1,9 +1,37 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { User, Mail, Lock, Shield, Bell, Key } from 'lucide-react';
+import { User, Mail, Lock, Shield, Bell, Key, Loader2 } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function SettingsPage() {
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+        const { data: profData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        setProfile(profData);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [supabase]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 text-coral animate-spin" /></div>;
+  }
+
   return (
     <div className="space-y-10 max-w-4xl pb-20">
       <div>
@@ -25,8 +53,8 @@ export default function SettingsPage() {
         </h2>
         
         <div className="flex flex-col md:flex-row gap-12 items-start">
-          <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/5 flex items-center justify-center text-zinc-900 dark:text-white font-black text-3xl shrink-0 shadow-inner">
-            JD
+          <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/5 flex items-center justify-center text-zinc-900 dark:text-white font-black text-3xl shrink-0 shadow-inner uppercase">
+            {profile?.full_name ? profile.full_name.charAt(0) : user?.email?.charAt(0) || 'U'}
           </div>
           
           <div className="flex-1 space-y-8 w-full">
@@ -35,7 +63,8 @@ export default function SettingsPage() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 ml-4">Full Identity</label>
                 <input 
                   type="text" 
-                  defaultValue="John Doe"
+                  defaultValue={profile?.full_name || user?.email?.split('@')[0] || ''}
+                  placeholder="Your Name"
                   className="w-full px-6 py-4 bg-zinc-50 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/5 rounded-full focus:outline-none focus:border-coral transition-all text-zinc-900 dark:text-white font-bold"
                 />
               </div>
@@ -43,7 +72,7 @@ export default function SettingsPage() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 ml-4">Encrypted Email</label>
                 <input 
                   type="email" 
-                  defaultValue="john@example.com"
+                  defaultValue={user?.email || ''}
                   disabled
                   className="w-full px-6 py-4 bg-zinc-100 dark:bg-black/20 opacity-50 border border-zinc-200 dark:border-white/5 rounded-full text-zinc-500 dark:text-zinc-700 cursor-not-allowed font-medium"
                 />
@@ -76,7 +105,7 @@ export default function SettingsPage() {
               <h3 className="font-bold text-zinc-900 dark:text-white mb-2 flex items-center gap-2">
                 <Lock className="w-4 h-4 text-zinc-400" /> Password Authentication
               </h3>
-              <p className="text-sm text-zinc-500 font-light">Last rotation cycle: 90 days ago</p>
+              <p className="text-sm text-zinc-500 font-light">Last rotation cycle: Managed via provider</p>
             </div>
             <button className="px-6 py-3 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-zinc-300 hover:text-coral transition-colors text-xs font-black uppercase tracking-widest">
               Rotate Keys
@@ -90,7 +119,7 @@ export default function SettingsPage() {
               </h3>
               <p className="text-sm text-zinc-500 font-light">Inject an extra layer of biometric security to your workspace.</p>
             </div>
-            <button className="px-6 py-3 rounded-full bg-coral text-white hover:bg-coral-hover transition-all text-xs font-black uppercase tracking-widest shadow-[0_4px_10px_rgba(252,93,93,0.2)]">
+            <button className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:from-blue-500 hover:to-violet-500 transition-all text-xs font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(37,99,235,0.3)]">
               Enable 2FA
             </button>
           </div>

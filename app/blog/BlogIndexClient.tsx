@@ -55,7 +55,7 @@ export default function BlogIndexClient({ blogPosts }: BlogIndexClientProps) {
               <div className="h-60 w-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-900">
                 <div className="absolute inset-0 bg-coral opacity-0 group-hover:opacity-10 transition-opacity z-10" />
                 <Image 
-                  src={`https://picsum.photos/seed/${post.slug}/800/600`}
+                  src={post.image}
                   alt={post.title} 
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
