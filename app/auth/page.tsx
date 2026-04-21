@@ -234,7 +234,7 @@ function AuthContent() {
       <div className="mt-8 text-center">
         {authMode === 'login' ? (
           <p className="text-zinc-500 font-medium text-sm">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <button onClick={() => setAuthMode('signup')} className="font-bold text-coral hover:text-coral-hover transition-colors">Sign up</button>
           </p>
         ) : (
@@ -246,7 +246,7 @@ function AuthContent() {
       </div>
       
       <p className="text-center text-xs text-zinc-600 mt-8 font-medium">
-        By continuing, you agree to our <Link href="/" className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white underline decoration-transparent hover:decoration-zinc-400 transition-all underline-offset-4">Terms of Service</Link> & <Link href="/" className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white underline decoration-transparent hover:decoration-zinc-400 transition-all underline-offset-4">Privacy</Link>.
+        By continuing, you agree to our <Link href="/privacy" className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white underline decoration-transparent hover:decoration-zinc-400 transition-all underline-offset-4">Terms of Service</Link> & <Link href="/privacy" className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white underline decoration-transparent hover:decoration-zinc-400 transition-all underline-offset-4">Privacy</Link>.
       </p>
     </div>
   );
@@ -324,7 +324,7 @@ export default function AuthPage() {
             className="space-y-6 pl-4 border-l border-white/10"
           >
             <h3 className="text-2xl font-space font-bold leading-tight text-zinc-900 dark:text-white">
-              "The deployment speed is unmatched. It feels like we skipped DevOps entirely."
+              &quot;The deployment speed is unmatched. It feels like we skipped DevOps entirely.&quot;
             </h3>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center font-bold text-lg text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 shadow-sm">

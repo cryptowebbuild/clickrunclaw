@@ -56,9 +56,9 @@ export default function DashboardOverview() {
       setLoading(false);
 
       // Check for pending onboarding deployment
-      const pendingDeployStr = localStorage.getItem('CR_PENDING_DEPLOY');
-      if (pendingDeployStr && currentProfile.full_name) { // only trigger if onboarding is not blocking
-        try {
+      try {
+        const pendingDeployStr = localStorage.getItem('CR_PENDING_DEPLOY');
+        if (pendingDeployStr && currentProfile.full_name) { // only trigger if onboarding is not blocking
           const pending = JSON.parse(pendingDeployStr);
           setAgentName(pending.name || '');
           setProvider(pending.provider || 'openai');
@@ -71,7 +71,9 @@ export default function DashboardOverview() {
               setToast("Setup complete! Activate a node to deploy.");
             }
           }, 500);
-        } catch(e) {}
+        }
+      } catch(e) {
+        console.warn('Storage access failed:', e);
       }
     };
     fetchUser();
@@ -203,6 +205,7 @@ export default function DashboardOverview() {
 
       {/* Deployment Widget */}
       <motion.div 
+        id="deploy-section"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
@@ -439,7 +442,7 @@ export default function DashboardOverview() {
                 </div>
                 <h3 className="text-2xl font-bold font-space text-zinc-900 dark:text-white mb-2">Complete your profile</h3>
                 <p className="text-sm text-zinc-500 mb-8">
-                  Welcome aboard! Let's personalize your workspace before deploying your first agent.
+                  Welcome aboard! Let&apos;s personalize your workspace before deploying your first agent.
                 </p>
 
                 <form onSubmit={handleSaveProfile} className="space-y-5">

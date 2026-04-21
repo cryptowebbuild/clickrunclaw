@@ -25,7 +25,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-1 space-y-6">
             <h4 className="text-white font-bold font-space">Product</h4>
             <ul className="space-y-4">
-              <li><a href="/#features" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Features</a></li>
+              <li><Link href="/#features" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Features</Link></li>
               <li><Link href="/blog" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Documentation</Link></li>
               <li><Link href="/blog" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Status</Link></li>
             </ul>
@@ -35,9 +35,9 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-1 space-y-6">
             <h4 className="text-white font-bold font-space">Legal</h4>
             <ul className="space-y-4">
-              <li><Link href="/" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Privacy</Link></li>
-              <li><Link href="/" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Security</Link></li>
-              <li><Link href="/" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Privacy</Link></li>
+              <li><Link href="/privacy" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Security</Link></li>
+              <li><Link href="/privacy" className="text-sm font-medium hover:text-[#FF5A5F] transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
 

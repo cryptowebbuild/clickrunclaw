@@ -37,7 +37,7 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-zinc-600 dark:text-zinc-400">
             <Link href="/" className="hover:text-[#FF5A5F] transition-colors">Home</Link>
             <Link href="/dashboard/skills" className="hover:text-[#FF5A5F] transition-colors">Skills</Link>
-            <a href="/#pricing" className="hover:text-[#FF5A5F] transition-colors">Pricing</a>
+            <Link href="/#pricing" className="hover:text-[#FF5A5F] transition-colors">Pricing</Link>
             <Link href="/dashboard/integrations" className="hover:text-[#FF5A5F] transition-colors">Integrations</Link>
             <Link href="/blog" className="hover:text-[#FF5A5F] transition-colors">Blog</Link>
           </div>
@@ -88,7 +88,7 @@ export default function Header() {
               <div className="px-4 py-8 flex flex-col gap-6">
                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-zinc-900 dark:text-white hover:text-[#FF5A5F] transition-colors">Home</Link>
                 <Link href="/dashboard/skills" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-zinc-900 dark:text-white hover:text-[#FF5A5F] transition-colors">Skills</Link>
-                <a href="/#pricing" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-zinc-900 dark:text-white hover:text-[#FF5A5F] transition-colors">Pricing</a>
+                <Link href="/#pricing" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-zinc-900 dark:text-white hover:text-[#FF5A5F] transition-colors">Pricing</Link>
                 <Link href="/dashboard/integrations" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-zinc-900 dark:text-white hover:text-[#FF5A5F] transition-colors">Integrations</Link>
                 <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-zinc-900 dark:text-white hover:text-[#FF5A5F] transition-colors">Blog</Link>
                 <div className="pt-6 border-t border-zinc-200 dark:border-white/10 mt-2">
