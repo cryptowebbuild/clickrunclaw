@@ -28,7 +28,7 @@ export default function Header() {
         <nav className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tighter font-space text-zinc-900 dark:text-white group">
             <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform bg-[#090A0F]">
-              <TerminalSquare className="w-5 h-5 text-[#FF5A5F]" />
+              <Image src="/mascot.webp" alt="ClickRunClaw Mascot" width={32} height={32} className="object-contain" />
             </div>
             <span>ClickRunClaw</span>
           </Link>

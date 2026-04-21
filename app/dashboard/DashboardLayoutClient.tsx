@@ -35,7 +35,7 @@ const SidebarContent = ({
     <div className="flex flex-col h-full relative z-10">
       <div className="p-8 flex items-center gap-3 font-bold text-xl font-space">
         <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden flex items-center justify-center bg-[#090A0F]">
-          <TerminalSquare className="w-5 h-5 text-[#FF5A5F]" />
+          <Image src="/mascot.webp" alt="ClickRunClaw Mascot" width={32} height={32} className="object-contain" />
         </div>
         <span className="text-zinc-900 dark:text-white tracking-tighter">ClickRunClaw</span>
       </div>
