@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+export const runtime = 'edge';
+
 export async function POST(req: Request) {
   try {
     // Init Supabase Admin (সার্ভার সাইডে ডাটাবেস এক্সেস করার জন্য Service Role Key প্রয়োজন)
