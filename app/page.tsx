@@ -23,6 +23,13 @@ export default function LandingPage() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, [supabase]);
 
+  const handleWhopCheckout = (planId: string) => {
+    const userId = user?.id || '';
+    const userEmail = user?.email || '';
+    const checkoutUrl = `https://whop.com/checkout/${planId}?custom_user_id=${userId}&email=${encodeURIComponent(userEmail)}`;
+    window.location.href = checkoutUrl;
+  };
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 overflow-x-hidden selection:bg-coral/30 selection:text-white">
       {/* Background Effects */}
@@ -448,12 +455,12 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/auth"
+                <button
+                  onClick={() => handleWhopCheckout('plan_T8nSbRxGGTlly')}
                   className="flex items-center justify-center w-full h-14 rounded-full bg-zinc-900 dark:bg-zinc-800 border border-zinc-800 dark:border-zinc-700 text-white font-bold text-base hover:bg-zinc-800 dark:hover:bg-zinc-700 transition-all hover:scale-[1.02] shadow-lg"
                 >
                   Get Started
-                </Link>
+                </button>
               </motion.div>
 
               {/* Pro Tier */}
@@ -498,12 +505,12 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link 
-                  href="/auth"
+                <button 
+                  onClick={() => handleWhopCheckout('plan_Bhg70HYNZqmJV')}
                   className="flex items-center justify-center w-full h-14 rounded-full bg-coral text-white font-bold text-base hover:bg-coral-hover transition-all shadow-[0_4px_25px_rgba(255,90,95,0.4)] hover:scale-[1.02]"
                 >
                   Go Pro
-                </Link>
+                </button>
               </motion.div>
             </div>
           </div>

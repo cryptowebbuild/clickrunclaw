@@ -35,13 +35,13 @@ export default function BillingPage() {
               <Zap className="w-4 h-4 text-coral" />
               Available Balance
             </h2>
-            <div className="text-5xl font-black font-space text-zinc-900 dark:text-white mb-6 tracking-tighter">$45.50</div>
-            <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-10 leading-relaxed italic">Auto-recharge is active when balance drops below $10.00.</p>
+            <div className="text-5xl font-black font-space text-zinc-900 dark:text-white mb-6 tracking-tighter">Starter</div>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-10 leading-relaxed italic">Upgrade to the Starter Plan to test capabilities before pushing large scale traffic models.</p>
             <button 
-              onClick={() => handleWhopCheckout('plan_5credits')}
+              onClick={() => handleWhopCheckout('plan_T8nSbRxGGTlly')}
               className="w-full py-4 rounded-full bg-zinc-900 dark:bg-zinc-900 text-white hover:bg-zinc-800 transition-all font-bold text-sm shadow-lg mt-auto"
             >
-              Add Credits via Whop
+              $9.99 Starter Plan
             </button>
           </div>
         </motion.div>
@@ -79,7 +79,7 @@ export default function BillingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4">
             <button 
-              onClick={() => handleWhopCheckout('plan_pro_monthly')}
+              onClick={() => handleWhopCheckout('plan_Bhg70HYNZqmJV')}
               className="px-8 py-4 rounded-full bg-coral text-white font-bold hover:bg-coral-hover transition-all text-sm shadow-[0_4px_15px_rgba(252,93,93,0.3)]"
             >
               Upgrade Subscription

@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Init Supabase Admin (সার্ভার সাইডে ডাটাবেস এক্সেস করার জন্য Service Role Key প্রয়োজন)
-// এটি ইউজারের লগিন ছাড়াই ব্যাকগ্রাউন্ডে ডাটাবেস আপডেট করতে পারে
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(req: Request) {
   try {
+    // Init Supabase Admin (সার্ভার সাইডে ডাটাবেস এক্সেস করার জন্য Service Role Key প্রয়োজন)
+    // এটি ইউজারের লগিন ছাড়াই ব্যাকগ্রাউন্ডে ডাটাবেস আপডেট করতে পারে
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     const payload = await req.json();
     
     // **সিকিউরিটি চেক**: এটি কি আসলেই Whop থেকে এসেছে কিনা তা চেক করা (HMAC Verification)
