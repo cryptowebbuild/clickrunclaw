@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Key, Save, Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 

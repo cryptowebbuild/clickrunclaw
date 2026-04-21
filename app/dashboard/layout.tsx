@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
-import DashboardLayoutClient from './DashboardLayoutClient';
-
-export const runtime = 'edge';
+import { DashboardLayoutClient } from './DashboardLayoutClient';
 
 export const metadata: Metadata = {
   title: 'Dashboard | ClickRunClaw',

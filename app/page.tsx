@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Box, Key, Webhook, ChevronRight, TerminalSquare, Server, ShieldCheck, Zap,
   MessageSquare, Send, Phone, MessageCircle, Globe, Smartphone,
@@ -62,11 +62,12 @@ export default function LandingPage() {
             <div className="relative w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden border border-white/10 dark:border-white/5 bg-[#0D1117] shadow-2xl flex items-center justify-center p-0">
               <div className="w-full h-full relative">
                 <Image 
-                  src="/mascot.webp" 
+                  src="https://picsum.photos/seed/cyberpunk/400/400" 
                   alt="ClickRunClaw Mascot" 
                   fill 
                   className="object-cover scale-110" 
                   priority
+                  referrerPolicy="no-referrer"
                 />
               </div>
             </div>

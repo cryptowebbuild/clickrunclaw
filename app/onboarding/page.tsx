@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { TerminalSquare, ChevronRight, Zap, Bot, BrainCircuit, Key, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,7 @@ import Image from 'next/image';
 const PROVIDERS = [
   { id: 'openai', name: 'OpenAI (GPT-4)', icon: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg' },
   { id: 'anthropic', name: 'Anthropic (Claude)', icon: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_logo.svg' },
-  { id: 'deepseek', name: 'DeepSeek (V3)', icon: '/mascot.webp' }, // Placeholder for deepseek icon, using mascot
+  { id: 'deepseek', name: 'DeepSeek (V3)', icon: 'https://avatars.githubusercontent.com/u/155490407?s=200&v=4' },
   { id: 'gemini', name: 'Google Gemini', icon: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg' }
 ];
 

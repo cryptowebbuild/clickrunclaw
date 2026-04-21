@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Terminal, Play, Square, RotateCw, Server, 
   Search, Plus, X, Activity, Globe, Cpu, Loader2, MessageCircle, AlertCircle, HelpCircle, Send, Paperclip

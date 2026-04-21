@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: 'Sign In | ClickRunClaw',
   description: 'Sign in to ClickRunClaw to deploy and manage your AI agents.',

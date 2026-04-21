@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Facebook, Twitter, Send } from 'lucide-react';
+import { Facebook, Twitter, Send, TerminalSquare } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-1 space-y-6">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tighter font-space text-white group">
               <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform bg-[#090A0F]">
-                <Image src="/mascot.webp" alt="ClickRunClaw Mascot" width={32} height={32} className="object-contain" />
+                <TerminalSquare className="w-5 h-5 text-[#FF5A5F]" />
               </div>
               <span>ClickRunClaw</span>
             </Link>

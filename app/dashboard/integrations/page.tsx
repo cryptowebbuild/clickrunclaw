@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Search, Link as LinkIcon, Database, Mail, Calendar, FileText, MessagesSquare, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 
