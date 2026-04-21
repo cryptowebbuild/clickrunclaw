@@ -8,6 +8,7 @@ import {
   Menu, X
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
@@ -17,6 +18,7 @@ import Footer from './components/Footer';
 
 export default function LandingPage() {
   const [user, setUser] = useState<any>(null);
+  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
@@ -24,6 +26,12 @@ export default function LandingPage() {
   }, [supabase]);
 
   const handleWhopCheckout = (planId: string) => {
+    if (!user) {
+      // If the user isn't logged in, intercept the checkout and force them to auth first
+      // Pass the plan intent so after auth, we can auto-route them or just have them in the dashboard
+      router.push(`/auth?intent=checkout&plan=${planId}`);
+      return;
+    }
     const userId = user?.id || '';
     const userEmail = user?.email || '';
     const checkoutUrl = `https://whop.com/checkout/${planId}?custom_user_id=${userId}&email=${encodeURIComponent(userEmail)}`;

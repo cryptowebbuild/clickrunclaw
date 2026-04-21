@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon } from 'lucide-react';
+import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon, User, Building, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -13,6 +13,12 @@ export default function DashboardOverview() {
   // Paywall & Profile State
   const [profile, setProfile] = useState<any>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  // Onboarding State
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingName, setOnboardingName] = useState('');
+  const [onboardingCompany, setOnboardingCompany] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
 
   // Agent Deployment State
   const [agentName, setAgentName] = useState('');
@@ -27,7 +33,7 @@ export default function DashboardOverview() {
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await supabase.auth.getUser();
-      let currentProfile = { plan_tier: 'free' };
+      let currentProfile = { plan_tier: 'free', full_name: '' };
       if (data.user) {
         setUser(data.user);
         const { data: profData, error } = await supabase
@@ -35,15 +41,23 @@ export default function DashboardOverview() {
           .select('*')
           .eq('id', data.user.id)
           .single();
-        // If table doesn't exist yet, fallback to 'free'
-        currentProfile = profData && !error ? profData : { plan_tier: 'free' };
+        
+        if (profData && !error) {
+           currentProfile = profData;
+        }
+
         setProfile(currentProfile);
+
+        // Trigger Onboarding if no name is set
+        if (!currentProfile.full_name) {
+          setShowOnboarding(true);
+        }
       }
       setLoading(false);
 
       // Check for pending onboarding deployment
       const pendingDeployStr = localStorage.getItem('CR_PENDING_DEPLOY');
-      if (pendingDeployStr) {
+      if (pendingDeployStr && currentProfile.full_name) { // only trigger if onboarding is not blocking
         try {
           const pending = JSON.parse(pendingDeployStr);
           setAgentName(pending.name || '');
@@ -63,11 +77,36 @@ export default function DashboardOverview() {
     fetchUser();
   }, [supabase]);
 
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onboardingName.trim()) return;
+    
+    setSavingProfile(true);
+    try {
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        full_name: onboardingName,
+        company: onboardingCompany,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'id' });
+
+      if (error) throw error;
+
+      setProfile({ ...profile, full_name: onboardingName, company: onboardingCompany });
+      setShowOnboarding(false);
+      setToast("Profile configured successfully!");
+    } catch (err: any) {
+      setToast(err.message || 'Error saving profile');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   const handleUpgrade = (plan: string) => {
     const link = plan === 'Pro' 
-      ? 'https://whop.com/clickrunclaws/clickrun-procore/'
-      : 'https://whop.com/clickrunclaws/clickrunclaw-starter-node/';
-    window.open(link, '_blank');
+      ? `https://whop.com/checkout/plan_Bhg70HYNZqmJV?custom_user_id=${user?.id}&email=${encodeURIComponent(user?.email || '')}`
+      : `https://whop.com/checkout/plan_T8nSbRxGGTlly?custom_user_id=${user?.id}&email=${encodeURIComponent(user?.email || '')}`;
+    window.location.href = link;
   };
 
   const handleDeploy = async (e: React.FormEvent) => {
@@ -379,6 +418,79 @@ export default function DashboardOverview() {
         <span>Secure payments powered by Whop. Cancel anytime.</span>
       </motion.div>
 
+      {/* Post-Signup Onboarding Modal */}
+      <AnimatePresence>
+        {showOnboarding && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-white dark:bg-[#090A0F] border border-zinc-200 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl overflow-hidden"
+            >
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-coral/10 rounded-2xl flex items-center justify-center mb-6">
+                  <User className="w-6 h-6 text-coral" />
+                </div>
+                <h3 className="text-2xl font-bold font-space text-zinc-900 dark:text-white mb-2">Complete your profile</h3>
+                <p className="text-sm text-zinc-500 mb-8">
+                  Welcome aboard! Let's personalize your workspace before deploying your first agent.
+                </p>
+
+                <form onSubmit={handleSaveProfile} className="space-y-5">
+                  <div className="space-y-2">
+                     <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Full Name</label>
+                     <div className="relative group">
+                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                         <User className="w-4 h-4 text-zinc-400 group-focus-within:text-zinc-900 dark:group-focus-within:text-white transition-colors" />
+                       </div>
+                       <input 
+                         type="text" 
+                         required
+                         value={onboardingName}
+                         onChange={(e) => setOnboardingName(e.target.value)}
+                         placeholder="John Doe" 
+                         className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-[#111318] border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all text-zinc-900 dark:text-white placeholder:text-zinc-500 font-medium"
+                       />
+                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                     <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Company (Optional)</label>
+                     <div className="relative group">
+                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                         <Building className="w-4 h-4 text-zinc-400 group-focus-within:text-zinc-900 dark:group-focus-within:text-white transition-colors" />
+                       </div>
+                       <input 
+                         type="text" 
+                         value={onboardingCompany}
+                         onChange={(e) => setOnboardingCompany(e.target.value)}
+                         placeholder="Acme Inc." 
+                         className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-[#111318] border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all text-zinc-900 dark:text-white placeholder:text-zinc-500 font-medium"
+                       />
+                     </div>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={savingProfile || !onboardingName.trim()}
+                    className="w-full py-4 mt-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all disabled:opacity-50"
+                  >
+                    {savingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Enter Dashboard'}
+                    {!savingProfile && <ArrowRight className="w-4 h-4" />}
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Cosmic Dark Upgrade Modal */}
       <AnimatePresence>
         {showUpgradeModal && (
@@ -413,18 +525,20 @@ export default function DashboardOverview() {
 
                 <div className="space-y-4">
                   <a 
-                    href="https://whop.com/clickrunclaws/clickrunclaw-starter-node/" 
-                    target="_blank" rel="noreferrer"
-                    className="block w-full py-5 px-8 bg-zinc-50 dark:bg-zinc-950 hover:bg-white dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-900 rounded-full text-zinc-900 dark:text-white font-bold transition-all flex items-center justify-between group shadow-sm"
+                    href={`https://whop.com/checkout/plan_T8nSbRxGGTlly?custom_user_id=${user?.id}&email=${encodeURIComponent(user?.email || '')}`}
+                    onClick={(e) => e.preventDefault()}
+                    onMouseUp={() => window.location.href = `https://whop.com/checkout/plan_T8nSbRxGGTlly?custom_user_id=${user?.id}&email=${encodeURIComponent(user?.email || '')}`}
+                    className="block w-full py-5 px-8 bg-zinc-50 dark:bg-zinc-950 hover:bg-white dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-900 rounded-full text-zinc-900 dark:text-white font-bold transition-all flex items-center justify-between group shadow-sm cursor-pointer"
                   >
                     <span className="flex items-center gap-3 text-base"><Server className="w-5 h-5 text-coral/60" /> Starter Pod ($9.99/mo)</span>
                     <span className="text-[10px] bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-white px-4 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 uppercase tracking-widest font-black group-hover:bg-zinc-900 dark:group-hover:bg-coral transition-all">Select</span>
                   </a>
                   
                   <a 
-                    href="https://whop.com/clickrunclaws/clickrun-procore/" 
-                    target="_blank" rel="noreferrer"
-                    className="block w-full py-5 px-8 bg-coral hover:bg-coral-hover rounded-full text-white font-bold transition-all flex items-center justify-between group shadow-[0_4px_25px_rgba(255,90,95,0.4)]"
+                    href={`https://whop.com/checkout/plan_Bhg70HYNZqmJV?custom_user_id=${user?.id}&email=${encodeURIComponent(user?.email || '')}`}
+                    onClick={(e) => e.preventDefault()}
+                    onMouseUp={() => window.location.href = `https://whop.com/checkout/plan_Bhg70HYNZqmJV?custom_user_id=${user?.id}&email=${encodeURIComponent(user?.email || '')}`}
+                    className="block w-full py-5 px-8 bg-coral hover:bg-coral-hover rounded-full text-white font-bold transition-all flex items-center justify-between group shadow-[0_4px_25px_rgba(255,90,95,0.4)] cursor-pointer"
                   >
                     <span className="flex items-center gap-3 text-base"><Zap className="w-5 h-5 text-white" /> Pro Pod ($29.99/mo)</span>
                     <span className="text-[10px] bg-white text-coral px-4 py-1.5 rounded-full uppercase tracking-widest font-black shadow-lg">Best Value</span>

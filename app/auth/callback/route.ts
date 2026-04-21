@@ -9,6 +9,7 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   // if "next" is in param, use it as the redirect URL
   const next = searchParams.get('next') ?? '/dashboard'
+  const checkoutPlan = searchParams.get('checkout_plan');
 
   if (code) {
     const cookieStore = await cookies()
@@ -34,8 +35,14 @@ export async function GET(request: Request) {
         },
       }
     )
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+    const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (!error && session) {
+      if (checkoutPlan) {
+        // Forward directly to Whop checkout leveraging the newly forged session
+        const checkoutUrl = `https://whop.com/checkout/${checkoutPlan}?custom_user_id=${session.user.id}&email=${encodeURIComponent(session.user.email || '')}`;
+        return NextResponse.redirect(checkoutUrl);
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
   }
