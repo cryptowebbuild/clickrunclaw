@@ -9,7 +9,20 @@ const SUPPORTED_EVENTS = new Set([
   'membership_activated',
   'membership.activated',
   'membership.went_valid',
+  'membership.updated',
 ]);
+
+const ACTIVE_MEMBERSHIP_STATUSES = new Set(['trialing', 'active']);
+
+const PLAN_TIER_BY_PRODUCT_ID: Record<string, 'starter' | 'pro'> = {
+  prod_3ucOWlOWqqBTK: 'starter',
+  prod_6hVRfVLQZt6cY: 'pro',
+};
+
+const PLAN_TIER_BY_PLAN_ID: Record<string, 'starter' | 'pro'> = {
+  plan_T8nSbRxGGTlly: 'starter',
+  plan_Bhg70HYNZqmJV: 'pro',
+};
 
 export async function POST(req: Request) {
   try {
@@ -69,7 +82,29 @@ export async function POST(req: Request) {
       body.metadata?.custom_user_id ||
       null;
 
+    const membershipStatus = String(
+      body.data?.membership?.status ||
+      body.data?.status ||
+      ''
+    ).trim().toLowerCase();
+
+    if (eventType.startsWith('membership') && membershipStatus && !ACTIVE_MEMBERSHIP_STATUSES.has(membershipStatus)) {
+      return NextResponse.json({
+        success: true,
+        message: `Membership ignored due to status: ${membershipStatus}`,
+        eventType,
+      });
+    }
+
     const assignedTier = resolvePlanTier(body);
+
+    if (!assignedTier) {
+      return NextResponse.json({
+        success: true,
+        message: 'Webhook ignored: unsupported product or plan',
+        eventType,
+      });
+    }
 
     if (!email && !customUserId) {
       console.error('Whop webhook missing both email and custom_user_id.');
@@ -149,16 +184,25 @@ async function verifySignature(signature: string, secret: string, bodyText: stri
   );
 }
 
-function resolvePlanTier(body: any) {
-  const haystack = JSON.stringify({
-    plan: body.data?.plan,
-    product: body.data?.product,
-    membership: body.data?.membership,
-    data: body.data,
-  }).toLowerCase();
+function resolvePlanTier(body: any): 'starter' | 'pro' | null {
+  const productId = body.data?.product?.id;
+  const planId = body.data?.plan?.id;
+  const productTitle = String(body.data?.product?.title || '').toLowerCase();
+  const planTitle = String(body.data?.plan?.title || '').toLowerCase();
 
+  if (productId && PLAN_TIER_BY_PRODUCT_ID[productId]) {
+    return PLAN_TIER_BY_PRODUCT_ID[productId];
+  }
+
+  if (planId && PLAN_TIER_BY_PLAN_ID[planId]) {
+    return PLAN_TIER_BY_PLAN_ID[planId];
+  }
+
+  const haystack = `${productTitle} ${planTitle}`;
   if (haystack.includes('pro')) return 'pro';
-  return 'starter';
+  if (haystack.includes('starter')) return 'starter';
+
+  return null;
 }
 
 function hexToBuffer(hex: string) {
