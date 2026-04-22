@@ -61,6 +61,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required configuration: agentName, provider, or apiKey.' }, { status: 400 });
     }
 
+    const normalizedName = String(agentName).trim();
+    const normalizedProvider = String(provider).trim().toLowerCase();
+    const normalizedApiKey = String(apiKey).trim();
+    const normalizedTelegramToken = telegramToken ? String(telegramToken).trim() : null;
+
+    if (!normalizedName || !normalizedProvider || !normalizedApiKey) {
+      return NextResponse.json({ error: 'Invalid deployment configuration.' }, { status: 400 });
+    }
+
+    const coolifyWebhook = process.env.COOLIFY_DEPLOY_WEBHOOK_URL;
+    if (!coolifyWebhook) {
+      return NextResponse.json({ error: 'Deployment is not configured yet. COOLIFY_DEPLOY_WEBHOOK_URL is missing.' }, { status: 500 });
+    }
+
     // 3. Insert Agent into Supabase Database 
     // Initial status: 'deploying'
     const { data: dbAgent, error: dbError } = await supabase
@@ -68,11 +82,11 @@ export async function POST(req: Request) {
       .insert([
         {
           user_id: user.id,
-          name: agentName,
-          provider: provider,
-          api_key_secure: apiKey, // Securely stored in RLS protected table
-          telegram_bot_token: telegramToken || null,
-          telegram_status: telegramToken ? 'pending' : 'none',
+          name: normalizedName,
+          provider: normalizedProvider,
+          api_key_secure: normalizedApiKey, // Securely stored in RLS protected table
+          telegram_bot_token: normalizedTelegramToken,
+          telegram_status: normalizedTelegramToken ? 'pending' : 'none',
           status: 'deploying'
         }
       ])
@@ -85,30 +99,20 @@ export async function POST(req: Request) {
     }
 
     // -------------------------------------------------------------
-    // 4. THE MAGIC HAPPENS HERE: TRIGGER DOCKER VPS (COOLIFY)
+    // 4. Trigger Coolify deployment
     // -------------------------------------------------------------
-    // We send a request to your actual Coolify instance at your Contabo IP (37.60.252.51)
-    // Coolify gives you a Webhook URL for each project. You will place that in your .env
-    const coolifyWebhook = process.env.COOLIFY_DEPLOY_WEBHOOK_URL;
     let deploymentSuccess = true;
     
-    if (coolifyWebhook) {
-      try {
-        // Trigger the deployment on Coolify
-        const res = await fetch(coolifyWebhook, { method: 'POST' });
-        if (!res.ok) {
-           deploymentSuccess = false;
-           throw new Error("Coolify responded with a non-200 status code.");
-        }
-        console.log("Coolify deployment triggered successfully.");
-      } catch (err) {
-        deploymentSuccess = false;
-        console.error("Warning: Could not trigger Coolify webhook. Is it correct?", err);
+    try {
+      const res = await fetch(coolifyWebhook, { method: 'POST' });
+      if (!res.ok) {
+         deploymentSuccess = false;
+         throw new Error(`Coolify webhook failed with status ${res.status}`);
       }
-    } else {
-      // Fallback delay for local testing without the webhook
-      console.log("No COOLIFY_DEPLOY_WEBHOOK_URL found. Simulating delay...");
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Coolify deployment triggered successfully.');
+    } catch (err) {
+      deploymentSuccess = false;
+      console.error('Could not trigger Coolify webhook.', err);
     }
     
     if (!deploymentSuccess) {
@@ -140,7 +144,7 @@ export async function POST(req: Request) {
       message: 'Agent successfully deployed to Contabo Cloud Server via Coolify.',
       agent: {
         id: dbAgent.id,
-        name: agentName,
+        name: normalizedName,
         status: 'running',
         webhookUrl: userHookUrl,
         containerId: containerIdTag

@@ -42,14 +42,12 @@ export default function AgentsPage() {
     fetchAgents();
   }, [supabase]);
 
-  const handleAction = async (agentId: string, action: 'stop' | 'running') => {
-    setAgents(agents.map(a => a.id === agentId ? { ...a, status: action === 'stop' ? 'stopped' : 'running' } : a));
-    await supabase.from('agents').update({ status: action === 'stop' ? 'stopped' : 'running' }).eq('id', agentId);
+  const handleAction = async () => {
+    alert('Real container start or stop is not connected yet. This control is temporarily disabled to avoid fake status changes.');
   };
   
-  const handleDelete = async (agentId: string) => {
-    setAgents(agents.filter(a => a.id !== agentId));
-    await supabase.from('agents').delete().eq('id', agentId);
+  const handleDelete = async () => {
+    alert('Real agent deletion is not connected yet. This control is temporarily disabled to avoid deleting database records without removing infrastructure.');
   };
 
   const handleSupportSubmit = (e: any) => {
@@ -67,26 +65,9 @@ export default function AgentsPage() {
     if (!pairingCode.trim()) return;
     setPairingStatus('submitting');
     
-    // Simulate sending pairing code to the OpenClaw container
-    setTimeout(async () => {
-      // Update DB to mark as paired
-      const { error } = await supabase
-        .from('agents')
-        .update({ telegram_status: 'paired' })
-        .eq('id', pairingAgent.id);
-        
-      if (!error) {
-        setAgents(agents.map(a => a.id === pairingAgent.id ? { ...a, telegram_status: 'paired' } : a));
-        setPairingStatus('success');
-        setTimeout(() => {
-          setPairingAgent(null);
-          setPairingCode('');
-          setPairingStatus(null);
-        }, 2000);
-      } else {
-        setPairingStatus('error');
-      }
-    }, 1500);
+    setTimeout(() => {
+      setPairingStatus('error');
+    }, 800);
   };
 
   const filteredAgents = agents.filter(agent => 
@@ -244,14 +225,14 @@ export default function AgentsPage() {
                   
                   <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-white/5 rounded-full p-1.5 border border-zinc-200 dark:border-white/10">
                     <button 
-                      onClick={() => handleAction(agent.id, agent.status === 'running' ? 'stop' : 'running')}
+                      onClick={() => handleAction()}
                       className={`p-2 rounded-full hover:bg-white dark:hover:bg-[#090A0F] transition-all transition-colors ${agent.status === 'running' ? 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white' : 'text-green-500 hover:text-green-400'}`} 
                       title={agent.status === 'running' ? "Stop" : "Restart"}
                     >
                       <Square className={`w-4 h-4 ${agent.status === 'running' ? '' : 'fill-green-500/20 text-green-500'}`} />
                     </button>
                     <button 
-                      onClick={() => handleDelete(agent.id)}
+                      onClick={() => handleDelete()}
                       className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 transition-all transition-colors" 
                       title="Delete"
                     >
