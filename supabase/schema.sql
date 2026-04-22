@@ -1,0 +1,12 @@
+-- Deprecated schema snapshot.
+-- Do not apply this file.
+--
+-- Canonical setup for the current app lives in:
+--   1. supabase-setup.sql
+--   2. supabase_profiles.sql
+--   3. supabase_schema.sql
+--
+-- Reason:
+-- This file uses outdated columns and states such as `subscription_tier`,
+-- `plan`, and `pending_activation` that do not match the current app code.
+-- Applying it can break payment, dashboard, and deploy flows.
