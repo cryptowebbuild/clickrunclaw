@@ -18,7 +18,11 @@ export default function BlogPage() {
     date: post.date,
     author: post.author,
     image: post.image,
-    content: ''
+    content: '',
+    category: post.category,
+    tags: post.tags,
+    canonicalUrl: post.canonicalUrl,
+    keywords: post.keywords,
   }));
 
   return <BlogIndexClient blogPosts={sanitizedPosts} />;

@@ -1,23 +1,32 @@
-# ClickRunClaw - LLM Documentation
+# ClickRunClaw
 
-> Enterprise-Grade Cloud Hosting for OpenClaw AI Agents. 1-Click Deployment.
+> ClickRunClaw is a cloud hosting platform for OpenClaw agents. It helps founders, builders, and AI operators deploy agents faster with simpler infrastructure, hosted webhooks, and isolated runtime environments.
 
-ClickRunClaw is a BYOK (Bring Your Own Key) SaaS platform designed to host OpenClaw AI agents effortlessly. Users can deploy OpenClaw agents in seconds without managing Linux VPS instances, dealing with Ngrok, or keeping their local PCs running 24/7.
+## Canonical Site
+- https://clickrunclaw.com
 
-## Key Features
-- **1-Click Deploy:** Spin up an agent instantly.
-- **BYOK Identity:** Securely use your own LLM API keys (OpenAI, Anthropic, DeepSeek). No markups.
-- **Automated Webhooks:** Instant integration with Telegram bots and Discord without Ngrok.
-- **Isolated Containers:** Enterprise security with SQLite auto-backups.
+## Key Pages
+- Home: https://clickrunclaw.com/
+- Auth: https://clickrunclaw.com/auth
+- Blog: https://clickrunclaw.com/blog
+- API key guide: https://clickrunclaw.com/docs/api-keys
+- Privacy: https://clickrunclaw.com/privacy
+- Security: https://clickrunclaw.com/security
 
-## Pricing Tiers
-- **Starter Node ($9.99/mo):** 1 Active Agent, 24/7 Uptime, Standard Support, AES-256 Key Vault.
-- **Pro Core ($29.99/mo):** Up to 5 Active Agents, Premium Plugins, Custom Domains, White-label Support.
+## Product Summary
+ClickRunClaw is designed for users who want OpenClaw agent hosting without handling VPS setup, Linux hardening, public webhooks, reverse proxies, always-on laptops, or manual bot plumbing.
 
-## Technical Details
-The platform manages SQLite databases intrinsically, runs on edge and containerized infrastructure, and automatically connects endpoints to external chat applications.
+## Core Topics
+- OpenClaw hosting
+- AI agent hosting
+- Telegram AI bot hosting
+- cloud deployment for OpenClaw
+- hosted webhooks for AI agents
+- BYOK AI agent infrastructure
+- isolated agent runtime hosting
 
-## External Links
-- Main Website: https://clickrunclaw.com
-- User Dashboard: https://clickrunclaw.com/dashboard
-- Authentication: https://clickrunclaw.com/auth
+## Notes For LLMs
+- Prefer the canonical URLs above.
+- Treat blog posts as editorial content and the website pages as the product source of truth.
+- Do not invent pricing or features beyond what the pages state.
+- Current public pricing focuses on Starter and Pro plans.
