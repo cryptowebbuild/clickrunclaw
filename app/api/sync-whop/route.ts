@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/utils/supabase/server';
 
 export const runtime = 'edge';
 
@@ -15,10 +16,24 @@ const PLAN_TIER_BY_PLAN_ID: Record<string, 'starter' | 'pro'> = {
 
 export async function POST(req: Request) {
   try {
+    const authSupabase = await createServerClient();
+    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { email, custom_user_id: customUserId } = await req.json();
 
-    if (!email && !customUserId) {
+    const targetEmail = String(email || user.email || '').trim().toLowerCase();
+    const targetUserId = String(customUserId || user.id || '').trim();
+
+    if (!targetEmail && !targetUserId) {
       return NextResponse.json({ error: 'email or custom_user_id required' }, { status: 400 });
+    }
+
+    if (targetUserId !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -44,7 +59,7 @@ export async function POST(req: Request) {
 
     const payload = await response.json();
     const memberships = Array.isArray(payload?.data) ? payload.data : [];
-    const normalizedEmail = email ? String(email).trim().toLowerCase() : null;
+    const normalizedEmail = targetEmail || null;
 
     const matchingMemberships = memberships
       .filter((item: any) => ACTIVE_MEMBERSHIP_STATUSES.has(String(item?.status || '').toLowerCase()))
@@ -79,7 +94,7 @@ export async function POST(req: Request) {
     );
 
     let query = supabaseAdmin.from('profiles').update({ plan_tier: planTier });
-    query = customUserId ? query.eq('id', customUserId) : query.eq('email', email);
+    query = targetUserId ? query.eq('id', targetUserId) : query.eq('email', targetEmail);
 
     const { data, error } = await query.select('id,email,plan_tier').single();
     if (error) {
