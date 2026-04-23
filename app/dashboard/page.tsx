@@ -177,9 +177,9 @@ export default function DashboardOverview() {
         }
 
         setToast(`Plan synced successfully: ${data.plan_tier}`);
-      setShowPlanSyncButton(false);
+        setShowPlanSyncButton(false);
       } else {
-        setToast('No active Whop membership found yet.');
+        setToast(data.hint || 'No active Whop membership found yet.');
       }
     } catch (err: any) {
       setToast(err.message || 'Plan sync failed');

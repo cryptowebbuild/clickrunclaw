@@ -44,13 +44,28 @@ export async function POST(req: Request) {
 
     const payload = await response.json();
     const memberships = Array.isArray(payload?.data) ? payload.data : [];
-    const latestMembership = memberships
-      .filter((item: any) => !email || item?.user?.email === email)
+    const normalizedEmail = email ? String(email).trim().toLowerCase() : null;
+
+    const matchingMemberships = memberships
       .filter((item: any) => ACTIVE_MEMBERSHIP_STATUSES.has(String(item?.status || '').toLowerCase()))
-      .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+      .filter((item: any) => !normalizedEmail || String(item?.user?.email || '').trim().toLowerCase() === normalizedEmail)
+      .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    const latestMembership = matchingMemberships[0];
 
     if (!latestMembership) {
-      return NextResponse.json({ synced: false, reason: 'no_active_membership' });
+      const recentEmails = memberships
+        .filter((item: any) => ACTIVE_MEMBERSHIP_STATUSES.has(String(item?.status || '').toLowerCase()))
+        .slice(-5)
+        .map((item: any) => item?.user?.email)
+        .filter(Boolean);
+
+      return NextResponse.json({
+        synced: false,
+        reason: 'no_active_membership',
+        email: normalizedEmail,
+        hint: recentEmails.length ? `Recent Whop emails: ${Array.from(new Set(recentEmails)).join(', ')}` : null,
+      });
     }
 
     const planTier = resolvePlanTier(latestMembership);
