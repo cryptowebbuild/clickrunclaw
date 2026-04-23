@@ -64,6 +64,8 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
+    const whopApiKey = process.env.CLICKRUNCLAW_WHOP_API_KEY || process.env.WHOP_API_KEY || null;
+
     const eventType = String(body.type || body.action || '').trim();
     if (!SUPPORTED_EVENTS.has(eventType)) {
       return NextResponse.json({ success: true, message: `Webhook ignored: ${eventType || 'unknown_event'}` });
@@ -123,6 +125,19 @@ export async function POST(req: Request) {
     if (error) {
       console.error('Error updating user plan:', error);
       return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
+    }
+
+    if ((!updatedRows || updatedRows.length === 0) && whopApiKey && email) {
+      const synced = await syncProfileFromWhop({
+        supabaseAdmin,
+        whopApiKey,
+        email,
+        customUserId,
+      });
+
+      if (synced) {
+        updatedRows = [synced];
+      }
     }
 
     if (!updatedRows || updatedRows.length === 0) {
@@ -203,6 +218,64 @@ function resolvePlanTier(body: any): 'starter' | 'pro' | null {
   if (haystack.includes('starter')) return 'starter';
 
   return null;
+}
+
+async function syncProfileFromWhop({
+  supabaseAdmin,
+  whopApiKey,
+  email,
+  customUserId,
+}: {
+  supabaseAdmin: any;
+  whopApiKey: string;
+  email: string;
+  customUserId: string | null;
+}) {
+  try {
+    const response = await fetch(`https://api.whop.com/api/v1/memberships?company_id=biz_860wM852Q3ACNi`, {
+      headers: {
+        Authorization: `Bearer ${whopApiKey}`,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      console.error('Whop membership sync failed.', response.status);
+      return null;
+    }
+
+    const payload = await response.json();
+    const memberships = Array.isArray(payload?.data) ? payload.data : [];
+
+    const latestMembership = memberships
+      .filter((item: any) => item?.user?.email === email)
+      .filter((item: any) => ACTIVE_MEMBERSHIP_STATUSES.has(String(item?.status || '').toLowerCase()))
+      .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+
+    if (!latestMembership) {
+      return null;
+    }
+
+    const syncedTier = resolvePlanTier({ data: latestMembership });
+    if (!syncedTier) {
+      return null;
+    }
+
+    let query = supabaseAdmin.from('profiles').update({ plan_tier: syncedTier });
+    query = customUserId ? query.eq('id', customUserId) : query.eq('email', email);
+
+    const { data, error } = await query.select('id,email,plan_tier');
+    if (error || !data?.length) {
+      if (error) console.error('Fallback Whop sync update failed.', error);
+      return null;
+    }
+
+    return data[0];
+  } catch (error) {
+    console.error('Fallback Whop sync error:', error);
+    return null;
+  }
 }
 
 function hexToBuffer(hex: string) {
