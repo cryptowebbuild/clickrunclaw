@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Link as LinkIcon, Database, Mail, Calendar, FileText, MessagesSquare, CheckCircle2 } from 'lucide-react';
-import Image from 'next/image';
+import { Search, Database, Mail, Calendar, FileText, MessagesSquare } from 'lucide-react';
 
 const INTEGRATIONS = [
   {
@@ -74,11 +73,7 @@ const INTEGRATIONS = [
 export default function IntegrationsPage() {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
-  const [connected, setConnected] = useState<{ [key: string]: boolean }>({});
-
-  const handleConnect = (id: string) => {
-    setConnected(prev => ({ ...prev, [id]: !prev[id] }));
-  };
+  const comingSoonText = 'Live OAuth integrations are coming soon. For now, connect services directly inside your deployed agent workflow.';
 
   const categories = ['All', 'Communication', 'Productivity', 'Business', 'Development', 'Design', 'Other'];
 
@@ -129,6 +124,10 @@ export default function IntegrationsPage() {
         ))}
       </div>
 
+      <div className="rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#111318] px-5 py-4 text-sm text-zinc-600 dark:text-zinc-300">
+        {comingSoonText}
+      </div>
+
       <div className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
         Showing {filtered.length} of {INTEGRATIONS.length} integrations
       </div>
@@ -156,20 +155,9 @@ export default function IntegrationsPage() {
               </div>
             </div>
 
-            <button 
-              onClick={() => handleConnect(item.id)}
-              className={`w-full sm:w-auto px-6 py-2.5 rounded-full font-bold text-sm transition-all focus:scale-95 ${
-                connected[item.id] 
-                  ? 'bg-zinc-100 dark:bg-white/5 text-zinc-900 dark:text-white border border-zinc-200 dark:border-white/10' 
-                  : 'bg-[#4B6BFB] hover:bg-[#3D5FE4] text-white shadow-md'
-              }`}
-            >
-              {connected[item.id] ? (
-                 <span className="flex items-center justify-center gap-2">
-                   <CheckCircle2 className="w-4 h-4 text-green-500" /> Connected
-                 </span>
-              ) : 'Connect'}
-            </button>
+            <div className="w-full sm:w-auto px-4 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-white/10 text-center">
+              Coming soon
+            </div>
           </motion.div>
         ))}
       </div>

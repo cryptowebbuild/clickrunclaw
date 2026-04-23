@@ -93,61 +93,23 @@ export default function BillingPage() {
             >
               Upgrade Subscription
             </button>
-            <button className="px-8 py-4 rounded-full bg-transparent border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/5 transition-all font-bold text-sm">
-              View Billing Portal
-            </button>
+            <a href="mailto:support@clickrunclaw.com?subject=Billing%20portal%20access" className="px-8 py-4 rounded-full bg-transparent border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/5 transition-all font-bold text-sm text-center">
+              Contact Billing Support
+            </a>
           </div>
         </motion.div>
       </div>
 
-      {/* Payment History */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
         className="bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/5 rounded-[2rem] p-10 shadow-sm relative overflow-hidden"
       >
-        <h2 className="text-2xl font-black font-space mb-10 text-zinc-900 dark:text-white uppercase tracking-tight">Invoice History</h2>
-        
-        {/* Added overlay gradient to indicate scrollability on mobile */}
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#111318] to-transparent z-10 pointer-events-none md:hidden" />
-        
-        <div className="overflow-x-auto relative">
-          <table className="w-full text-left border-collapse min-w-[600px]">
-            <thead>
-              <tr className="border-b border-zinc-100 dark:border-white/5 text-zinc-400 dark:text-zinc-600 text-[10px] font-black uppercase tracking-widest">
-                <th className="pb-6 font-black">Date</th>
-                <th className="pb-6 font-black">Description</th>
-                <th className="pb-6 font-black">Amount</th>
-                <th className="pb-6 font-black">Status</th>
-                <th className="pb-6 font-black text-right">PDF</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { date: 'Apr 12, 2026', desc: 'Secure Pro Hosting - Monthly', amount: '$29.99', status: 'Paid' },
-                { date: 'Mar 12, 2026', desc: 'Secure Pro Hosting - Monthly', amount: '$29.99', status: 'Paid' },
-                { date: 'Feb 12, 2026', desc: 'Advanced Credit Recharge', amount: '$50.00', status: 'Paid' },
-              ].map((invoice, i) => (
-                <tr key={i} className="border-b border-zinc-50 dark:border-white/5 last:border-0 text-sm group">
-                  <td className="py-6 text-zinc-500 dark:text-zinc-500 font-medium">{invoice.date}</td>
-                  <td className="py-6 text-zinc-900 dark:text-zinc-200 font-bold tracking-tight">{invoice.desc}</td>
-                  <td className="py-6 text-zinc-900 dark:text-zinc-200 font-black tracking-tighter">{invoice.amount}</td>
-                  <td className="py-6">
-                    <span className="px-4 py-1 bg-green-500/10 text-green-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-500/20">
-                      {invoice.status}
-                    </span>
-                  </td>
-                  <td className="py-6 text-right">
-                    <button className="w-10 h-10 rounded-full bg-zinc-50 dark:bg-zinc-900 hover:bg-coral hover:text-white transition-all border border-zinc-200 dark:border-white/10 text-zinc-400 inline-flex items-center justify-center shadow-sm">
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <h2 className="text-2xl font-black font-space mb-4 text-zinc-900 dark:text-white uppercase tracking-tight">Invoices and receipts</h2>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+          Live invoice history is not wired into the dashboard yet. For billing receipts, renewals, or portal access, use Whop billing management or contact support.
+        </p>
       </motion.div>
     </div>
   );
