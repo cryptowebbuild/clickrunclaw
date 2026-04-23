@@ -197,7 +197,7 @@ export default function DashboardOverview() {
     }
 
     setDeploying(true);
-    setToast("Initializing secure container deployment...");
+    setToast('Submitting deployment request...');
 
     try {
       const res = await fetch('/api/deploy', {
@@ -213,13 +213,14 @@ export default function DashboardOverview() {
            if (data.error === 'PAYWALL') setShowUpgradeModal(true);
            throw new Error(data.message);
         }
-        throw new Error(data.error || 'Deployment failed');
+        throw new Error(data.message || data.error || 'Deployment failed');
       }
 
       setDeployedAgent(data.agent);
-      setToast("✨ Agent Deployed Successfully!");
+      setToast(data.message || 'Deployment request accepted.');
       setAgentName('');
       setApiKey('');
+      setTelegramToken('');
     } catch (err: any) {
       setToast(err.message || 'Deployment error');
     } finally {
@@ -383,7 +384,8 @@ export default function DashboardOverview() {
             <h3 className="text-green-600 dark:text-green-500 font-bold mb-4 flex items-center gap-3">
               <CheckCircle2 className="w-6 h-6" /> Deployment record created
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Your agent was accepted for deployment. If a webhook URL was generated, you can use it below.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2">Your agent was accepted for deployment. If a webhook URL was generated, you can use it below.</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-500 mb-6">Current status: {deployedAgent.status || 'deploying'}</p>
             <div className="bg-white dark:bg-zinc-900 px-6 py-4 rounded-2xl font-mono text-sm text-zinc-800 dark:text-zinc-200 break-all border border-zinc-200 dark:border-zinc-800 shadow-inner">
               {deployedAgent.webhookUrl}
             </div>

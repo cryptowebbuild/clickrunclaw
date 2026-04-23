@@ -99,38 +99,34 @@ export async function POST(req: Request) {
     }
 
     // -------------------------------------------------------------
-    // 4. Trigger Coolify deployment
+    // 4. Trigger shared Coolify deployment hook if configured
     // -------------------------------------------------------------
-    let deploymentSuccess = true;
-    
+    let deploymentQueued = false;
+    let deploymentWarning: string | null = null;
+
     try {
       const res = await fetch(coolifyWebhook, { method: 'POST' });
       if (!res.ok) {
-         deploymentSuccess = false;
-         throw new Error(`Coolify webhook failed with status ${res.status}`);
+        deploymentWarning = `Deployment hook responded with status ${res.status}.`;
+      } else {
+        deploymentQueued = true;
       }
-      console.log('Coolify deployment triggered successfully.');
     } catch (err) {
-      deploymentSuccess = false;
+      deploymentWarning = 'Deployment hook could not be reached.';
       console.error('Could not trigger Coolify webhook.', err);
     }
-    
-    if (!deploymentSuccess) {
-       await supabase.from('agents').update({ status: 'failed' }).eq('id', dbAgent.id);
-       return NextResponse.json({ error: 'Failed to deploy container to cloud infrastructure.' }, { status: 500 });
-    }
 
-    // Generate a secure, unique Webhook URL that users can use for their bot
     const userHookUrl = `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
-    const containerIdTag = `openclaw-${dbAgent.id.split('-')[0]}`;
 
-    // 5. Update Status to 'running' and save the Webhook URL
+    const nextStatus = deploymentQueued ? 'deploying' : 'failed';
+
     const { error: updateError } = await supabase
       .from('agents')
       .update({ 
-        status: 'running', 
+        status: nextStatus,
         webhook_url: userHookUrl,
-        container_id: containerIdTag
+        container_id: null,
+        updated_at: new Date().toISOString(),
       })
       .eq('id', dbAgent.id);
 
@@ -138,17 +134,32 @@ export async function POST(req: Request) {
       console.error('Update Error:', updateError);
     }
 
-    // 6. Return Success Response
+    if (!deploymentQueued) {
+      return NextResponse.json({
+        error: 'DEPLOYMENT_QUEUE_FAILED',
+        message: deploymentWarning || 'Deployment could not be queued.',
+        agent: {
+          id: dbAgent.id,
+          name: normalizedName,
+          status: 'failed',
+          webhookUrl: userHookUrl,
+          containerId: null,
+        }
+      }, { status: 502 });
+    }
+
     return NextResponse.json({ 
-      success: true, 
-      message: 'Agent successfully deployed to Contabo Cloud Server via Coolify.',
+      success: true,
+      queued: true,
+      message: 'Deployment request accepted and queued for provisioning.',
       agent: {
         id: dbAgent.id,
         name: normalizedName,
-        status: 'running',
+        status: 'deploying',
         webhookUrl: userHookUrl,
-        containerId: containerIdTag
-      }
+        containerId: null
+      },
+      warning: deploymentWarning,
     });
 
   } catch (error: any) {
