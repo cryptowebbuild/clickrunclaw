@@ -20,7 +20,11 @@ export async function POST(req: Request) {
     const { data: { user }, error: authError } = await authSupabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({
+        synced: false,
+        reason: 'unauthorized',
+        error: 'Unauthorized',
+      }, { status: 401 });
     }
 
     const { email, custom_user_id: customUserId } = await req.json();
@@ -29,20 +33,38 @@ export async function POST(req: Request) {
     const targetUserId = String(customUserId || user.id || '').trim();
 
     if (!targetEmail && !targetUserId) {
-      return NextResponse.json({ error: 'email or custom_user_id required' }, { status: 400 });
+      return NextResponse.json({
+        synced: false,
+        reason: 'missing_identity',
+        error: 'email or custom_user_id required',
+      }, { status: 400 });
     }
 
     if (targetUserId !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({
+        synced: false,
+        reason: 'forbidden',
+        error: 'Forbidden',
+        expectedUserId: user.id,
+        receivedUserId: targetUserId,
+      }, { status: 403 });
     }
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return NextResponse.json({ error: 'Missing Supabase configuration' }, { status: 500 });
+      return NextResponse.json({
+        synced: false,
+        reason: 'missing_supabase_config',
+        error: 'Missing Supabase configuration',
+      }, { status: 500 });
     }
 
     const whopApiKey = process.env.CLICKRUNCLAW_WHOP_API_KEY || process.env.WHOP_API_KEY;
     if (!whopApiKey) {
-      return NextResponse.json({ error: 'Missing Whop API key' }, { status: 500 });
+      return NextResponse.json({
+        synced: false,
+        reason: 'missing_whop_api_key',
+        error: 'Missing Whop API key',
+      }, { status: 500 });
     }
 
     const response = await fetch('https://api.whop.com/api/v1/memberships?company_id=biz_860wM852Q3ACNi', {
@@ -54,7 +76,11 @@ export async function POST(req: Request) {
     });
 
     if (!response.ok) {
-      return NextResponse.json({ error: `Whop API error: ${response.status}` }, { status: 502 });
+      return NextResponse.json({
+        synced: false,
+        reason: 'whop_api_error',
+        error: `Whop API error: ${response.status}`,
+      }, { status: 502 });
     }
 
     const payload = await response.json();
@@ -85,7 +111,13 @@ export async function POST(req: Request) {
 
     const planTier = resolvePlanTier(latestMembership);
     if (!planTier) {
-      return NextResponse.json({ synced: false, reason: 'unsupported_plan' });
+      return NextResponse.json({
+        synced: false,
+        reason: 'unsupported_plan',
+        membership_id: latestMembership.id,
+        product_id: latestMembership?.product?.id || null,
+        plan_id: latestMembership?.plan?.id || null,
+      });
     }
 
     const supabaseAdmin = createClient(
@@ -98,11 +130,20 @@ export async function POST(req: Request) {
 
     const { data, error } = await query.select('id,email,plan_tier').single();
     if (error) {
-      return NextResponse.json({ synced: false, error: error.message }, { status: 500 });
+      return NextResponse.json({
+        synced: false,
+        reason: 'supabase_update_failed',
+        error: error.message,
+        targetEmail,
+        targetUserId,
+        membership_id: latestMembership.id,
+        plan_tier: planTier,
+      }, { status: 500 });
     }
 
     return NextResponse.json({
       synced: true,
+      reason: 'synced',
       plan_tier: planTier,
       membership_id: latestMembership.id,
       membership_status: latestMembership.status,

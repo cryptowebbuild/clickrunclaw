@@ -162,7 +162,7 @@ export default function DashboardOverview() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Plan sync failed');
+        throw new Error(data.error || data.reason || 'Plan sync failed');
       }
 
       if (data.synced) {
@@ -179,7 +179,7 @@ export default function DashboardOverview() {
         setToast(`Plan synced successfully: ${data.plan_tier}`);
         setShowPlanSyncButton(false);
       } else {
-        setToast(data.hint || 'No active Whop membership found yet.');
+        setToast(data.hint || data.error || data.reason || 'No active Whop membership found yet.');
       }
     } catch (err: any) {
       setToast(err.message || 'Plan sync failed');
