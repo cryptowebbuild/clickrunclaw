@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { createLocalAgent, upsertLocalUser } from '@/lib/db/agents';
 
 export const runtime = 'nodejs';
 
@@ -15,7 +14,7 @@ export async function POST(req: Request) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('plan_tier, full_name, email')
+      .select('plan_tier')
       .eq('id', user.id)
       .single();
 
@@ -69,23 +68,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Deployment is not configured yet. COOLIFY_DEPLOY_WEBHOOK_URL is missing.' }, { status: 500 });
     }
 
-    upsertLocalUser({
-      id: user.id,
-      email: profile?.email || user.email,
-      fullName: profile?.full_name || user.user_metadata?.full_name || null,
-      planTier,
-    });
+    const { data: dbAgent, error: dbError } = await supabase
+      .from('agents')
+      .insert([
+        {
+          user_id: user.id,
+          name: normalizedName,
+          provider: normalizedProvider,
+          api_key_secure: normalizedApiKey,
+          telegram_bot_token: normalizedTelegramToken,
+          telegram_status: normalizedTelegramToken ? 'pending' : 'none',
+          status: 'deploying'
+        }
+      ])
+      .select()
+      .single();
 
-    const dbAgent = createLocalAgent({
-      userId: user.id,
-      name: normalizedName,
-      provider: normalizedProvider,
-      planSnapshot: planTier,
-      telegramStatus: normalizedTelegramToken ? 'pending' : 'none',
-      deploymentStatusDetail: 'Deployment requested from dashboard',
-      apiKey: normalizedApiKey,
-      telegramBotToken: normalizedTelegramToken,
-    });
+    if (dbError) {
+      console.error('Database Error:', dbError);
+      return NextResponse.json({ error: 'Failed to initialize agent in database.' }, { status: 500 });
+    }
 
     let deploymentQueued = false;
     let deploymentWarning: string | null = null;
@@ -102,26 +104,21 @@ export async function POST(req: Request) {
       console.error('Could not trigger Coolify webhook.', err);
     }
 
-    const userHookUrl = dbAgent.webhook_url;
+    const userHookUrl = `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
     const nextStatus = deploymentQueued ? 'deploying' : 'failed';
 
-    const mirrorPayload = {
-      id: dbAgent.id,
-      user_id: user.id,
-      name: normalizedName,
-      provider: normalizedProvider,
-      api_key_secure: normalizedApiKey,
-      telegram_bot_token: normalizedTelegramToken,
-      telegram_status: normalizedTelegramToken ? 'pending' : 'none',
-      status: nextStatus,
-      webhook_url: userHookUrl,
-      container_id: null,
-      updated_at: new Date().toISOString(),
-    };
+    const { error: updateError } = await supabase
+      .from('agents')
+      .update({
+        status: nextStatus,
+        webhook_url: userHookUrl,
+        container_id: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', dbAgent.id);
 
-    const mirrorResult = await supabase.from('agents').insert([mirrorPayload]);
-    if (mirrorResult.error) {
-      console.error('Supabase mirror insert failed:', mirrorResult.error);
+    if (updateError) {
+      console.error('Update Error:', updateError);
     }
 
     if (!deploymentQueued) {
