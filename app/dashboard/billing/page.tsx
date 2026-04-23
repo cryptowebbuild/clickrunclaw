@@ -2,17 +2,26 @@
 
 import { motion } from 'framer-motion';
 import { CreditCard, Zap, CheckCircle2, AlertCircle, Download } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function BillingPage() {
+  const supabase = useMemo(() => createClient(), []);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user ?? null);
+    });
+  }, [supabase]);
+
   const handleWhopCheckout = (planId: string) => {
-    // 1. You would normally grab the logged in user's ID from Supabase here
-    const mockUserId = "usr_123456789"; // Replace with actual user.id
-    
-    // 2. We append the user_id as a custom parameter.
-    // The Webhook we built above will extract this and upgrade the exact account!
-    const whopCheckoutUrl = `https://whop.com/checkout/${planId}?custom_user_id=${mockUserId}`;
-    
-    // 3. Redirect user to secure hosted Whop checkout (or open iframe)
+    if (!user?.id) {
+      window.location.href = `/auth?intent=checkout&plan=${encodeURIComponent(planId)}`;
+      return;
+    }
+
+    const whopCheckoutUrl = `https://whop.com/checkout/${planId}?custom_user_id=${user.id}&email=${encodeURIComponent(user.email || '')}`;
     window.location.href = whopCheckoutUrl;
   };
 

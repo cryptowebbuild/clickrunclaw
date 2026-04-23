@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon, User, Building, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 export default function DashboardOverview() {
@@ -29,6 +30,8 @@ export default function DashboardOverview() {
   const [deployedAgent, setDeployedAgent] = useState<any>(null);
 
   const supabase = useMemo(() => createClient(), []);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -55,6 +58,32 @@ export default function DashboardOverview() {
       }
       setLoading(false);
 
+      const checkoutStatus = searchParams.get('checkout_status') || searchParams.get('status');
+      const receiptId = searchParams.get('receipt_id') || searchParams.get('payment_id');
+      if (checkoutStatus === 'success') {
+        setToast(receiptId ? `Checkout success received (${receiptId}). Syncing your plan...` : 'Checkout success received. Syncing your plan...');
+        if (data.user?.id) {
+          setTimeout(async () => {
+            const { data: refreshedProfile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .single();
+
+            if (refreshedProfile) {
+              setProfile(refreshedProfile);
+              if ((refreshedProfile.plan_tier || 'free') !== 'free') {
+                setToast('Plan activated successfully. You can deploy now.');
+              } else {
+                setToast('Checkout succeeded, but your plan is still syncing. Retry the webhook once if needed.');
+              }
+            }
+
+            router.replace('/dashboard');
+          }, 1500);
+        }
+      }
+
       // Check for pending onboarding deployment
       try {
         const pendingDeployStr = localStorage.getItem('CR_PENDING_DEPLOY');
@@ -77,7 +106,7 @@ export default function DashboardOverview() {
       }
     };
     fetchUser();
-  }, [supabase]);
+  }, [router, searchParams, supabase]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
