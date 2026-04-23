@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Terminal, Server, 
-  Search, Plus, X, Activity, Globe, Loader2, MessageCircle, HelpCircle
+  Search, Plus, X, Globe, Loader2, MessageCircle, HelpCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
@@ -13,8 +13,6 @@ import AgentMonitoring from '@/components/dashboard/AgentMonitoring';
 export default function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTerminal, setSelectedTerminal] = useState<any | null>(null);
-  const [showSupportModal, setShowSupportModal] = useState(false);
-  
   // Real Database State
   const [agents, setAgents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,7 +125,7 @@ export default function AgentsPage() {
                   <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                   <span className="flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5" />
-                    Webhook Active
+                    {agent.webhook_url ? 'Webhook Ready' : 'Webhook Pending'}
                   </span>
                   <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                   <span className="flex items-center gap-1.5 uppercase font-bold text-[10px] tracking-wider bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
@@ -147,29 +145,30 @@ export default function AgentsPage() {
             </div>
 
               <div className="w-full mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/50 flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div className="flex w-full md:w-auto items-center gap-4 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                <div className="flex w-full md:w-auto items-center gap-4 text-sm font-medium text-zinc-500 dark:text-zinc-400 flex-wrap">
                    <div className="flex items-center gap-2">
-                     <span className="text-zinc-400 dark:text-zinc-600">Model</span>
-                     <div className="px-3 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-md font-mono text-zinc-900 dark:text-zinc-300">
-                       {agent.provider === 'openai' ? 'gpt-4-turbo' : agent.provider === 'anthropic' ? 'claude-3-opus' : 'gemini-1.5-pro'}
+                     <span className="text-zinc-400 dark:text-zinc-600">Provider</span>
+                     <div className="px-3 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-md font-mono text-zinc-900 dark:text-zinc-300 uppercase">
+                       {agent.provider}
                      </div>
                    </div>
-                   <div className="flex items-center gap-2">
-                     <span className="text-zinc-400 dark:text-zinc-600">Search</span>
-                     <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/5 border border-green-500/20 text-green-600 dark:text-green-500 rounded-md">
-                       <Globe className="w-3 h-3" /> Enabled
+                   {agent.created_at && (
+                     <div className="flex items-center gap-2">
+                       <span className="text-zinc-400 dark:text-zinc-600">Created</span>
+                       <div className="px-3 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-md text-zinc-900 dark:text-zinc-300">
+                         {new Date(agent.created_at).toLocaleDateString()}
+                       </div>
                      </div>
-                   </div>
+                   )}
                 </div>
 
-                {/* Actions Section */}
                 <div className="flex items-center justify-end gap-2 w-full md:w-auto">
                   <button 
                     onClick={() => setSelectedTerminal(agent)}
                     className="flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 border border-zinc-800 transition-all text-sm font-bold"
                   >
                     <Terminal className="w-4 h-4" />
-                    Inspect
+                    Details
                   </button>
                 </div>
               </div>
@@ -214,33 +213,38 @@ export default function AgentsPage() {
                 </button>
               </div>
 
-              {/* Terminal Content */}
-              <div className="flex-1 p-8 font-mono text-xs md:text-sm overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400">
-                <div className="text-zinc-400 dark:text-zinc-500 mb-6 font-light italic leading-relaxed">
-                  Welcome to ClickRunClaw Agent Inspector (Cloud Console)<br/>
-                  Container Reference: {selectedTerminal.container_id}<br/>
-                  Architecture: Cloud-Native ({selectedTerminal.provider.toUpperCase()})
+              <div className="flex-1 p-8 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 space-y-8">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500 mb-3">Agent details</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-4">
+                      <div className="text-zinc-400 dark:text-zinc-500 text-xs uppercase tracking-widest mb-2">Status</div>
+                      <div className="font-semibold text-zinc-900 dark:text-zinc-100 uppercase">{selectedTerminal.status || 'unknown'}</div>
+                    </div>
+                    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-4">
+                      <div className="text-zinc-400 dark:text-zinc-500 text-xs uppercase tracking-widest mb-2">Provider</div>
+                      <div className="font-semibold text-zinc-900 dark:text-zinc-100 uppercase">{selectedTerminal.provider || 'unknown'}</div>
+                    </div>
+                    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-4 md:col-span-2">
+                      <div className="text-zinc-400 dark:text-zinc-500 text-xs uppercase tracking-widest mb-2">Container reference</div>
+                      <div className="font-mono text-zinc-900 dark:text-zinc-100 break-all">{selectedTerminal.container_id || 'Not assigned yet'}</div>
+                    </div>
+                    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-4 md:col-span-2">
+                      <div className="text-zinc-400 dark:text-zinc-500 text-xs uppercase tracking-widest mb-2">Webhook URL</div>
+                      <div className="font-mono text-zinc-900 dark:text-zinc-100 break-all">{selectedTerminal.webhook_url || 'Not generated yet'}</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-green-600 dark:text-green-500 font-bold mt-2 flex items-center gap-2">
-                   <Activity className="w-4 h-4" /> [SUCCESS] Container securely allocated and isolated.
-                </div>
-                <div className="text-zinc-900 dark:text-zinc-300 font-medium mt-1">[INFO] Environment variables injected successfully.</div>
-                <div className="text-zinc-400 dark:text-zinc-600 mt-1">[WARN] Connecting securely to encrypted webhook tunnel...</div>
-                
-                <div className="mt-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-6 rounded-2xl shadow-inner group">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 mb-3">TELEGRAM / DISCORD WEBHOOK URL</p>
-                  <p className="text-zinc-800 dark:text-zinc-200 font-bold break-all select-all selection:bg-coral/30">{selectedTerminal.webhook_url}</p>
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-4 leading-relaxed italic">Paste this exact URL into your bot configuration to bring it online instantly.</p>
-                </div>
-                
-                <div className="mt-8 pt-8 border-t border-zinc-100 dark:border-zinc-900">
-                  <AgentMonitoring containerId={selectedTerminal.container_id} />
-                </div>
-                
-                <div className="mt-8 flex items-center gap-2">
-                  <span className="text-coral font-bold tracking-tight">root@ClickRunClaw:~#</span>
-                  <span className="w-2 h-4 bg-zinc-300 dark:bg-zinc-500 animate-pulse" />
-                </div>
+
+                {selectedTerminal.container_id ? (
+                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-900">
+                    <AgentMonitoring containerId={selectedTerminal.container_id} />
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-amber-200 dark:border-amber-900/30 bg-amber-50 dark:bg-amber-950/20 p-5 text-sm text-amber-800 dark:text-amber-200">
+                    Live container monitoring is not available until this agent has a real infrastructure mapping.
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
