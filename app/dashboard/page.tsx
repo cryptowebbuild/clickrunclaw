@@ -14,6 +14,7 @@ export default function DashboardOverview() {
   // Paywall & Profile State
   const [profile, setProfile] = useState<any>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [syncingPlan, setSyncingPlan] = useState(false);
 
   // Onboarding State
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -138,6 +139,50 @@ export default function DashboardOverview() {
       ? `https://whop.com/checkout/plan_Bhg70HYNZqmJV?custom_user_id=${user?.id}&email=${encodeURIComponent(user?.email || '')}`
       : `https://whop.com/checkout/plan_T8nSbRxGGTlly?custom_user_id=${user?.id}&email=${encodeURIComponent(user?.email || '')}`;
     window.location.href = link;
+  };
+
+  const handleSyncPlan = async () => {
+    if (!user?.id || !user?.email) return;
+
+    setSyncingPlan(true);
+    setToast('Checking Whop membership and syncing your plan...');
+
+    try {
+      const res = await fetch('/api/sync-whop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          custom_user_id: user.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Plan sync failed');
+      }
+
+      if (data.synced) {
+        const { data: refreshedProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (refreshedProfile) {
+          setProfile(refreshedProfile);
+        }
+
+        setToast(`Plan synced successfully: ${data.plan_tier}`);
+      } else {
+        setToast('No active Whop membership found yet.');
+      }
+    } catch (err: any) {
+      setToast(err.message || 'Plan sync failed');
+    } finally {
+      setSyncingPlan(false);
+      setTimeout(() => setToast(null), 4000);
+    }
   };
 
   const handleDeploy = async (e: React.FormEvent) => {
@@ -551,9 +596,17 @@ export default function DashboardOverview() {
                   <Zap className="w-8 h-8 text-coral animate-pulse" />
                 </div>
                 <h3 className="text-3xl font-bold font-space text-zinc-900 dark:text-white mb-2 tracking-tighter">Active Plan Required</h3>
-                <p className="text-base text-zinc-500 mb-10 max-w-sm mx-auto leading-relaxed">
+                <p className="text-base text-zinc-500 mb-6 max-w-sm mx-auto leading-relaxed">
                   You are currently on the Free Tier. Deploying cloud agents requires a premium container slot.
                 </p>
+
+                <button
+                  onClick={handleSyncPlan}
+                  disabled={syncingPlan}
+                  className="w-full mb-4 py-4 px-6 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white font-bold hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all disabled:opacity-60"
+                >
+                  {syncingPlan ? 'Syncing plan...' : 'Refresh Plan from Whop'}
+                </button>
 
                 <div className="space-y-4">
                   <a 
