@@ -120,7 +120,7 @@ export async function POST(req: Request) {
       query = query.eq('email', email);
     }
 
-    const { data: updatedRows, error } = await query.select('id,email,plan_tier');
+    let { data: updatedRows, error } = await query.select('id,email,plan_tier');
 
     if (error) {
       console.error('Error updating user plan:', error);
