@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Shield, Bell, Key, Loader2, Sparkles } from 'lucide-react';
+import { User, Mail, Lock, Shield, Key, Loader2, Sparkles } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -11,6 +11,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [fullName, setFullName] = useState('');
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function SettingsPage() {
           .eq('id', user.id)
           .single();
         setProfile(profData);
+        setFullName(profData?.full_name || user.email?.split('@')[0] || '');
       }
       setLoading(false);
     };
@@ -31,23 +33,27 @@ export default function SettingsPage() {
   }, [supabase]);
 
   const handleSave = async () => {
-    setSaving(true);
-    // Simulate network delay
-    setTimeout(() => {
-      setSaving(false);
-      setToast('Configuration permanently saved to the cloud.');
-      setTimeout(() => setToast(null), 3000);
-    }, 1200);
-  };
+    if (!user?.id || !fullName.trim()) return;
 
-  const handlePurge = async () => {
-    if (!confirm("Are you ABSOLUTELY sure you want to terminate this instance? This is completely irreversible.")) return;
     setSaving(true);
-    setTimeout(() => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ full_name: fullName.trim() })
+        .eq('id', user.id)
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
+      if (data) setProfile(data);
+      setToast('Profile saved successfully.');
+    } catch (err: any) {
+      setToast(err.message || 'Failed to save profile.');
+    } finally {
       setSaving(false);
-      setToast('Workspace termination protocol initiated.');
       setTimeout(() => setToast(null), 3000);
-    }, 1500);
+    }
   };
 
   if (loading) {
@@ -97,7 +103,8 @@ export default function SettingsPage() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 ml-4">Full Identity</label>
                 <input 
                   type="text" 
-                  defaultValue={profile?.full_name || user?.email?.split('@')[0] || ''}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Your Name"
                   className="w-full px-6 py-4 bg-zinc-50 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/5 rounded-full focus:outline-none focus:border-coral transition-all text-zinc-900 dark:text-white font-bold"
                 />
@@ -164,32 +171,6 @@ export default function SettingsPage() {
         </div>
       </motion.section>
 
-      {/* Danger Zone */}
-      <motion.section 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-[#111318] border border-rose-900/40 rounded-[2.5rem] p-10 md:p-14 shadow-sm relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(225,29,72,0.05),transparent_70%)] pointer-events-none" />
-        <h2 className="text-xl font-bold font-space mb-2 text-rose-600 dark:text-rose-500 uppercase tracking-tight relative z-10">System Termination</h2>
-        <p className="text-zinc-500 text-sm mb-10 font-light italic relative z-10">Irreversible and destructive actions. Proceed with total caution.</p>
-        
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-3xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 transition-all relative z-10">
-          <div>
-            <h3 className="font-bold text-rose-700 dark:text-rose-500 mb-2">Purge Workspace</h3>
-            <p className="text-sm text-rose-900/60 dark:text-rose-500/60 max-w-sm">Permanently delete your account, encrypted keys, and all active agent containers.</p>
-          </div>
-          <button 
-            onClick={handlePurge}
-            disabled={saving}
-            className="px-8 py-4 rounded-full bg-rose-600 hover:bg-rose-700 text-white transition-all text-xs font-black uppercase tracking-widest shadow-[0_4px_20px_rgba(225,29,72,0.2)] disabled:opacity-50 disabled:hover:bg-rose-600 flex items-center gap-2"
-          >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            Execute Termination
-          </button>
-        </div>
-      </motion.section>
     </div>
   );
 }
