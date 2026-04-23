@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon, User, Building, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon, User, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -20,7 +20,6 @@ export default function DashboardOverview() {
   // Onboarding State
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingName, setOnboardingName] = useState('');
-  const [onboardingCompany, setOnboardingCompany] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
 
   // Agent Deployment State
@@ -121,13 +120,12 @@ export default function DashboardOverview() {
       const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         full_name: onboardingName,
-        company: onboardingCompany,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
 
       if (error) throw error;
 
-      setProfile({ ...profile, full_name: onboardingName, company: onboardingCompany });
+      setProfile({ ...profile, full_name: onboardingName });
       setShowOnboarding(false);
       setToast("Profile configured successfully!");
     } catch (err: any) {
@@ -339,7 +337,7 @@ export default function DashboardOverview() {
           </div>
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-zinc-500 dark:text-zinc-400">API Key (Encrypted securely)</label>
+              <label className="text-sm font-bold text-zinc-500 dark:text-zinc-400">API Key</label>
               <input 
                 type="password" 
                 required
@@ -353,7 +351,7 @@ export default function DashboardOverview() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-bold text-zinc-500 dark:text-zinc-400">Telegram Bot Token (Optional)</label>
-                <span className="text-[10px] border border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 px-3 py-1 rounded-full uppercase tracking-widest font-black">Auto-Pairing</span>
+                <span className="text-[10px] border border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 px-3 py-1 rounded-full uppercase tracking-widest font-black">Manual setup</span>
               </div>
               <input 
                 type="password" 
@@ -362,7 +360,7 @@ export default function DashboardOverview() {
                 placeholder="1234567890:AAH..." 
                 className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full focus:border-coral transition-all text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 outline-none"
               />
-              <p className="text-xs text-zinc-500 dark:text-zinc-500 px-4">Provide this to enable 1-click Telegram pairing. Get from @BotFather.</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-500 px-4">Add a BotFather token if you want it stored with this agent for later manual setup. Automatic Telegram pairing is not live yet.</p>
             </div>
           </div>
 
@@ -372,7 +370,7 @@ export default function DashboardOverview() {
             className="w-full md:w-auto min-h-[56px] px-10 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-black rounded-full transition-all shadow-[0_4px_25px_rgba(37,99,235,0.4)] disabled:opacity-50 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] uppercase tracking-widest text-sm"
           >
             {deploying && <Loader2 className="w-5 h-5 animate-spin" />}
-            {deploying ? 'Allocating Container...' : 'Deploy Agent Instantly'}
+            {deploying ? 'Starting deployment...' : 'Deploy Agent'}
           </button>
         </form>
 
@@ -383,14 +381,14 @@ export default function DashboardOverview() {
             className="mt-8 p-8 bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-3xl"
           >
             <h3 className="text-green-600 dark:text-green-500 font-bold mb-4 flex items-center gap-3">
-              <CheckCircle2 className="w-6 h-6" /> Active Webhook Established
+              <CheckCircle2 className="w-6 h-6" /> Deployment record created
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Paste this URL into Telegram or Discord to link your agent.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Your agent was accepted for deployment. If a webhook URL was generated, you can use it below.</p>
             <div className="bg-white dark:bg-zinc-900 px-6 py-4 rounded-2xl font-mono text-sm text-zinc-800 dark:text-zinc-200 break-all border border-zinc-200 dark:border-zinc-800 shadow-inner">
               {deployedAgent.webhookUrl}
             </div>
             <div className="flex items-center gap-4 mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-900">
-               <span className="text-xs font-black uppercase tracking-widest text-zinc-300 dark:text-zinc-700">Container Ready</span>
+               <span className="text-xs font-black uppercase tracking-widest text-zinc-300 dark:text-zinc-700">Deployment Submitted</span>
                <div className="h-1 flex-1 bg-zinc-100 dark:bg-zinc-900 rounded-full overflow-hidden">
                  <div className="h-full bg-green-500 w-full" />
                </div>
@@ -558,21 +556,6 @@ export default function DashboardOverview() {
                      </div>
                   </div>
 
-                  <div className="space-y-2">
-                     <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Company (Optional)</label>
-                     <div className="relative group">
-                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                         <Building className="w-4 h-4 text-zinc-400 group-focus-within:text-zinc-900 dark:group-focus-within:text-white transition-colors" />
-                       </div>
-                       <input 
-                         type="text" 
-                         value={onboardingCompany}
-                         onChange={(e) => setOnboardingCompany(e.target.value)}
-                         placeholder="Acme Inc." 
-                         className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-[#111318] border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all text-zinc-900 dark:text-white placeholder:text-zinc-500 font-medium"
-                       />
-                     </div>
-                  </div>
 
                   <button 
                     type="submit" 
