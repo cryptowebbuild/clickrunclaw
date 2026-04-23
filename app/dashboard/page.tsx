@@ -15,6 +15,7 @@ export default function DashboardOverview() {
   const [profile, setProfile] = useState<any>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [syncingPlan, setSyncingPlan] = useState(false);
+  const [showPlanSyncButton, setShowPlanSyncButton] = useState(false);
 
   // Onboarding State
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -62,6 +63,7 @@ export default function DashboardOverview() {
       const checkoutStatus = searchParams.get('checkout_status') || searchParams.get('status');
       const receiptId = searchParams.get('receipt_id') || searchParams.get('payment_id');
       if (checkoutStatus === 'success') {
+        setShowPlanSyncButton(true);
         setToast(receiptId ? `Checkout success received (${receiptId}). Syncing your plan...` : 'Checkout success received. Syncing your plan...');
         if (data.user?.id) {
           setTimeout(async () => {
@@ -75,8 +77,9 @@ export default function DashboardOverview() {
               setProfile(refreshedProfile);
               if ((refreshedProfile.plan_tier || 'free') !== 'free') {
                 setToast('Plan activated successfully. You can deploy now.');
+                setShowPlanSyncButton(false);
               } else {
-                setToast('Checkout succeeded, but your plan is still syncing. Retry the webhook once if needed.');
+                setToast('Checkout succeeded, but your plan is still syncing. Use Refresh Plan from Whop below.');
               }
             }
 
@@ -174,6 +177,7 @@ export default function DashboardOverview() {
         }
 
         setToast(`Plan synced successfully: ${data.plan_tier}`);
+      setShowPlanSyncButton(false);
       } else {
         setToast('No active Whop membership found yet.');
       }
@@ -285,6 +289,23 @@ export default function DashboardOverview() {
         transition={{ delay: 0.15 }}
         className="max-w-5xl mx-auto mb-16 bg-white dark:bg-[#111318] border border-zinc-200 dark:border-white/5 rounded-[2rem] p-8 shadow-sm"
       >
+        {showPlanSyncButton && profile?.plan_tier === 'free' && (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 dark:border-amber-500/20 dark:bg-amber-500/10">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-black uppercase tracking-widest text-amber-700 dark:text-amber-300">Payment detected, plan not synced yet</p>
+                <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-200">If you just completed checkout, press this once to pull your active plan from Whop instantly.</p>
+              </div>
+              <button
+                onClick={handleSyncPlan}
+                disabled={syncingPlan}
+                className="rounded-full bg-amber-500 px-5 py-3 text-sm font-black text-white transition-all hover:bg-amber-600 disabled:opacity-60"
+              >
+                {syncingPlan ? 'Syncing plan...' : 'Refresh Plan from Whop'}
+              </button>
+            </div>
+          </div>
+        )}
         <h2 className="text-xl font-bold font-space mb-6 flex items-center gap-2 text-zinc-900 dark:text-white">
           <Zap className="w-5 h-5 text-coral" /> Let&apos;s Deploy a ClickRunClaw Agent
         </h2>
