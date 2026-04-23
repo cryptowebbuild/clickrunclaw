@@ -17,7 +17,13 @@ const PROVIDERS = [
 
 export default function OnboardingWizard() {
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => {
+    try {
+      return createClient();
+    } catch {
+      return null;
+    }
+  }, []);
   
   const [step, setStep] = useState(1);
   const [agentName, setAgentName] = useState('');
@@ -26,6 +32,7 @@ export default function OnboardingWizard() {
 
   // Validate user session, if no session, back to auth
   useEffect(() => {
+    if (!supabase) return;
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         router.push('/auth');

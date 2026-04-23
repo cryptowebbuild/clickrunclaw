@@ -30,12 +30,22 @@ export default function DashboardOverview() {
   const [deploying, setDeploying] = useState(false);
   const [deployedAgent, setDeployedAgent] = useState<any>(null);
 
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => {
+    try {
+      return createClient();
+    } catch {
+      return null;
+    }
+  }, []);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchUser = async () => {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
       const { data } = await supabase.auth.getUser();
       let currentProfile = { plan_tier: 'free', full_name: '' };
       if (data.user) {
@@ -113,7 +123,7 @@ export default function DashboardOverview() {
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!onboardingName.trim()) return;
+    if (!supabase || !onboardingName.trim()) return;
     
     setSavingProfile(true);
     try {
@@ -143,7 +153,7 @@ export default function DashboardOverview() {
   };
 
   const handleSyncPlan = async () => {
-    if (!user?.id || !user?.email) return;
+    if (!supabase || !user?.id || !user?.email) return;
 
     setSyncingPlan(true);
     setToast('Checking Whop membership and syncing your plan...');

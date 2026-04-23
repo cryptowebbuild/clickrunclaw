@@ -12,10 +12,20 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => {
+    try {
+      return createClient();
+    } catch {
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
@@ -33,7 +43,7 @@ export default function SettingsPage() {
   }, [supabase]);
 
   const handleSave = async () => {
-    if (!user?.id || !fullName.trim()) return;
+    if (!supabase || !user?.id || !fullName.trim()) return;
 
     setSaving(true);
     try {

@@ -1,4 +1,4 @@
-import Header from '../../components/Header';
+import StaticHeader from '../../components/StaticHeader';
 import Footer from '../../components/Footer';
 import { Key } from 'lucide-react';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function ApiKeysDocsPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 selection:bg-coral selection:text-white font-sans relative overflow-x-hidden">
-      <Header />
+      <StaticHeader />
       
       <main className="max-w-4xl mx-auto px-6 pt-40 pb-24 relative z-10">
         <div className="mb-16">

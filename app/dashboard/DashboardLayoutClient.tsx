@@ -89,9 +89,16 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => {
+    try {
+      return createClient();
+    } catch {
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -99,10 +106,12 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       }
     };
     getUser();
-  }, [supabase.auth]);
+  }, [supabase]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
     router.push('/auth');
   };
 

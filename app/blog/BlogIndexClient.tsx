@@ -5,7 +5,7 @@ import { Calendar, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-import Header from '../components/Header';
+import StaticHeader from '../components/StaticHeader';
 import Footer from '../components/Footer';
 import type { BlogPost } from '@/lib/blog';
 
@@ -20,7 +20,7 @@ export default function BlogIndexClient({ blogPosts }: BlogIndexClientProps) {
         <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
       </div>
 
-      <Header />
+      <StaticHeader />
 
       <main className="max-w-7xl mx-auto px-6 pt-40 pb-20 relative z-10">
         <motion.div 

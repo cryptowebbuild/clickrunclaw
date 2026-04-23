@@ -1,6 +1,6 @@
 import { getPostBySlug, getAllPosts } from '@/lib/blog';
 import { notFound } from 'next/navigation';
-import Header from '../../components/Header';
+import StaticHeader from '../../components/StaticHeader';
 import Footer from '../../components/Footer';
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
@@ -39,7 +39,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 selection:bg-coral selection:text-white font-sans">
-      <Header />
+      <StaticHeader />
       
       <main className="pt-32 pb-24 px-6 md:px-8 max-w-3xl mx-auto relative z-10">
         <Link 
