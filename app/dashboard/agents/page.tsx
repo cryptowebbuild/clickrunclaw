@@ -52,9 +52,18 @@ export default function AgentsPage() {
     setFeedback(null);
 
     try {
+      const { data: { session } } = await supabase!.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Session expired. Please log in again and retry.');
+      }
+
       const res = await fetch('/api/deploy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        credentials: 'include',
         body: JSON.stringify({
           agentName: agent.name,
           provider: agent.provider,
@@ -69,6 +78,9 @@ export default function AgentsPage() {
       try {
         data = raw ? JSON.parse(raw) : null;
       } catch {
+        if (raw && raw.includes('<!DOCTYPE')) {
+          throw new Error('Session expired or redirected. Please log in again and retry.');
+        }
         throw new Error('Server returned a non-JSON response. Please log in again and retry.');
       }
 
