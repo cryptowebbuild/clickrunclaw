@@ -121,7 +121,7 @@ export default function AgentsPage() {
                 <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-space flex items-center gap-2">
                   {agent.name}
                   <span className="text-xs font-mono text-zinc-500 font-normal px-2 py-0.5 bg-zinc-100 dark:bg-black/50 rounded-md border border-zinc-200 dark:border-white/5">
-                    {agent.container_id || 'pending'}
+                    {agent.container_id || 'not mapped'}
                   </span>
                 </h3>
                 <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -212,7 +212,7 @@ export default function AgentsPage() {
                     <div className="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-800" />
                   </div>
                   <span className="font-mono text-xs font-bold text-zinc-500 dark:text-zinc-500 tracking-tight">
-                    user@{selectedTerminal.container_id}
+                    user@{selectedTerminal.container_id || 'pending'}
                   </span>
                 </div>
                 <button 
@@ -247,12 +247,15 @@ export default function AgentsPage() {
                 </div>
 
                 {selectedTerminal.container_id ? (
-                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-900">
+                  <div className="space-y-4 pt-2 border-t border-zinc-100 dark:border-zinc-900">
+                    <div className="rounded-2xl border border-blue-200 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/20 p-5 text-sm text-blue-800 dark:text-blue-200">
+                      Infrastructure mapping is currently linked to Coolify service <span className="font-mono break-all">{selectedTerminal.container_id}</span>. This confirms the deployment request was attached to a real Coolify resource.
+                    </div>
                     <AgentMonitoring containerId={selectedTerminal.container_id} />
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-amber-200 dark:border-amber-900/30 bg-amber-50 dark:bg-amber-950/20 p-5 text-sm text-amber-800 dark:text-amber-200">
-                    Live container monitoring is not available until this agent has a real infrastructure mapping.
+                    Real infrastructure mapping is still missing for this agent, so live monitoring is not available yet.
                   </div>
                 )}
               </div>

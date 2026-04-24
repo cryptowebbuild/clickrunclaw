@@ -64,8 +64,14 @@ export async function POST(req: Request) {
     }
 
     const coolifyWebhook = process.env.COOLIFY_DEPLOY_WEBHOOK_URL;
-    if (!coolifyWebhook) {
-      return NextResponse.json({ error: 'Deployment is not configured yet. COOLIFY_DEPLOY_WEBHOOK_URL is missing.' }, { status: 500 });
+    const coolifyUrl = process.env.CLICKRUNCLAW_COOLIFY_URL;
+    const coolifyToken = process.env.CLICKRUNCLAW_COOLIFY_TOKEN;
+    const coolifyServiceUuid = process.env.COOLIFY_RESOURCE_UUID;
+
+    if (!coolifyWebhook && !(coolifyUrl && coolifyToken && coolifyServiceUuid)) {
+      return NextResponse.json({
+        error: 'Deployment is not configured yet. Missing Coolify webhook or API configuration.'
+      }, { status: 500 });
     }
 
     const { data: dbAgent, error: dbError } = await supabase
@@ -91,17 +97,50 @@ export async function POST(req: Request) {
 
     let deploymentQueued = false;
     let deploymentWarning: string | null = null;
+    let infrastructureRef: string | null = null;
 
-    try {
-      const res = await fetch(coolifyWebhook, { method: 'POST' });
-      if (!res.ok) {
-        deploymentWarning = `Deployment hook responded with status ${res.status}.`;
-      } else {
-        deploymentQueued = true;
+    if (coolifyUrl && coolifyToken && coolifyServiceUuid) {
+      try {
+        const res = await fetch(`${coolifyUrl.replace(/\/$/, '')}/api/v1/services/${coolifyServiceUuid}/start`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${coolifyToken}`,
+            Accept: 'application/json',
+          },
+          cache: 'no-store',
+        });
+
+        const raw = await res.text();
+        let parsed: any = null;
+        try {
+          parsed = raw ? JSON.parse(raw) : null;
+        } catch {
+          parsed = null;
+        }
+
+        if (!res.ok) {
+          deploymentWarning = parsed?.message || `Coolify API responded with status ${res.status}.`;
+        } else {
+          deploymentQueued = true;
+          infrastructureRef = coolifyServiceUuid;
+          deploymentWarning = parsed?.message || null;
+        }
+      } catch (err) {
+        deploymentWarning = 'Coolify API could not be reached.';
+        console.error('Could not trigger Coolify service start.', err);
       }
-    } catch (err) {
-      deploymentWarning = 'Deployment hook could not be reached.';
-      console.error('Could not trigger Coolify webhook.', err);
+    } else if (coolifyWebhook) {
+      try {
+        const res = await fetch(coolifyWebhook, { method: 'POST' });
+        if (!res.ok) {
+          deploymentWarning = `Deployment hook responded with status ${res.status}.`;
+        } else {
+          deploymentQueued = true;
+        }
+      } catch (err) {
+        deploymentWarning = 'Deployment hook could not be reached.';
+        console.error('Could not trigger Coolify webhook.', err);
+      }
     }
 
     const userHookUrl = `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
@@ -112,7 +151,7 @@ export async function POST(req: Request) {
       .update({
         status: nextStatus,
         webhook_url: userHookUrl,
-        container_id: null,
+        container_id: infrastructureRef,
         updated_at: new Date().toISOString(),
       })
       .eq('id', dbAgent.id);
@@ -130,7 +169,7 @@ export async function POST(req: Request) {
           name: normalizedName,
           status: 'failed',
           webhookUrl: userHookUrl,
-          containerId: null,
+          containerId: infrastructureRef,
         }
       }, { status: 502 });
     }
@@ -144,7 +183,7 @@ export async function POST(req: Request) {
         name: normalizedName,
         status: 'deploying',
         webhookUrl: userHookUrl,
-        containerId: null,
+        containerId: infrastructureRef,
       },
       warning: deploymentWarning,
     });
