@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     const coolifyWebhook = process.env.COOLIFY_DEPLOY_WEBHOOK_URL;
     const coolifyUrl = process.env.CLICKRUNCLAW_COOLIFY_URL;
     const coolifyToken = process.env.CLICKRUNCLAW_COOLIFY_TOKEN;
-    const coolifyServiceUuid = process.env.COOLIFY_RESOURCE_UUID;
+    const coolifyServiceUuid = process.env.CLICKRUNCLAW_COOLIFY_RESOURCE_UUID;
 
     if (!coolifyWebhook && !(coolifyUrl && coolifyToken && coolifyServiceUuid)) {
       return NextResponse.json({
