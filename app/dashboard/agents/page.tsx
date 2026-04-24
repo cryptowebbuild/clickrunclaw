@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Terminal, Server, 
+  Terminal, Server, RotateCcw,
   Search, Plus, X, Globe, Loader2, MessageCircle, HelpCircle
 } from 'lucide-react';
 import Link from 'next/link';
@@ -13,6 +13,8 @@ import AgentMonitoring from '@/components/dashboard/AgentMonitoring';
 export default function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTerminal, setSelectedTerminal] = useState<any | null>(null);
+  const [retryingId, setRetryingId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
   // Real Database State
   const [agents, setAgents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,25 +26,58 @@ export default function AgentsPage() {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchAgents = async () => {
-      if (!supabase) {
-        setLoading(false);
-        return;
-      }
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('agents')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-        if (data) setAgents(data);
-      }
+  const fetchAgents = async () => {
+    if (!supabase) {
       setLoading(false);
-    };
+      return;
+    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from('agents')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (data) setAgents(data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchAgents();
   }, [supabase]);
+
+  const handleRetry = async (agent: any) => {
+    setRetryingId(agent.id);
+    setFeedback(null);
+
+    try {
+      const res = await fetch('/api/deploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentName: agent.name,
+          provider: agent.provider,
+          apiKey: agent.api_key_secure,
+          telegramToken: agent.telegram_bot_token,
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || data.error || 'Retry failed');
+      }
+
+      setFeedback('Retry queued on real server. Refreshing status...');
+      await fetchAgents();
+    } catch (err: any) {
+      setFeedback(err.message || 'Retry failed');
+    } finally {
+      setRetryingId(null);
+      setTimeout(() => setFeedback(null), 4000);
+    }
+  };
 
   const supportEmail = 'support@clickrunclaw.com';
 
@@ -57,6 +92,18 @@ export default function AgentsPage() {
 
   return (
     <div className="space-y-6 relative">
+      <AnimatePresence>
+        {feedback && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[120] rounded-full border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#111318] px-5 py-3 text-sm font-medium text-zinc-800 dark:text-zinc-100 shadow-xl"
+          >
+            {feedback}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold font-space mb-2 text-zinc-900 dark:text-white">My Agents</h1>
@@ -173,6 +220,16 @@ export default function AgentsPage() {
                 </div>
 
                 <div className="flex items-center justify-end gap-2 w-full md:w-auto">
+                  {agent.status === 'failed' && (
+                    <button
+                      onClick={() => handleRetry(agent)}
+                      disabled={retryingId === agent.id}
+                      className="flex items-center gap-2 px-5 py-2 rounded-full bg-coral text-white hover:bg-coral-hover border border-coral/80 transition-all text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {retryingId === agent.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                      Retry Deploy
+                    </button>
+                  )}
                   <button 
                     onClick={() => setSelectedTerminal(agent)}
                     className="flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 border border-zinc-800 transition-all text-sm font-bold"
