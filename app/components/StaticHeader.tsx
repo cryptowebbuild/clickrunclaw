@@ -1,7 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 
 export default function StaticHeader() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <>
       <div className="bg-zinc-900 dark:bg-black text-white text-center py-2 text-xs font-bold tracking-widest uppercase border-b border-zinc-800 z-50 relative">
@@ -23,13 +29,35 @@ export default function StaticHeader() {
             <Link href="/blog" className="hover:text-[#FF5A5F] transition-colors">Blog</Link>
           </div>
 
-          <Link
-            href="/auth"
-            className="hidden md:flex items-center justify-center h-10 px-6 text-sm font-bold text-white bg-[#FF5A5F] hover:bg-opacity-90 rounded-full transition-all shadow-sm"
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/auth"
+              className="flex items-center justify-center h-10 px-6 text-sm font-bold text-white bg-[#FF5A5F] hover:bg-opacity-90 rounded-full transition-all shadow-sm"
+            >
+              Launch Agent
+            </Link>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full border border-zinc-200 dark:border-white/10 bg-white/80 dark:bg-white/5 text-zinc-900 dark:text-white"
+            aria-label="Toggle menu"
           >
-            Launch Agent
-          </Link>
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </nav>
+
+        {mobileOpen && (
+          <div className="md:hidden border-t border-zinc-200 dark:border-white/10 bg-white dark:bg-[#090A0F] px-4 py-4">
+            <div className="flex flex-col gap-3 text-sm font-bold text-zinc-700 dark:text-zinc-300">
+              <Link href="/" onClick={() => setMobileOpen(false)} className="py-2">Home</Link>
+              <Link href="/#pricing" onClick={() => setMobileOpen(false)} className="py-2">Pricing</Link>
+              <Link href="/blog" onClick={() => setMobileOpen(false)} className="py-2">Blog</Link>
+              <Link href="/auth" onClick={() => setMobileOpen(false)} className="mt-2 inline-flex items-center justify-center h-11 px-5 rounded-full bg-[#FF5A5F] text-white">Launch Agent</Link>
+            </div>
+          </div>
+        )}
       </header>
     </>
   );
