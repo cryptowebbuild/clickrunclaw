@@ -105,7 +105,7 @@ export default function AgentsPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-[120] rounded-full border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#111318] px-5 py-3 text-sm font-medium text-zinc-800 dark:text-zinc-100 shadow-xl"
+            className="sticky top-3 z-20 mx-auto w-fit max-w-[calc(100vw-2rem)] rounded-2xl border border-zinc-200 dark:border-white/10 bg-white/95 dark:bg-[#111318]/95 px-4 py-3 text-sm font-medium text-zinc-800 dark:text-zinc-100 shadow-xl backdrop-blur"
           >
             {feedback}
           </motion.div>
