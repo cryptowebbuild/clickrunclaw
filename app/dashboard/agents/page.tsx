@@ -63,10 +63,17 @@ export default function AgentsPage() {
         })
       });
 
-      const data = await res.json();
+      const raw = await res.text();
+      let data: any = null;
+
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        throw new Error('Server returned a non-JSON response. Please log in again and retry.');
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || data.error || 'Retry failed');
+        throw new Error(data?.message || data?.error || 'Retry failed');
       }
 
       setFeedback('Retry queued on real server. Refreshing status...');
