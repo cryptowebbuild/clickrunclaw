@@ -475,7 +475,7 @@ export default function DashboardOverview() {
             <h3 className="text-2xl font-bold mb-2 font-space text-zinc-900 dark:text-white">
               Pro Pod
             </h3>
-            <p className="text-zinc-500 dark:text-zinc-400 mb-8 h-12 text-sm leading-relaxed">For serious builders and production deployments.</p>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-8 h-12 text-sm leading-relaxed">For serious builders who need multiple agents without overselling active capacity.</p>
             <div className="flex flex-col gap-2 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
               <div className="flex items-center gap-3">
                 <span className="text-xl text-zinc-400 dark:text-zinc-600 line-through font-medium">$49.98</span>
@@ -488,8 +488,8 @@ export default function DashboardOverview() {
             </div>
             <ul className="flex flex-col gap-5 mb-10">
               {[
-                '5 Active Agent Containers',
-                'Instant Warm-Pool Boots (<1s)',
+                '5 Agents Included',
+                '2 Active Agents at a Time',
                 'All Premium Plugins & Integrations',
                 'Advanced Analytics & Logs',
                 'Custom Domains',

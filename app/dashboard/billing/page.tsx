@@ -82,7 +82,7 @@ export default function BillingPage() {
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-              {['5 Active High-Performance Agents', 'Priority 24/7 Tech Support', 'Custom Verified Domains', 'White-label Secure Webhooks'].map((feature, i) => (
+              {['5 Agents Included', '2 Active Agents at a Time', 'Priority 24/7 Tech Support', 'White-label Secure Webhooks'].map((feature, i) => (
                 <div key={i} className="flex items-center gap-4 text-sm text-zinc-900 dark:text-zinc-300 font-medium">
                   <div className="w-6 h-6 rounded-full bg-coral/10 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-3.5 h-3.5 text-coral" />

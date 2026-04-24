@@ -75,14 +75,14 @@ export async function POST(req: Request) {
     if (planTier === 'starter' && currentAgentCount >= 1) {
       return NextResponse.json({
         error: 'PAYWALL',
-        message: 'Starter plan limit reached (1/1 Agents). Please upgrade to Pro to deploy up to 5 agents.'
+        message: 'Starter plan limit reached (1/1 active agents). Upgrade to Pro for up to 5 included agents with 2 active at a time.'
       }, { status: 403 });
     }
 
-    if (planTier === 'pro' && currentAgentCount >= 5) {
+    if (planTier === 'pro' && currentAgentCount >= 2) {
       return NextResponse.json({
         error: 'PAYWALL_MAX',
-        message: 'Pro plan limit reached (5/5 Agents). Contact support for Enterprise.'
+        message: 'Pro plan limit reached (2/2 active agents). Pro includes up to 5 agents total, with 2 active at a time on the current infrastructure.'
       }, { status: 403 });
     }
 

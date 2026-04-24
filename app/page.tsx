@@ -13,15 +13,22 @@ import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 
-import Header from './components/Header';
+import StaticHeader from './components/StaticHeader';
 import Footer from './components/Footer';
 
 export default function LandingPage() {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => {
+    try {
+      return createClient();
+    } catch {
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, [supabase]);
 
@@ -45,7 +52,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-grid-dots opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
       </div>
 
-      <Header />
+      <StaticHeader />
 
       <main className="relative z-10">
         {/* Hero Section */}
@@ -424,8 +431,8 @@ export default function LandingPage() {
         <section id="pricing" className="py-24 px-4 relative border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#090A0F]">
           <div className="max-w-5xl mx-auto relative z-10">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 font-space tracking-tight text-zinc-900 dark:text-white">Simple pricing. <br/>Scale infinitely.</h2>
-              <p className="text-xl text-zinc-500 dark:text-zinc-400 font-light">Start small, grow massive. Cancel anytime.</p>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 font-space tracking-tight text-zinc-900 dark:text-white">Simple pricing. <br/>Scale clearly.</h2>
+              <p className="text-xl text-zinc-500 dark:text-zinc-400 font-light">Start small, grow safely. Cancel anytime.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -485,7 +492,7 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <h3 className="text-2xl font-bold mb-2 font-space text-zinc-900 dark:text-white">Pro</h3>
-                <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-sm">For serious builders and agencies.</p>
+                <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-sm">For serious builders and agencies who need more room without losing stability.</p>
                 <div className="flex flex-col gap-2 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
                   <div className="flex items-center gap-3">
                     <span className="text-xl text-zinc-400 dark:text-zinc-600 line-through font-medium">$49.98</span>
@@ -498,7 +505,8 @@ export default function LandingPage() {
                 </div>
                 <ul className="flex flex-col gap-5 mb-10 flex-grow">
                   {[
-                    '5 Active Agents',
+                    '5 Agents Included',
+                    '2 Active Agents at a Time',
                     'Priority 24/7 Support',
                     'All Premium Plugins',
                     'Advanced Analytics',
@@ -543,7 +551,7 @@ export default function LandingPage() {
                 },
                 {
                   q: "How many agents can I deploy?",
-                  a: "Our Starter node ($9/mo) allows you to run 1 active 24/7 Agent. The Pro Core ($29/mo) unlocks the ability to run up to 5 independent OpenClaw agents simultaneously for agencies and heavy automation."
+                  a: "Our Starter plan ($9.99/mo) allows 1 active agent. The Pro plan ($29.99/mo) includes up to 5 agents total, with 2 active at a time on the current infrastructure."
                 },
                 {
                   q: "How do Telegram and Discord Webhooks work?",
