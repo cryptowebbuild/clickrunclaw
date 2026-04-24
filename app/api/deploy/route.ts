@@ -27,12 +27,18 @@ export async function POST(req: Request) {
       }, { status: 403 });
     }
 
-    const { count } = await supabase
+    const { data: existingAgents, error: agentsError } = await supabase
       .from('agents')
-      .select('id', { count: 'exact', head: true })
+      .select('id, status, name, provider, api_key_secure, telegram_bot_token')
       .eq('user_id', user.id);
 
-    const currentAgentCount = count || 0;
+    if (agentsError) {
+      return NextResponse.json({ error: 'Could not inspect existing agents.' }, { status: 500 });
+    }
+
+    const agents = existingAgents || [];
+    const activeStatuses = new Set(['deploying', 'queued', 'running', 'starting', 'active']);
+    const currentAgentCount = agents.filter(agent => activeStatuses.has(String(agent.status || '').toLowerCase())).length;
 
     if (planTier === 'starter' && currentAgentCount >= 1) {
       return NextResponse.json({
@@ -59,6 +65,12 @@ export async function POST(req: Request) {
     const normalizedApiKey = String(apiKey).trim();
     const normalizedTelegramToken = telegramToken ? String(telegramToken).trim() : null;
 
+    const retryTarget = agents.find(agent =>
+      String(agent.status || '').toLowerCase() === 'failed' &&
+      String(agent.name || '').trim().toLowerCase() === normalizedName.toLowerCase() &&
+      String(agent.provider || '').trim().toLowerCase() === normalizedProvider
+    );
+
     if (!normalizedName || !normalizedProvider || !normalizedApiKey) {
       return NextResponse.json({ error: 'Invalid deployment configuration.' }, { status: 400 });
     }
@@ -74,25 +86,51 @@ export async function POST(req: Request) {
       }, { status: 500 });
     }
 
-    const { data: dbAgent, error: dbError } = await supabase
-      .from('agents')
-      .insert([
-        {
-          user_id: user.id,
-          name: normalizedName,
-          provider: normalizedProvider,
+    let dbAgent: any = null;
+
+    if (retryTarget) {
+      const { data: updatedAgent, error: retryError } = await supabase
+        .from('agents')
+        .update({
           api_key_secure: normalizedApiKey,
           telegram_bot_token: normalizedTelegramToken,
           telegram_status: normalizedTelegramToken ? 'pending' : 'none',
-          status: 'deploying'
-        }
-      ])
-      .select()
-      .single();
+          status: 'deploying',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', retryTarget.id)
+        .select()
+        .single();
 
-    if (dbError) {
-      console.error('Database Error:', dbError);
-      return NextResponse.json({ error: 'Failed to initialize agent in database.' }, { status: 500 });
+      if (retryError || !updatedAgent) {
+        console.error('Retry Update Error:', retryError);
+        return NextResponse.json({ error: 'Failed to requeue existing failed agent.' }, { status: 500 });
+      }
+
+      dbAgent = updatedAgent;
+    } else {
+      const { data: insertedAgent, error: dbError } = await supabase
+        .from('agents')
+        .insert([
+          {
+            user_id: user.id,
+            name: normalizedName,
+            provider: normalizedProvider,
+            api_key_secure: normalizedApiKey,
+            telegram_bot_token: normalizedTelegramToken,
+            telegram_status: normalizedTelegramToken ? 'pending' : 'none',
+            status: 'deploying'
+          }
+        ])
+        .select()
+        .single();
+
+      if (dbError || !insertedAgent) {
+        console.error('Database Error:', dbError);
+        return NextResponse.json({ error: 'Failed to initialize agent in database.' }, { status: 500 });
+      }
+
+      dbAgent = insertedAgent;
     }
 
     let deploymentQueued = false;
