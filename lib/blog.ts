@@ -17,6 +17,9 @@ export interface BlogPost {
   tags: string[];
   canonicalUrl: string;
   keywords: string[];
+  ctaTitle?: string;
+  ctaText?: string;
+  ctaHref?: string;
 }
 
 export function getAllPosts(): BlogPost[] {
@@ -45,6 +48,9 @@ export function getAllPosts(): BlogPost[] {
         tags,
         canonicalUrl: matterResult.data.canonicalUrl || `${siteUrl}/blog/${slug}`,
         keywords,
+        ctaTitle: matterResult.data.ctaTitle || 'Ready to deploy faster?',
+        ctaText: matterResult.data.ctaText || 'Launch your ClickRunClaw workspace and move from local chaos to production-safe hosting.',
+        ctaHref: matterResult.data.ctaHref || '/auth',
       };
     });
 
