@@ -12,6 +12,44 @@ function slugifyAgentName(input: string) {
     .slice(0, 40) || 'agent';
 }
 
+async function syncAgentStatus(supabase: any, agentId: string, serviceUuid: string) {
+  const coolifyUrl = process.env.CLICKRUNCLAW_COOLIFY_URL?.replace(/\/$/, '');
+  const coolifyToken = process.env.CLICKRUNCLAW_COOLIFY_TOKEN;
+
+  if (!coolifyUrl || !coolifyToken) return;
+
+  try {
+    const response = await fetch(`${coolifyUrl}/api/v1/services/${serviceUuid}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${coolifyToken}`,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    const rawStatus = String(data?.status || '').toLowerCase();
+
+    let nextStatus = 'deploying';
+    if (rawStatus.includes('healthy') || rawStatus.includes('running')) nextStatus = 'running';
+    else if (rawStatus.includes('exited') || rawStatus.includes('dead') || rawStatus.includes('failed')) nextStatus = 'failed';
+    else if (rawStatus.includes('starting')) nextStatus = 'starting';
+
+    await supabase
+      .from('agents')
+      .update({
+        status: nextStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', agentId);
+  } catch (error) {
+    console.error('Agent status sync failed:', error);
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
@@ -148,6 +186,7 @@ export async function POST(req: Request) {
     let deploymentWarning: string | null = null;
     let infrastructureRef: string | null = null;
     let serviceDomain: string | null = null;
+    let nextStatus = 'failed';
 
     try {
       const serviceName = `crc-${slugifyAgentName(normalizedName)}-${dbAgent.id.split('-')[0]}`;
@@ -169,6 +208,8 @@ export async function POST(req: Request) {
       deploymentQueued = Boolean(infrastructureRef);
       if (!deploymentQueued) {
         deploymentWarning = 'Coolify service was created without a returned UUID.';
+      } else if (infrastructureRef) {
+        await syncAgentStatus(supabase, dbAgent.id, infrastructureRef);
       }
     } catch (err: any) {
       deploymentWarning = err?.message || 'Coolify service provisioning failed.';
@@ -176,7 +217,9 @@ export async function POST(req: Request) {
     }
 
     const userHookUrl = serviceDomain ? `https://${serviceDomain}` : `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
-    const nextStatus = deploymentQueued ? 'deploying' : 'failed';
+    if (deploymentQueued && nextStatus === 'failed') {
+      nextStatus = 'deploying';
+    }
 
     const { error: updateError } = await supabase
       .from('agents')
@@ -196,6 +239,7 @@ export async function POST(req: Request) {
       return NextResponse.json({
         error: 'DEPLOYMENT_QUEUE_FAILED',
         message: deploymentWarning || 'Deployment could not be queued.',
+        reason: deploymentWarning || null,
         agent: {
           id: dbAgent.id,
           name: normalizedName,
@@ -213,7 +257,7 @@ export async function POST(req: Request) {
       agent: {
         id: dbAgent.id,
         name: normalizedName,
-        status: 'deploying',
+        status: nextStatus,
         webhookUrl: userHookUrl,
         containerId: infrastructureRef,
       },

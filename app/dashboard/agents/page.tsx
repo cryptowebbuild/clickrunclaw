@@ -79,13 +79,13 @@ export default function AgentsPage() {
         data = raw ? JSON.parse(raw) : null;
       } catch {
         if (raw && raw.includes('<!DOCTYPE')) {
-          throw new Error('Session expired or redirected. Please log in again and retry.');
+          throw new Error('Dashboard session is invalid or redirected. Please refresh and log in again.');
         }
-        throw new Error('Server returned a non-JSON response. Please log in again and retry.');
+        throw new Error(raw?.slice(0, 220) || 'Server returned a non-JSON response.');
       }
 
       if (!res.ok) {
-        throw new Error(data?.message || data?.error || 'Retry failed');
+        throw new Error(data?.message || data?.reason || data?.error || 'Retry failed');
       }
 
       setFeedback('Retry queued on real server. Refreshing status...');

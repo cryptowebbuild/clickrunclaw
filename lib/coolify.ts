@@ -84,17 +84,21 @@ export function buildOpenClawCompose(input: CoolifyCreateServiceInput) {
   ].join('\n');
 }
 
+function toBase64(value: string) {
+  return Buffer.from(value, 'utf8').toString('base64');
+}
+
 export async function createCoolifyService(input: CoolifyCreateServiceInput) {
   const coolifyUrl = requireEnv('CLICKRUNCLAW_COOLIFY_URL').replace(/\/$/, '');
   const coolifyToken = requireEnv('CLICKRUNCLAW_COOLIFY_TOKEN');
+  const compose = buildOpenClawCompose(input);
   const body = {
-    type: 'docker-compose',
     name: input.name,
     project_uuid: input.projectUuid,
     environment_uuid: input.environmentUuid,
     server_uuid: input.serverUuid,
     instant_deploy: true,
-    docker_compose_raw: buildOpenClawCompose(input),
+    docker_compose_raw: toBase64(compose),
     is_container_label_escape_enabled: true,
   };
 
@@ -123,4 +127,3 @@ export async function createCoolifyService(input: CoolifyCreateServiceInput) {
 
   return data as { uuid?: string; domains?: string[] };
 }
-
