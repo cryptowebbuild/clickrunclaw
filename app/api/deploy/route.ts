@@ -2,8 +2,17 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createCoolifyService } from '@/lib/coolify';
 
 export const runtime = 'edge';
+
+function slugifyAgentName(input: string) {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40) || 'agent';
+}
 
 export async function POST(req: Request) {
   try {
@@ -107,14 +116,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid deployment configuration.' }, { status: 400 });
     }
 
-    const coolifyWebhook = process.env.COOLIFY_DEPLOY_WEBHOOK_URL;
     const coolifyUrl = process.env.CLICKRUNCLAW_COOLIFY_URL;
     const coolifyToken = process.env.CLICKRUNCLAW_COOLIFY_TOKEN;
-    const coolifyServiceUuid = process.env.CLICKRUNCLAW_COOLIFY_RESOURCE_UUID;
+    const coolifyProjectUuid = process.env.CLICKRUNCLAW_COOLIFY_PROJECT_ID;
+    const coolifyEnvironmentUuid = process.env.CLICKRUNCLAW_COOLIFY_ENVIRONMENT_ID;
+    const coolifyServerUuid = process.env.CLICKRUNCLAW_COOLIFY_SERVER_UUID || 'pst7oglnpvrso8c4pqm5he8h';
+    const coolifyBaseDomain = process.env.CLICKRUNCLAW_AGENT_BASE_DOMAIN;
 
-    if (!coolifyWebhook && !(coolifyUrl && coolifyToken && coolifyServiceUuid)) {
+    if (!(coolifyUrl && coolifyToken && coolifyProjectUuid && coolifyEnvironmentUuid && coolifyServerUuid)) {
       return NextResponse.json({
-        error: 'Deployment is not configured yet. Missing Coolify webhook or API configuration.'
+        error: 'Deployment is not configured yet. Missing Coolify API configuration.'
       }, { status: 500 });
     }
 
@@ -168,52 +179,35 @@ export async function POST(req: Request) {
     let deploymentQueued = false;
     let deploymentWarning: string | null = null;
     let infrastructureRef: string | null = null;
+    let serviceDomain: string | null = null;
 
-    if (coolifyUrl && coolifyToken && coolifyServiceUuid) {
-      try {
-        const res = await fetch(`${coolifyUrl.replace(/\/$/, '')}/api/v1/services/${coolifyServiceUuid}/start`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${coolifyToken}`,
-            Accept: 'application/json',
-          },
-          cache: 'no-store',
-        });
+    try {
+      const serviceName = `crc-${slugifyAgentName(normalizedName)}-${dbAgent.id.split('-')[0]}`;
+      serviceDomain = coolifyBaseDomain ? `${serviceName}.${coolifyBaseDomain}` : null;
 
-        const raw = await res.text();
-        let parsed: any = null;
-        try {
-          parsed = raw ? JSON.parse(raw) : null;
-        } catch {
-          parsed = null;
-        }
+      const created = await createCoolifyService({
+        name: serviceName,
+        projectUuid: coolifyProjectUuid,
+        environmentUuid: coolifyEnvironmentUuid,
+        serverUuid: coolifyServerUuid,
+        domain: serviceDomain,
+        env: {
+          OPENCLAW_AGENT_NAME: normalizedName,
+          OPENCLAW_LLM_PROVIDER: normalizedProvider,
+        },
+      });
 
-        if (!res.ok) {
-          deploymentWarning = parsed?.message || `Coolify API responded with status ${res.status}.`;
-        } else {
-          deploymentQueued = true;
-          infrastructureRef = coolifyServiceUuid;
-          deploymentWarning = parsed?.message || null;
-        }
-      } catch (err) {
-        deploymentWarning = 'Coolify API could not be reached.';
-        console.error('Could not trigger Coolify service start.', err);
+      infrastructureRef = created?.uuid || null;
+      deploymentQueued = Boolean(infrastructureRef);
+      if (!deploymentQueued) {
+        deploymentWarning = 'Coolify service was created without a returned UUID.';
       }
-    } else if (coolifyWebhook) {
-      try {
-        const res = await fetch(coolifyWebhook, { method: 'POST' });
-        if (!res.ok) {
-          deploymentWarning = `Deployment hook responded with status ${res.status}.`;
-        } else {
-          deploymentQueued = true;
-        }
-      } catch (err) {
-        deploymentWarning = 'Deployment hook could not be reached.';
-        console.error('Could not trigger Coolify webhook.', err);
-      }
+    } catch (err: any) {
+      deploymentWarning = err?.message || 'Coolify service provisioning failed.';
+      console.error('Could not create Coolify service.', err);
     }
 
-    const userHookUrl = `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
+    const userHookUrl = serviceDomain ? `https://${serviceDomain}` : `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
     const nextStatus = deploymentQueued ? 'deploying' : 'failed';
 
     const { error: updateError } = await supabase

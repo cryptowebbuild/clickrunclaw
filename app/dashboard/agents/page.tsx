@@ -201,7 +201,7 @@ export default function AgentsPage() {
                   <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                   <span className="flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5" />
-                    {agent.webhook_url ? 'Webhook Ready' : 'Webhook Pending'}
+                    {agent.webhook_url ? 'Endpoint Ready' : 'Endpoint Pending'}
                   </span>
                   <span className="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                   <span className="flex items-center gap-1.5 uppercase font-bold text-[10px] tracking-wider bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
@@ -325,7 +325,7 @@ export default function AgentsPage() {
                 {selectedTerminal.container_id ? (
                   <div className="space-y-4 pt-2 border-t border-zinc-100 dark:border-zinc-900">
                     <div className="rounded-2xl border border-blue-200 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/20 p-5 text-sm text-blue-800 dark:text-blue-200">
-                      Infrastructure mapping is currently linked to Coolify service <span className="font-mono break-all">{selectedTerminal.container_id}</span>. This confirms the deployment request was attached to a real Coolify resource.
+                      This agent is linked to real Coolify service <span className="font-mono break-all">{selectedTerminal.container_id}</span>. Monitoring appears only after a true infrastructure mapping exists.
                     </div>
                     <AgentMonitoring containerId={selectedTerminal.container_id} />
                   </div>
