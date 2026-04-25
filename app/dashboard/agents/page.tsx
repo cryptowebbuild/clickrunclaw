@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import AgentMonitoring from '@/components/dashboard/AgentMonitoring';
 
 export default function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -327,7 +326,9 @@ export default function AgentsPage() {
                     <div className="rounded-2xl border border-blue-200 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/20 p-5 text-sm text-blue-800 dark:text-blue-200">
                       This agent is linked to real Coolify service <span className="font-mono break-all">{selectedTerminal.container_id}</span>. Monitoring appears only after a true infrastructure mapping exists.
                     </div>
-                    <AgentMonitoring containerId={selectedTerminal.container_id} />
+                    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-5 text-sm text-zinc-700 dark:text-zinc-300">
+                      Live CPU and RAM charts are temporarily hidden until real metrics are wired to Coolify data. This avoids showing fake monitoring numbers.
+                    </div>
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-amber-200 dark:border-amber-900/30 bg-amber-50 dark:bg-amber-950/20 p-5 text-sm text-amber-800 dark:text-amber-200">

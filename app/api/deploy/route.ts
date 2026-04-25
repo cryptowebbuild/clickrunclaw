@@ -45,9 +45,13 @@ async function syncAgentStatus(supabase: any, agentId: string, serviceUuid: stri
         updated_at: new Date().toISOString(),
       })
       .eq('id', agentId);
+
+    return nextStatus;
   } catch (error) {
     console.error('Agent status sync failed:', error);
   }
+
+  return null;
 }
 
 export async function POST(req: Request) {
@@ -209,7 +213,10 @@ export async function POST(req: Request) {
       if (!deploymentQueued) {
         deploymentWarning = 'Coolify service was created without a returned UUID.';
       } else if (infrastructureRef) {
-        await syncAgentStatus(supabase, dbAgent.id, infrastructureRef);
+        const syncedStatus = await syncAgentStatus(supabase, dbAgent.id, infrastructureRef);
+        if (syncedStatus) {
+          nextStatus = syncedStatus;
+        }
       }
     } catch (err: any) {
       deploymentWarning = err?.message || 'Coolify service provisioning failed.';
