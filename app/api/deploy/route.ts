@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { createCoolifyService } from '@/lib/coolify';
+import { attachCoolifyServiceUrl, buildOpenClawCompose, createCoolifyService } from '@/lib/coolify';
 
 export const runtime = 'edge';
 
@@ -201,7 +201,6 @@ export async function POST(req: Request) {
         projectUuid: coolifyProjectUuid,
         environmentUuid: coolifyEnvironmentUuid,
         serverUuid: coolifyServerUuid,
-        domain: serviceDomain,
         env: {
           OPENCLAW_AGENT_NAME: normalizedName,
           OPENCLAW_LLM_PROVIDER: normalizedProvider,
@@ -213,6 +212,23 @@ export async function POST(req: Request) {
       if (!deploymentQueued) {
         deploymentWarning = 'Coolify service was created without a returned UUID.';
       } else if (infrastructureRef) {
+        if (serviceDomain) {
+          await attachCoolifyServiceUrl(infrastructureRef, {
+            name: serviceName,
+            compose: buildOpenClawCompose({
+              name: serviceName,
+              projectUuid: coolifyProjectUuid,
+              environmentUuid: coolifyEnvironmentUuid,
+              serverUuid: coolifyServerUuid,
+              env: {
+                OPENCLAW_AGENT_NAME: normalizedName,
+                OPENCLAW_LLM_PROVIDER: normalizedProvider,
+              },
+            }),
+            url: `https://${serviceDomain}`,
+          });
+        }
+
         const syncedStatus = await syncAgentStatus(supabase, dbAgent.id, infrastructureRef);
         if (syncedStatus) {
           nextStatus = syncedStatus;

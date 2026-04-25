@@ -127,3 +127,38 @@ export async function createCoolifyService(input: CoolifyCreateServiceInput) {
 
   return data as { uuid?: string; domains?: string[] };
 }
+
+export async function attachCoolifyServiceUrl(serviceUuid: string, input: { name: string; compose: string; url: string }) {
+  const coolifyUrl = requireEnv('CLICKRUNCLAW_COOLIFY_URL').replace(/\/$/, '');
+  const coolifyToken = requireEnv('CLICKRUNCLAW_COOLIFY_TOKEN');
+
+  const response = await fetch(`${coolifyUrl}/api/v1/services/${serviceUuid}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${coolifyToken}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: input.name,
+      docker_compose_raw: toBase64(input.compose),
+      is_container_label_escape_enabled: true,
+      urls: [{ name: 'openclaw', url: input.url }],
+    }),
+    cache: 'no-store',
+  });
+
+  const text = await response.text();
+  let data: any = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.message || `Coolify service URL attach failed with status ${response.status}`);
+  }
+
+  return data as { uuid?: string; domains?: string[] };
+}
