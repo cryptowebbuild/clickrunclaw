@@ -1,5 +1,3 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createCoolifyService } from '@/lib/coolify';
@@ -17,37 +15,7 @@ function slugifyAgentName(input: string) {
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    let { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (!user) {
-      const authHeader = req.headers.get('authorization');
-      const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-
-      if (token) {
-        const cookieStore = await cookies();
-        const tokenSupabase = createServerClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          {
-            cookies: {
-              getAll() {
-                return cookieStore.getAll();
-              },
-              setAll() {},
-            },
-            global: {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          }
-        );
-
-        const authResult = await tokenSupabase.auth.getUser(token);
-        user = authResult.data.user;
-        authError = authResult.error;
-      }
-    }
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized: Please log in to deploy agents.' }, { status: 401 });
