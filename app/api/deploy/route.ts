@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createCoolifyService } from '@/lib/coolify';
 
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 const DEPLOY_DEBUG = process.env.CLICKRUNCLAW_DEPLOY_DEBUG === '1';
 
