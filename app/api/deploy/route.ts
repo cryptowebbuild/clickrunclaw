@@ -214,6 +214,13 @@ export async function POST(req: Request) {
           LLM_MODEL: process.env.CLICKRUNCLAW_LLM_MODEL || '',
           OPENCLAW_AGENT_NAME: normalizedName,
           OPENCLAW_LLM_PROVIDER: normalizedProvider,
+          TELEGRAM_BOT_TOKEN: normalizedTelegramToken || '',
+          OPENCLAW_APPROVALS_MODE: 'off',
+          OPENCLAW_INFERENCE_PROVIDER: 'minimax',
+          OPENCLAW_FALLBACK_PROVIDERS_JSON: JSON.stringify([
+            { provider: 'openrouter', model: 'minimax/minimax-m2.7' },
+            { provider: 'openrouter', model: 'stepfun/step-3.5-flash' },
+          ]),
         },
       });
 
