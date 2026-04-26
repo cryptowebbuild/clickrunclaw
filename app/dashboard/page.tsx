@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon, User, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Zap, Server, ShieldCheck, Loader2, XIcon, User, ArrowRight, Sparkles, Clock3 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -24,7 +24,7 @@ export default function DashboardOverview() {
 
   // Agent Deployment State
   const [agentName, setAgentName] = useState('');
-  const [provider, setProvider] = useState('openai');
+  const [provider, setProvider] = useState('openai-compatible');
   const [apiKey, setApiKey] = useState('');
   const [telegramToken, setTelegramToken] = useState('');
   const [deploying, setDeploying] = useState(false);
@@ -103,7 +103,7 @@ export default function DashboardOverview() {
         if (pendingDeployStr && currentProfile.full_name) { // only trigger if onboarding is not blocking
           const pending = JSON.parse(pendingDeployStr);
           setAgentName(pending.name || '');
-          setProvider(pending.provider || 'openai');
+          setProvider(pending.provider || 'openai-compatible');
           setApiKey(pending.apiKey || '');
           localStorage.removeItem('CR_PENDING_DEPLOY');
           
@@ -325,38 +325,54 @@ export default function DashboardOverview() {
             </div>
           </div>
         )}
-        <h2 className="text-xl font-bold font-space mb-6 flex items-center gap-2 text-zinc-900 dark:text-white">
-          <Zap className="w-5 h-5 text-coral" /> Let&apos;s Deploy a ClickRunClaw Agent
-        </h2>
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h2 className="text-xl font-bold font-space flex items-center gap-2 text-zinc-900 dark:text-white">
+              <Zap className="w-5 h-5 text-coral" /> Launch your agent
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+              One simple setup. Name it, add your API key, and launch.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:max-w-sm md:flex-1">
+            <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/60">
+              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                <Sparkles className="h-3.5 w-3.5 text-coral" /> Ready base
+              </div>
+              <p className="mt-1 text-sm font-semibold text-zinc-900 dark:text-white">OpenAI-compatible model preconfigured</p>
+            </div>
+            <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/60">
+              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                <Clock3 className="h-3.5 w-3.5 text-coral" /> Simple flow
+              </div>
+              <p className="mt-1 text-sm font-semibold text-zinc-900 dark:text-white">No provider switching needed right now</p>
+            </div>
+          </div>
+        </div>
         
         <form onSubmit={handleDeploy} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-bold text-zinc-500 dark:text-zinc-400">Agent Name</label>
               <input 
                 type="text" 
                 required
                 value={agentName}
                 onChange={(e) => setAgentName(e.target.value)}
-                placeholder="e.g. SalesBot-Alpha, Support-Agent, Web3-Analyst" 
+                placeholder="e.g. Sales Assistant, Support Bot, Lead Closer" 
                 className="w-full px-4 py-3 bg-zinc-50 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/10 rounded-full focus:border-coral transition-all text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-700 outline-none"
               />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-zinc-500 dark:text-zinc-400">LLM Provider</label>
-              <select 
-                value={provider}
-                onChange={(e) => setProvider(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-50 dark:bg-[#090A0F] border border-zinc-200 dark:border-white/10 rounded-full focus:border-coral transition-all text-zinc-900 dark:text-white outline-none"
-              >
-                <option value="openai">OpenAI (GPT-4)</option>
-                <option value="anthropic">Anthropic (Claude)</option>
-                <option value="deepseek">DeepSeek (V3)</option>
-                <option value="gemini">Google Gemini</option>
-              </select>
+              <p className="px-1 text-xs text-zinc-500 dark:text-zinc-500">
+                Use a simple business-friendly name. This helps trust and makes the dashboard easier to manage later.
+              </p>
             </div>
           </div>
           <div className="space-y-4">
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-4 dark:border-blue-500/20 dark:bg-blue-500/10">
+              <p className="text-[11px] font-black uppercase tracking-widest text-blue-700 dark:text-blue-300">Default AI engine</p>
+              <p className="mt-1 text-sm font-semibold text-zinc-900 dark:text-white">Qwen 2.5 Coder 3B via OpenAI-compatible endpoint</p>
+              <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Provider switching is removed here for a cleaner launch flow and better conversion.</p>
+            </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-zinc-500 dark:text-zinc-400">API Key</label>
               <input 
@@ -364,9 +380,10 @@ export default function DashboardOverview() {
                 required
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="sk-..." 
+                placeholder="Enter your agent API key" 
                 className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full focus:border-coral transition-all text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 outline-none"
               />
+              <p className="px-1 text-xs text-zinc-500 dark:text-zinc-500">Stored for this agent only. Keep it active if you want the agent to run continuously.</p>
             </div>
             
             <div className="space-y-2">
@@ -381,7 +398,7 @@ export default function DashboardOverview() {
                 placeholder="1234567890:AAH..." 
                 className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full focus:border-coral transition-all text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 outline-none"
               />
-              <p className="text-xs text-zinc-500 dark:text-zinc-500 px-4">Add a BotFather token if you want it stored with this agent for later manual setup. Automatic Telegram pairing is not live yet.</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-500 px-4">Optional. Add it only if you want Telegram later. Automatic pairing is not live yet.</p>
             </div>
           </div>
 
@@ -391,7 +408,7 @@ export default function DashboardOverview() {
             className="w-full md:w-auto min-h-[56px] px-10 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-black rounded-full transition-all shadow-[0_4px_25px_rgba(37,99,235,0.4)] disabled:opacity-50 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] uppercase tracking-widest text-sm"
           >
             {deploying && <Loader2 className="w-5 h-5 animate-spin" />}
-            {deploying ? 'Starting deployment...' : 'Deploy Agent'}
+            {deploying ? 'Starting deployment...' : 'Launch Agent Now'}
           </button>
         </form>
 
@@ -433,7 +450,7 @@ export default function DashboardOverview() {
             <h3 className="text-xl font-bold mb-2 font-space text-zinc-900 dark:text-white">
               Starter Pod
             </h3>
-            <p className="text-zinc-500 dark:text-zinc-400 mb-6 h-12">Perfect for testing and small personal projects.</p>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-6 h-12">Best for launching one live agent fast without complexity.</p>
             <div className="flex flex-col gap-2 mb-8">
               <div className="flex items-center gap-3">
                 <span className="text-xl text-zinc-400 dark:text-zinc-600 line-through font-medium">$12.49</span>
@@ -446,10 +463,10 @@ export default function DashboardOverview() {
             </div>
             <ul className="flex flex-col gap-4 mb-10">
               {[
-                '1 Active Agent Container',
-                'Standard Deployment Speed',
-                'Community Plugins',
-                'Basic Analytics'
+                '1 Live Agent Slot',
+                'Fast launch setup',
+                'Simple webhook-ready flow',
+                'Good for first sales tests'
               ].map((feature, i) => (
                 <li key={i} className="flex items-center gap-3">
                   <CheckCircle2 className="w-5 h-5 text-zinc-500 shrink-0" />
@@ -463,7 +480,7 @@ export default function DashboardOverview() {
               onClick={() => handleUpgrade('Starter')}
               className="flex items-center justify-center w-full h-12 rounded-full bg-zinc-900 border border-zinc-800 text-white font-bold text-sm hover:bg-zinc-800 transition-all shadow-lg"
             >
-              Activate Starter
+              Start With Starter
             </button>
           </div>
         </motion.div>
@@ -485,7 +502,7 @@ export default function DashboardOverview() {
             <h3 className="text-2xl font-bold mb-2 font-space text-zinc-900 dark:text-white">
               Pro Pod
             </h3>
-            <p className="text-zinc-500 dark:text-zinc-400 mb-8 h-12 text-sm leading-relaxed">For serious builders who need multiple agents without overselling active capacity.</p>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-8 h-12 text-sm leading-relaxed">For founders who want more campaigns, more tests, and more room to scale.</p>
             <div className="flex flex-col gap-2 mb-8 border-b border-zinc-100 dark:border-zinc-900 pb-8">
               <div className="flex items-center gap-3">
                 <span className="text-xl text-zinc-400 dark:text-zinc-600 line-through font-medium">$49.98</span>
@@ -499,11 +516,11 @@ export default function DashboardOverview() {
             <ul className="flex flex-col gap-5 mb-10">
               {[
                 '5 Agents Included',
-                '2 Active Agents at a Time',
-                'All Premium Plugins & Integrations',
-                'Advanced Analytics & Logs',
-                'Custom Domains',
-                'White-label Webhooks'
+                '2 Live at the Same Time',
+                'Better for selling and client work',
+                'Advanced logs and visibility',
+                'Custom domains',
+                'White-label webhook flow'
               ].map((feature, i) => (
                 <li key={i} className="flex items-center gap-4">
                   <div className="w-5 h-5 rounded-full bg-coral/10 flex items-center justify-center shrink-0">
@@ -519,7 +536,7 @@ export default function DashboardOverview() {
               onClick={() => handleUpgrade('Pro')}
               className="flex items-center justify-center w-full h-14 rounded-full bg-coral text-white font-bold hover:bg-coral-hover transition-all text-base shadow-[0_4px_15px_rgba(252,93,93,0.25)] hover:scale-[1.02]"
             >
-              Upgrade to Boot
+              Upgrade to Pro
             </button>
           </div>
         </motion.div>
