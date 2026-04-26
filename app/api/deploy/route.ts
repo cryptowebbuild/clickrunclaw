@@ -4,6 +4,8 @@ import { createCoolifyService } from '@/lib/coolify';
 
 export const runtime = 'edge';
 
+const DEPLOY_DEBUG = process.env.CLICKRUNCLAW_DEPLOY_DEBUG === '1';
+
 function slugifyAgentName(input: string) {
   return input
     .toLowerCase()
@@ -59,6 +61,10 @@ export async function POST(req: Request) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
+    if (DEPLOY_DEBUG) {
+      console.log('[deploy] incoming request');
+    }
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized: Please log in to deploy agents.' }, { status: 401 });
     }
@@ -88,6 +94,10 @@ export async function POST(req: Request) {
     }
 
     const agents = existingAgents || [];
+
+    if (DEPLOY_DEBUG) {
+      console.log('[deploy] user', user.id, 'plan', planTier, 'agents', agents.length);
+    }
     const activeStatuses = new Set(['deploying', 'queued', 'running', 'starting', 'active']);
     const currentAgentCount = agents.filter(agent => activeStatuses.has(String(agent.status || '').toLowerCase())).length;
 
@@ -206,12 +216,18 @@ export async function POST(req: Request) {
 
       infrastructureRef = created?.uuid || null;
       deploymentQueued = Boolean(infrastructureRef);
+      if (DEPLOY_DEBUG) {
+        console.log('[deploy] coolify create result', JSON.stringify(created));
+      }
       if (!deploymentQueued) {
         deploymentWarning = 'Coolify service was created without a returned UUID.';
       } else if (infrastructureRef) {
         const syncedStatus = await syncAgentStatus(supabase, dbAgent.id, infrastructureRef);
         if (syncedStatus) {
           nextStatus = syncedStatus;
+        }
+        if (DEPLOY_DEBUG) {
+          console.log('[deploy] synced status', syncedStatus, 'for', infrastructureRef);
         }
       }
     } catch (err: any) {
@@ -238,11 +254,28 @@ export async function POST(req: Request) {
       console.error('Update Error:', updateError);
     }
 
+    if (DEPLOY_DEBUG) {
+      console.log('[deploy] final state', JSON.stringify({
+        agentId: dbAgent.id,
+        deploymentQueued,
+        nextStatus,
+        infrastructureRef,
+        userHookUrl,
+        deploymentWarning,
+      }));
+    }
+
     if (!deploymentQueued) {
       return NextResponse.json({
         error: 'DEPLOYMENT_QUEUE_FAILED',
         message: deploymentWarning || 'Deployment could not be queued.',
         reason: deploymentWarning || null,
+        debug: DEPLOY_DEBUG ? {
+          deploymentQueued,
+          nextStatus,
+          infrastructureRef,
+          warning: deploymentWarning,
+        } : undefined,
         agent: {
           id: dbAgent.id,
           name: normalizedName,
@@ -265,6 +298,11 @@ export async function POST(req: Request) {
         containerId: infrastructureRef,
       },
       warning: deploymentWarning,
+      debug: DEPLOY_DEBUG ? {
+        deploymentQueued,
+        nextStatus,
+        infrastructureRef,
+      } : undefined,
     });
   } catch (error: any) {
     console.error('Deployment Logic Error:', error);
