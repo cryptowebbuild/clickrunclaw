@@ -216,14 +216,24 @@ export default function DashboardOverview() {
         body: JSON.stringify({ agentName, provider, apiKey, telegramToken })
       });
 
-      const data = await res.json();
+      const raw = await res.text();
+      let data: any = null;
+
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        if (raw && raw.includes('<!DOCTYPE')) {
+          throw new Error('Server returned an HTML error page instead of a deploy response.');
+        }
+        throw new Error(raw?.slice(0, 220) || 'Server returned a non-JSON deploy response.');
+      }
       
       if (!res.ok) {
         if (data.error === 'PAYWALL' || data.error === 'PAYWALL_MAX') {
            if (data.error === 'PAYWALL') setShowUpgradeModal(true);
            throw new Error(data.message);
         }
-        throw new Error(data.message || data.error || 'Deployment failed');
+        throw new Error(data.message || data.reason || data.error || 'Deployment failed');
       }
 
       setDeployedAgent(data.agent);
