@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { attachCoolifyServiceUrl, buildOpenClawCompose, createCoolifyService } from '@/lib/coolify';
+import { createCoolifyService } from '@/lib/coolify';
 
 export const runtime = 'edge';
 
@@ -131,7 +131,6 @@ export async function POST(req: Request) {
     const coolifyProjectUuid = process.env.CLICKRUNCLAW_COOLIFY_PROJECT_ID;
     const coolifyEnvironmentUuid = process.env.CLICKRUNCLAW_COOLIFY_ENVIRONMENT_ID;
     const coolifyServerUuid = process.env.CLICKRUNCLAW_COOLIFY_SERVER_UUID || 'pst7oglnpvrso8c4pqm5he8h';
-    const coolifyBaseDomain = process.env.CLICKRUNCLAW_AGENT_BASE_DOMAIN;
 
     if (!(coolifyUrl && coolifyToken && coolifyProjectUuid && coolifyEnvironmentUuid && coolifyServerUuid)) {
       return NextResponse.json({
@@ -189,12 +188,10 @@ export async function POST(req: Request) {
     let deploymentQueued = false;
     let deploymentWarning: string | null = null;
     let infrastructureRef: string | null = null;
-    let serviceDomain: string | null = null;
     let nextStatus = 'failed';
 
     try {
       const serviceName = `crc-${slugifyAgentName(normalizedName)}-${dbAgent.id.split('-')[0]}`;
-      serviceDomain = coolifyBaseDomain ? `${serviceName}.${coolifyBaseDomain}` : null;
 
       const created = await createCoolifyService({
         name: serviceName,
@@ -212,23 +209,6 @@ export async function POST(req: Request) {
       if (!deploymentQueued) {
         deploymentWarning = 'Coolify service was created without a returned UUID.';
       } else if (infrastructureRef) {
-        if (serviceDomain) {
-          await attachCoolifyServiceUrl(infrastructureRef, {
-            name: serviceName,
-            compose: buildOpenClawCompose({
-              name: serviceName,
-              projectUuid: coolifyProjectUuid,
-              environmentUuid: coolifyEnvironmentUuid,
-              serverUuid: coolifyServerUuid,
-              env: {
-                OPENCLAW_AGENT_NAME: normalizedName,
-                OPENCLAW_LLM_PROVIDER: normalizedProvider,
-              },
-            }),
-            url: `https://${serviceDomain}`,
-          });
-        }
-
         const syncedStatus = await syncAgentStatus(supabase, dbAgent.id, infrastructureRef);
         if (syncedStatus) {
           nextStatus = syncedStatus;
@@ -239,7 +219,7 @@ export async function POST(req: Request) {
       console.error('Could not create Coolify service.', err);
     }
 
-    const userHookUrl = serviceDomain ? `https://${serviceDomain}` : `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
+    const userHookUrl = infrastructureRef ? `coolify-service://${infrastructureRef}` : `https://hook.clickrunclaw.com/a/${dbAgent.id.split('-')[0]}`;
     if (deploymentQueued && nextStatus === 'failed') {
       nextStatus = 'deploying';
     }

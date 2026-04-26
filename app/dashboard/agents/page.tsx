@@ -315,8 +315,8 @@ export default function AgentsPage() {
                       <div className="font-mono text-zinc-900 dark:text-zinc-100 break-all">{selectedTerminal.container_id || 'Not assigned yet'}</div>
                     </div>
                     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-4 md:col-span-2">
-                      <div className="text-zinc-400 dark:text-zinc-500 text-xs uppercase tracking-widest mb-2">Webhook URL</div>
-                      <div className="font-mono text-zinc-900 dark:text-zinc-100 break-all">{selectedTerminal.webhook_url || 'Not generated yet'}</div>
+                      <div className="text-zinc-400 dark:text-zinc-500 text-xs uppercase tracking-widest mb-2">Endpoint</div>
+                      <div className="font-mono text-zinc-900 dark:text-zinc-100 break-all">{selectedTerminal.webhook_url || 'Not assigned yet'}</div>
                     </div>
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export default function AgentsPage() {
                 {selectedTerminal.container_id ? (
                   <div className="space-y-4 pt-2 border-t border-zinc-100 dark:border-zinc-900">
                     <div className="rounded-2xl border border-blue-200 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/20 p-5 text-sm text-blue-800 dark:text-blue-200">
-                      This agent is linked to real Coolify service <span className="font-mono break-all">{selectedTerminal.container_id}</span>. Monitoring appears only after a true infrastructure mapping exists.
+                      This agent is linked to real Coolify service <span className="font-mono break-all">{selectedTerminal.container_id}</span>. Stable deploy mode is currently internal-only, so public per-agent routing is intentionally skipped until that layer is hardened.
                     </div>
                     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-5 text-sm text-zinc-700 dark:text-zinc-300">
                       Live CPU and RAM charts are temporarily hidden until real metrics are wired to Coolify data. This avoids showing fake monitoring numbers.
