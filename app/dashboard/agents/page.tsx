@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Terminal, Server, RotateCcw,
+  Terminal, Server, RotateCcw, Trash2,
   Search, Plus, X, Globe, Loader2, MessageCircle, HelpCircle
 } from 'lucide-react';
 import Link from 'next/link';
@@ -12,6 +12,9 @@ import { createClient } from '@/utils/supabase/client';
 export default function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTerminal, setSelectedTerminal] = useState<any | null>(null);
+  const [agentToDelete, setAgentToDelete] = useState<any | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [retryingId, setRetryingId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   // Real Database State
@@ -93,6 +96,42 @@ export default function AgentsPage() {
       setFeedback(err.message || 'Retry failed');
     } finally {
       setRetryingId(null);
+      setTimeout(() => setFeedback(null), 4000);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!agentToDelete || !supabase) return;
+    if (deleteConfirmText.trim() !== agentToDelete.name) {
+      setFeedback('Typed name does not match. Delete cancelled.');
+      return;
+    }
+
+    setDeletingId(agentToDelete.id);
+    setFeedback(null);
+
+    try {
+      const res = await fetch(`/api/agents/${agentToDelete.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || 'Delete failed');
+      }
+
+      setFeedback('Agent deleted successfully.');
+      setAgentToDelete(null);
+      setDeleteConfirmText('');
+      if (selectedTerminal?.id === agentToDelete.id) {
+        setSelectedTerminal(null);
+      }
+      await fetchAgents();
+    } catch (err: any) {
+      setFeedback(err.message || 'Delete failed');
+    } finally {
+      setDeletingId(null);
       setTimeout(() => setFeedback(null), 4000);
     }
   };
@@ -248,6 +287,16 @@ export default function AgentsPage() {
                       Retry Deploy
                     </button>
                   )}
+                  <button
+                    onClick={() => {
+                      setAgentToDelete(agent);
+                      setDeleteConfirmText('');
+                    }}
+                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-red-600 text-white hover:bg-red-700 border border-red-600 transition-all text-sm font-bold"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </button>
                   <button 
                     onClick={() => setSelectedTerminal(agent)}
                     className="flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 border border-zinc-800 transition-all text-sm font-bold"
@@ -263,6 +312,56 @@ export default function AgentsPage() {
 
       {/* Terminal Modal Overlay */}
       <AnimatePresence>
+        {agentToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => setAgentToDelete(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#090A0F] p-6 shadow-2xl"
+            >
+              <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3">Delete agent</h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-300 mb-4">
+                This will remove the agent record and attempt to remove its linked Coolify service. <span className="font-bold text-red-600 dark:text-red-400">There is no undo.</span>
+              </p>
+              <p className="text-sm text-zinc-700 dark:text-zinc-200 mb-3">
+                To confirm, type this exact agent name:
+              </p>
+              <div className="mb-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 px-4 py-3 font-mono text-sm text-zinc-900 dark:text-zinc-100 break-all">
+                {agentToDelete.name}
+              </div>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="Type agent name to confirm"
+                className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-3 text-sm text-zinc-900 dark:text-white outline-none focus:border-red-500"
+              />
+              <div className="mt-5 flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setAgentToDelete(null)}
+                  className="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deletingId === agentToDelete.id || deleteConfirmText.trim() !== agentToDelete.name}
+                  className="px-5 py-2 rounded-full bg-red-600 text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deletingId === agentToDelete.id ? 'Deleting...' : 'Delete forever'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
         {selectedTerminal && (
           <motion.div 
             initial={{ opacity: 0 }}
