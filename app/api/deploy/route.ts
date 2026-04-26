@@ -209,6 +209,9 @@ export async function POST(req: Request) {
         environmentUuid: coolifyEnvironmentUuid,
         serverUuid: coolifyServerUuid,
         env: {
+          OPENAI_API_BASE_URL: 'http://157.90.145.30:11434/v1',
+          OPENAI_API_KEY: 'ollama',
+          LLM_MODEL: 'qwen2.5-coder:3b',
           OPENCLAW_AGENT_NAME: normalizedName,
           OPENCLAW_LLM_PROVIDER: normalizedProvider,
         },
