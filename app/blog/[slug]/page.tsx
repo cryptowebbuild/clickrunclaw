@@ -61,27 +61,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </Link>
         
         <article className="px-4 md:px-0">
-          <header className="mb-12 overflow-hidden rounded-[2rem] border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#111318] shadow-sm">
-            <div className="relative h-64 md:h-80 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-              <Image src={post.image || '/blog-og-clickrunclaw.svg'} alt={post.title} fill className="object-cover" referrerPolicy="no-referrer" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <header className="mb-12 overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0D1117] shadow-[0_0_60px_rgba(255,90,95,0.05)] relative">
+            <div className="absolute inset-0 bg-coral opacity-[0.03] pointer-events-none blur-[100px] rounded-full" />
+            <div className="relative h-64 md:h-80 w-full overflow-hidden bg-black/50">
+              <Image src={post.image || '/blog-og-clickrunclaw.svg'} alt={post.title} fill className="object-cover opacity-80 mix-blend-screen" referrerPolicy="no-referrer" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0D1117] via-black/40 to-transparent" />
             </div>
-            <div className="p-6 md:p-10">
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <span className="rounded-full border border-coral/20 bg-coral/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-coral">{post.category}</span>
-                <span className="text-xs font-bold font-mono tracking-widest text-zinc-400 dark:text-zinc-500 uppercase">{post.date}</span>
+            <div className="p-8 md:p-12 relative z-10">
+              <div className="flex flex-wrap items-center gap-4 mb-8">
+                <span className="rounded-full border border-coral/30 bg-coral/10 px-5 py-2 text-[10px] font-black uppercase tracking-widest text-coral shadow-[0_0_15px_rgba(255,90,95,0.1)]">{post.category}</span>
+                <span className="text-xs font-bold font-mono tracking-widest text-zinc-400 uppercase">{post.date}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-coral/50"></span>
-                <span className="text-xs font-bold font-mono tracking-widest text-zinc-400 dark:text-zinc-500 uppercase">{post.author}</span>
+                <span className="text-xs font-bold font-mono tracking-widest text-zinc-400 uppercase">{post.author}</span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight font-space text-zinc-900 dark:text-white mb-5 leading-[1.05]">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter font-space text-white mb-6 leading-[1.1]">
                 {post.title}
               </h1>
-              <p className="max-w-3xl text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              <p className="max-w-3xl text-lg md:text-xl text-zinc-400 leading-relaxed font-light">
                 {post.description}
               </p>
-              <div className="mt-6 flex flex-wrap gap-2">
+              <div className="mt-8 flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
-                  <span key={tag} className="rounded-full border border-zinc-200 dark:border-zinc-800 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  <span key={tag} className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-colors">
                     {tag}
                   </span>
                 ))}
@@ -89,12 +90,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           </header>
           
-          <div className="rounded-[2rem] border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#111318] p-6 md:p-10 shadow-sm">
-            <div className="prose prose-zinc dark:prose-invert prose-lg max-w-none 
-                            prose-headings:font-space prose-headings:font-bold prose-headings:tracking-tight 
+          <div className="rounded-[2.5rem] border border-white/10 bg-[#0D1117]/80 backdrop-blur-xl p-8 md:p-12 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(255,90,95,0.03),transparent_50%)] pointer-events-none" />
+            <div className="prose prose-zinc prose-invert prose-lg max-w-none relative z-10
+                            prose-headings:font-space prose-headings:font-black prose-headings:tracking-tight prose-headings:text-white
+                            prose-p:text-zinc-300 prose-p:font-light prose-p:leading-relaxed
                             prose-a:text-coral hover:prose-a:text-coral-hover prose-a:no-underline hover:prose-a:underline
-                            prose-pre:bg-[#111318] prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl
-                            prose-img:rounded-3xl">
+                            prose-pre:bg-black/40 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl
+                            prose-img:rounded-3xl prose-img:border prose-img:border-white/10 prose-img:shadow-xl
+                            prose-strong:text-white prose-strong:font-bold">
               <ReactMarkdown>{post.content}</ReactMarkdown>
             </div>
           </div>

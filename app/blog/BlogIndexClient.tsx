@@ -23,29 +23,33 @@ export default function BlogIndexClient({ blogPosts }: BlogIndexClientProps) {
       <StaticHeader />
 
       <main className="max-w-7xl mx-auto px-6 pt-40 pb-20 relative z-10">
-        <section className="mb-14 overflow-hidden rounded-[2rem] border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#111318] shadow-sm">
-          <div className="relative grid gap-8 px-6 py-10 md:grid-cols-[1.3fr_0.7fr] md:px-10 md:py-12">
-            <div className="absolute inset-0 opacity-60 pointer-events-none">
-              <Image src="/blog-hero-pattern.svg" alt="" fill className="object-cover" />
+        <section className="mb-14 overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0D1117]/80 backdrop-blur-xl shadow-[0_0_80px_rgba(255,90,95,0.05)] relative">
+          <div className="absolute inset-0 bg-coral opacity-5 pointer-events-none blur-[100px] rounded-full" />
+          <div className="relative grid gap-8 px-6 py-10 md:grid-cols-[1.3fr_0.7fr] md:px-12 md:py-16">
+            <div className="absolute inset-0 opacity-40 pointer-events-none">
+              <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
             </div>
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 rounded-full border border-coral/20 bg-coral/5 px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-coral">
+            <div className="relative z-10 flex flex-col justify-center">
+              <div className="inline-flex items-center w-fit gap-2 rounded-full border border-coral/30 bg-coral/10 px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-coral shadow-[0_0_20px_rgba(255,90,95,0.15)] mb-6">
                 <Sparkles className="w-3.5 h-3.5" />
-                Production-safe content
+                Exclusive Insights
               </div>
-              <h2 className="mt-5 text-3xl md:text-5xl font-black font-space tracking-tight text-zinc-900 dark:text-white leading-tight">
-                Learn OpenClaw hosting, Telegram bot deployment, and agent operations without fake promises.
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black font-space tracking-tighter text-white leading-[1.1]">
+                Master the Art of <br />
+                <span className="text-coral">AI Cloud Deployment.</span>
               </h2>
-              <p className="mt-4 max-w-2xl text-sm md:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                Every post is written to match the product, the pricing, and the actual infrastructure limits behind ClickRunClaw.
+              <p className="mt-6 max-w-xl text-base md:text-lg text-zinc-400 leading-relaxed font-light">
+                High-converting strategies, architectural breakdowns, and unvarnished truths on scaling autonomous agencies in the Web3 space.
               </p>
             </div>
-            <div className="relative z-10 rounded-[1.5rem] border border-zinc-200 dark:border-white/10 bg-zinc-50/90 dark:bg-zinc-950/70 p-6">
-              <p className="text-[11px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-500">Best starting points</p>
-              <div className="mt-4 space-y-3">
+            <div className="relative z-10 rounded-[2rem] border border-white/10 bg-black/40 backdrop-blur-md p-8 flex flex-col justify-center">
+              <p className="text-[11px] font-black uppercase tracking-widest text-coral mb-6 flex items-center gap-2">
+                <Sparkles className="w-3 h-3" /> Priority Reads
+              </p>
+              <div className="space-y-4">
                 {blogPosts.slice(0, 3).map((post) => (
-                  <Link key={post.slug} href={`/blog/${post.slug}`} className="block rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111318] px-4 py-4 text-sm font-semibold text-zinc-800 dark:text-zinc-100 hover:border-coral/30 hover:text-coral transition-colors">
-                    {post.title}
+                  <Link key={post.slug} href={`/blog/${post.slug}`} className="group block rounded-2xl border border-white/5 bg-white/5 px-5 py-4 text-sm font-semibold text-zinc-200 hover:border-coral/40 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(255,90,95,0.1)] transition-all">
+                    <span className="line-clamp-2 leading-snug group-hover:text-coral transition-colors">{post.title}</span>
                   </Link>
                 ))}
               </div>
