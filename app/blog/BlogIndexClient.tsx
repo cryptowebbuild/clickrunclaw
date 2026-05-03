@@ -83,8 +83,9 @@ export default function BlogIndexClient({ blogPosts }: BlogIndexClientProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white dark:bg-[#111318] border border-gray-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden group hover:border-coral/20 transition-all flex flex-col shadow-sm hover:shadow-2xl hover:shadow-coral/5"
+              className="bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-white/10 rounded-[2.5rem] overflow-hidden group hover:border-coral/30 transition-all flex flex-col shadow-sm hover:shadow-[0_0_40px_rgba(255,90,95,0.1)] relative"
             >
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,90,95,0.05),transparent_70%)] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="h-60 w-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-900">
                 <div className="absolute inset-0 bg-coral opacity-0 group-hover:opacity-10 transition-opacity z-10" />
                 <Image 
@@ -98,29 +99,29 @@ export default function BlogIndexClient({ blogPosts }: BlogIndexClientProps) {
                 />
               </div>
               
-              <div className="p-10 flex flex-col flex-1">
+              <div className="p-10 flex flex-col flex-1 relative z-10">
                 <div className="flex items-center gap-4 mb-6">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#FF5A5F] bg-[#FF5A5F]/5 border border-[#FF5A5F]/10 px-4 py-1.5 rounded-full">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-coral bg-coral/10 border border-coral/20 px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,90,95,0.1)]">
                     {post.category}
                   </span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
+                  <span className="text-[10px] font-bold font-mono tracking-widest text-zinc-500">
                     {post.date}
                   </span>
                 </div>
                 
-                <h3 className="text-2xl font-bold font-space text-zinc-900 dark:text-white mb-6 leading-snug group-hover:text-coral transition-colors">
+                <h3 className="text-2xl font-black font-space text-zinc-900 dark:text-white mb-4 leading-tight group-hover:text-coral transition-colors">
                   <Link href={`/blog/${post.slug}`} className="before:absolute before:inset-0">
                     {post.title}
                   </Link>
                 </h3>
                 
-                <p className="text-zinc-500 dark:text-zinc-400 font-light leading-relaxed mb-6 flex-1 line-clamp-3">
+                <p className="text-zinc-500 dark:text-zinc-400 font-light leading-relaxed mb-8 flex-1 line-clamp-3">
                   {post.description}
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-8">
                   {post.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="rounded-full border border-zinc-200 dark:border-zinc-800 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <span key={tag} className="rounded-full border border-zinc-200 dark:border-white/10 dark:bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 group-hover:border-coral/20 group-hover:text-zinc-300 transition-colors">
                       {tag}
                     </span>
                   ))}

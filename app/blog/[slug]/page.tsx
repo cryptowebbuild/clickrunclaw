@@ -20,6 +20,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   return {
     title: `${post.title} | ClickRunClaw Blog`,
     description: post.description,
+    keywords: post.keywords,
+    authors: [{ name: post.author }],
     alternates: {
       canonical: post.canonicalUrl,
     },
@@ -27,6 +29,24 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: post.title,
       description: post.description,
       url: post.canonicalUrl,
+      siteName: 'ClickRunClaw',
+      images: [
+        {
+          url: post.image || '/blog-og-clickrunclaw.svg',
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      type: 'article',
+      publishedTime: post.date,
+      authors: [post.author],
+      tags: post.tags,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
       images: [post.image || '/blog-og-clickrunclaw.svg'],
     },
   };
