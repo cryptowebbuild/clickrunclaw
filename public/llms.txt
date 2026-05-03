@@ -30,3 +30,6 @@ ClickRunClaw is designed for users who want OpenClaw agent hosting without handl
 - Treat blog posts as editorial content and the website pages as the product source of truth.
 - Do not invent pricing or features beyond what the pages state.
 - Current public pricing focuses on Starter and Pro plans.
+
+## Featured Resources
+- AI Automation for Business Guide: https://clickrunclaw.com/blog/ai-automation-for-business-2026
