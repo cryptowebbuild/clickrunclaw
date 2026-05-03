@@ -131,7 +131,7 @@ export default function LandingPage() {
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <span className="text-xs text-zinc-500 font-medium">
-                Only 50 spots remaining for this month's batch.
+                Only 50 spots remaining for this month&apos;s batch.
               </span>
             </div>
             <Link 
@@ -218,7 +218,7 @@ export default function LandingPage() {
                   <div>
                     <h3 className="text-3xl font-bold mb-4 font-space text-zinc-900 dark:text-white tracking-tight">Zero DevOps Required</h3>
                     <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xl text-md">
-                      Forget about configuring Linux, managing Docker containers, or dealing with unexpected VPS crashes. We handle the complex cloud infrastructure, routing, and security. You just focus on your agent's logic.
+                      Forget about configuring Linux, managing Docker containers, or dealing with unexpected VPS crashes. We handle the complex cloud infrastructure, routing, and security. You just focus on your agent&apos;s logic.
                     </p>
                   </div>
                 </div>
@@ -623,8 +623,8 @@ export default function LandingPage() {
                   className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 text-center"
                 >
                   <CheckCircle2 className="w-10 h-10 text-green-400 mx-auto mb-3" />
-                  <p className="text-green-300 font-medium">You're on the list!</p>
-                  <p className="text-green-400/80 text-sm mt-1">We'll notify you as soon as a spot opens up.</p>
+                  <p className="text-green-300 font-medium">You&apos;re on the list!</p>
+                  <p className="text-green-400/80 text-sm mt-1">We&apos;ll notify you as soon as a spot opens up.</p>
                 </motion.div>
               ) : (
                 <form onSubmit={handleJoinWaitlist} className="space-y-4">
