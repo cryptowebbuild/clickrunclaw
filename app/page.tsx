@@ -18,6 +18,7 @@ import Footer from './components/Footer';
 
 export default function LandingPage() {
   const [user, setUser] = useState<any>(null);
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const router = useRouter();
   const supabase = useMemo(() => {
     try {
@@ -32,17 +33,22 @@ export default function LandingPage() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, [supabase]);
 
-  const handleWhopCheckout = (planId: string) => {
-    if (!user) {
-      // If the user isn't logged in, intercept the checkout and force them to auth first
-      // Pass the plan intent so after auth, we can auto-route them or just have them in the dashboard
-      router.push(`/auth?intent=checkout&plan=${planId}`);
-      return;
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleJoinWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!waitlistEmail || !supabase) return;
+
+    setWaitlistStatus('loading');
+    try {
+      const { error } = await supabase.from('waitlists').insert([{ email: waitlistEmail }]);
+      if (error && error.code !== '23505') throw error; // Ignore duplicate email errors
+      setWaitlistStatus('success');
+    } catch (err) {
+      console.error(err);
+      setWaitlistStatus('error');
     }
-    const userId = user?.id || '';
-    const userEmail = user?.email || '';
-    const checkoutUrl = `https://whop.com/checkout/${planId}?custom_user_id=${userId}&email=${encodeURIComponent(userEmail)}`;
-    window.location.href = checkoutUrl;
   };
 
   return (
@@ -86,7 +92,7 @@ export default function LandingPage() {
             className="flex flex-col items-center gap-6 md:gap-8 mb-8 md:mb-12"
           >
             <h1 className="text-[2.75rem] md:text-8xl font-black tracking-tighter font-space text-zinc-900 dark:text-white leading-[1.1] flex flex-col items-center">
-              Deploy Your <span className="text-coral">OpenClaw Agent</span> in 1 Second.
+              The Ultimate 1-Click <span className="text-coral">Cloud Engine</span> for AI Agents.
             </h1>
             
             <div className="flex flex-col items-center gap-4 md:gap-5">
@@ -116,13 +122,18 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto px-4 sm:px-0 mb-16 md:mb-24"
           >
-            <Link 
-              href="/auth"
-              className="group relative flex items-center justify-center gap-3 h-14 px-10 rounded-full bg-[#FF5A5F] text-white font-bold text-lg hover:bg-[#fa4a4a] transition-all w-full sm:w-auto shadow-[0_10px_40px_-10px_rgba(255,90,95,0.5)] hover:scale-[1.02] active:scale-[0.98]"
-            >
-              Get Started
-              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            <div className="flex flex-col items-center gap-3 w-full sm:w-auto">
+              <button
+                onClick={() => setIsWaitlistOpen(true)}
+                className="group relative flex items-center justify-center gap-3 h-14 px-10 rounded-full bg-[#FF5A5F] text-white font-bold text-lg hover:bg-[#fa4a4a] transition-all w-full shadow-[0_10px_40px_-10px_rgba(255,90,95,0.5)] hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Join Priority Waitlist
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <span className="text-xs text-zinc-500 font-medium">
+                Only 50 spots remaining for this month's batch.
+              </span>
+            </div>
             <Link 
               href="#features"
               className="flex items-center justify-center gap-3 h-14 px-10 rounded-full bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-zinc-600 dark:text-white font-bold text-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-all w-full sm:w-auto shadow-sm"
@@ -205,9 +216,9 @@ export default function LandingPage() {
                     <Server className="w-7 h-7 text-[#FF5A5F]" />
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold mb-4 font-space text-zinc-900 dark:text-white tracking-tight">Federated Instance Architecture</h3>
+                    <h3 className="text-3xl font-bold mb-4 font-space text-zinc-900 dark:text-white tracking-tight">Zero DevOps Required</h3>
                     <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xl text-md">
-                      Isolation is at our core. Every agent instance runs in a strictly partitioned environment mapping to isolated local SQLite databases. It means 0 latency responses, infinitely scalable infrastructure, and zero hardware overhead for you.
+                      Forget about configuring Linux, managing Docker containers, or dealing with unexpected VPS crashes. We handle the complex cloud infrastructure, routing, and security. You just focus on your agent's logic.
                     </p>
                   </div>
                 </div>
@@ -226,9 +237,9 @@ export default function LandingPage() {
                     <Webhook className="w-7 h-7 text-[#FF5A5F]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-3 font-space text-zinc-900 dark:text-white tracking-tight">Auto-Pairing</h3>
+                    <h3 className="text-xl font-bold mb-3 font-space text-zinc-900 dark:text-white tracking-tight">Instant Webhooks</h3>
                     <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
-                      Drop in your Telegram or Discord Bot Token and we handle the connectivity, webhooks, and long-polling instantly.
+                      Deploy and seamlessly connect your autonomous agent to any major community platform like Discord or Telegram in under 60 seconds.
                     </p>
                   </div>
                 </div>
@@ -247,9 +258,9 @@ export default function LandingPage() {
                     <Key className="w-7 h-7 text-[#FF5A5F]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-3 font-space text-zinc-900 dark:text-white tracking-tight">BYO Keys</h3>
+                    <h3 className="text-xl font-bold mb-3 font-space text-zinc-900 dark:text-white tracking-tight">Bring Your Own Key (BYOK)</h3>
                     <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
-                      Bring Your Own Key to use OpenRouter, Gemini, or OpenAI directly with your ClickRunClaw instance. Maintain full control.
+                      No hidden AI markups. Plug in your own OpenAI, Anthropic, or local LLM keys and pay only for the pure compute you consume.
                     </p>
                   </div>
                 </div>
@@ -471,10 +482,10 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <button
-                  onClick={() => handleWhopCheckout('plan_T8nSbRxGGTlly')}
+                  onClick={() => setIsWaitlistOpen(true)}
                   className="flex items-center justify-center w-full h-14 rounded-full bg-zinc-900 dark:bg-zinc-800 border border-zinc-800 dark:border-zinc-700 text-white font-bold text-base hover:bg-zinc-800 dark:hover:bg-zinc-700 transition-all hover:scale-[1.02] shadow-lg"
                 >
-                  Get Started
+                  Join Priority Waitlist
                 </button>
               </motion.div>
 
@@ -522,10 +533,10 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <button 
-                  onClick={() => handleWhopCheckout('plan_Bhg70HYNZqmJV')}
+                  onClick={() => setIsWaitlistOpen(true)}
                   className="flex items-center justify-center w-full h-14 rounded-full bg-coral text-white font-bold text-base hover:bg-coral-hover transition-all shadow-[0_4px_25px_rgba(255,90,95,0.4)] hover:scale-[1.02]"
                 >
-                  Go Pro
+                  Join Waitlist for Pro
                 </button>
               </motion.div>
             </div>
@@ -568,6 +579,88 @@ export default function LandingPage() {
         </section>
       </main>
 
+
+      {/* Waitlist Modal */}
+      <AnimatePresence>
+        {isWaitlistOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsWaitlistOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-[#0D1117]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-[0_0_80px_rgba(255,90,95,0.15)] overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-4">
+                <button
+                  onClick={() => setIsWaitlistOpen(false)}
+                  className="p-2 rounded-full hover:bg-white/5 text-zinc-400 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-16 h-16 rounded-2xl bg-coral/10 border border-coral/20 flex items-center justify-center mb-6">
+                  <Key className="w-8 h-8 text-coral" />
+                </div>
+                <h3 className="text-2xl font-bold font-space text-white mb-3">Priority Access</h3>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  Due to unprecedented demand from the Web3 community, our server capacity is currently full. Join the priority waitlist to secure your spot for the next batch rollout.
+                </p>
+              </div>
+
+              {waitlistStatus === 'success' ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 text-center"
+                >
+                  <CheckCircle2 className="w-10 h-10 text-green-400 mx-auto mb-3" />
+                  <p className="text-green-300 font-medium">You're on the list!</p>
+                  <p className="text-green-400/80 text-sm mt-1">We'll notify you as soon as a spot opens up.</p>
+                </motion.div>
+              ) : (
+                <form onSubmit={handleJoinWaitlist} className="space-y-4">
+                  <div>
+                    <input
+                      type="email"
+                      required
+                      placeholder="Enter your email address"
+                      value={waitlistEmail}
+                      onChange={(e) => setWaitlistEmail(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder:text-zinc-500 focus:outline-none focus:border-coral/50 focus:ring-1 focus:ring-coral/50 transition-all"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={waitlistStatus === 'loading'}
+                    className="w-full h-14 rounded-xl bg-coral text-white font-bold text-lg hover:bg-coral-hover transition-all shadow-[0_0_30px_rgba(255,90,95,0.3)] hover:shadow-[0_0_40px_rgba(255,90,95,0.5)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {waitlistStatus === 'loading' ? (
+                      <Clock className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        Join Waitlist
+                        <ChevronRight className="w-5 h-5" />
+                      </>
+                    )}
+                  </button>
+                  {waitlistStatus === 'error' && (
+                    <p className="text-red-400 text-sm text-center">Something went wrong. Please try again.</p>
+                  )}
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       <Footer />
     </div>
   );
