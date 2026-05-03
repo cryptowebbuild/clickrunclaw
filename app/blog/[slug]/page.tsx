@@ -103,8 +103,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <p className="text-[11px] font-black uppercase tracking-widest text-coral">Next step</p>
             <h2 className="mt-3 text-2xl md:text-3xl font-black font-space text-zinc-900 dark:text-white">{post.ctaTitle}</h2>
             <p className="mt-3 max-w-2xl text-zinc-600 dark:text-zinc-400 leading-relaxed">{post.ctaText}</p>
-            <Link href={post.ctaHref || '/auth'} className="mt-6 inline-flex items-center gap-2 rounded-full bg-coral px-6 py-3 text-sm font-bold text-white shadow-[0_4px_18px_rgba(255,90,95,0.25)] hover:bg-coral-hover transition-colors">
-              Launch ClickRunClaw
+            <Link href={post.ctaHref || '/'} className="mt-6 inline-flex items-center gap-2 rounded-full bg-coral px-6 py-3 text-sm font-bold text-white shadow-[0_4px_18px_rgba(255,90,95,0.25)] hover:bg-coral-hover transition-colors">
+              Join Priority Waitlist
               <ArrowRight className="w-4 h-4" />
             </Link>
           </section>
