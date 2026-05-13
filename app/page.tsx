@@ -18,7 +18,6 @@ import Footer from './components/Footer';
 
 export default function LandingPage() {
   const [user, setUser] = useState<any>(null);
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const router = useRouter();
   const supabase = useMemo(() => {
     try {
@@ -33,23 +32,7 @@ export default function LandingPage() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, [supabase]);
 
-  const [waitlistEmail, setWaitlistEmail] = useState('');
-  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const handleJoinWaitlist = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!waitlistEmail || !supabase) return;
-
-    setWaitlistStatus('loading');
-    try {
-      const { error } = await supabase.from('waitlists').insert([{ email: waitlistEmail }]);
-      if (error && error.code !== '23505') throw error; // Ignore duplicate email errors
-      setWaitlistStatus('success');
-    } catch (err) {
-      console.error(err);
-      setWaitlistStatus('error');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#090A0F] text-zinc-900 dark:text-zinc-100 overflow-x-hidden selection:bg-coral/30 selection:text-white">
@@ -124,10 +107,10 @@ export default function LandingPage() {
           >
             <div className="flex flex-col items-center gap-3 w-full sm:w-auto">
               <button
-                onClick={() => setIsWaitlistOpen(true)}
+                onClick={() => router.push('/dashboard')}
                 className="group relative flex items-center justify-center gap-3 h-14 px-10 rounded-full bg-[#FF5A5F] text-white font-bold text-lg hover:bg-[#fa4a4a] transition-all w-full shadow-[0_10px_40px_-10px_rgba(255,90,95,0.5)] hover:scale-[1.02] active:scale-[0.98]"
               >
-                Join Priority Waitlist
+                Get Early Access
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <span className="text-xs text-zinc-500 font-medium">
@@ -482,10 +465,10 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <button
-                  onClick={() => setIsWaitlistOpen(true)}
+                  onClick={() => router.push('/dashboard')}
                   className="flex items-center justify-center w-full h-14 rounded-full bg-zinc-900 dark:bg-zinc-800 border border-zinc-800 dark:border-zinc-700 text-white font-bold text-base hover:bg-zinc-800 dark:hover:bg-zinc-700 transition-all hover:scale-[1.02] shadow-lg"
                 >
-                  Join Priority Waitlist
+                  Get Early Access
                 </button>
               </motion.div>
 
@@ -533,10 +516,10 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <button 
-                  onClick={() => setIsWaitlistOpen(true)}
+                  onClick={() => router.push('/dashboard')}
                   className="flex items-center justify-center w-full h-14 rounded-full bg-coral text-white font-bold text-base hover:bg-coral-hover transition-all shadow-[0_4px_25px_rgba(255,90,95,0.4)] hover:scale-[1.02]"
                 >
-                  Join Waitlist for Pro
+                  Start Deployment
                 </button>
               </motion.div>
             </div>
@@ -580,87 +563,6 @@ export default function LandingPage() {
       </main>
 
 
-      {/* Waitlist Modal */}
-      <AnimatePresence>
-        {isWaitlistOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setIsWaitlistOpen(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-[#0D1117]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-[0_0_80px_rgba(255,90,95,0.15)] overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 p-4">
-                <button
-                  onClick={() => setIsWaitlistOpen(false)}
-                  className="p-2 rounded-full hover:bg-white/5 text-zinc-400 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="flex flex-col items-center text-center mb-8">
-                <div className="w-16 h-16 rounded-2xl bg-coral/10 border border-coral/20 flex items-center justify-center mb-6">
-                  <Key className="w-8 h-8 text-coral" />
-                </div>
-                <h3 className="text-2xl font-bold font-space text-white mb-3">Priority Access</h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Due to unprecedented demand from the Web3 community, our server capacity is currently full. Join the priority waitlist to secure your spot for the next batch rollout.
-                </p>
-              </div>
-
-              {waitlistStatus === 'success' ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 text-center"
-                >
-                  <CheckCircle2 className="w-10 h-10 text-green-400 mx-auto mb-3" />
-                  <p className="text-green-300 font-medium">You&apos;re on the list!</p>
-                  <p className="text-green-400/80 text-sm mt-1">We&apos;ll notify you as soon as a spot opens up.</p>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleJoinWaitlist} className="space-y-4">
-                  <div>
-                    <input
-                      type="email"
-                      required
-                      placeholder="Enter your email address"
-                      value={waitlistEmail}
-                      onChange={(e) => setWaitlistEmail(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder:text-zinc-500 focus:outline-none focus:border-coral/50 focus:ring-1 focus:ring-coral/50 transition-all"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={waitlistStatus === 'loading'}
-                    className="w-full h-14 rounded-xl bg-coral text-white font-bold text-lg hover:bg-coral-hover transition-all shadow-[0_0_30px_rgba(255,90,95,0.3)] hover:shadow-[0_0_40px_rgba(255,90,95,0.5)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {waitlistStatus === 'loading' ? (
-                      <Clock className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <>
-                        Join Waitlist
-                        <ChevronRight className="w-5 h-5" />
-                      </>
-                    )}
-                  </button>
-                  {waitlistStatus === 'error' && (
-                    <p className="text-red-400 text-sm text-center">Something went wrong. Please try again.</p>
-                  )}
-                </form>
-              )}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
       <Footer />
     </div>
   );
