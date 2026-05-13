@@ -22,6 +22,11 @@ export default function DashboardOverview() {
   const [onboardingName, setOnboardingName] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
 
+  // Waitlist State
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [isWaitlisted, setIsWaitlisted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState('14:05:22');
+
   // Agent Deployment State
   const [agentName, setAgentName] = useState('');
   const [provider, setProvider] = useState('openai-compatible');
@@ -57,6 +62,17 @@ export default function DashboardOverview() {
           .single();
         
         if (profData && !error) {
+
+           // Check waitlist status
+           const { data: waitlistData } = await supabase
+             .from('waitlists')
+             .select('*' )
+             .eq('email', data.user.email)
+             .single();
+           if (waitlistData) {
+             setIsWaitlisted(true);
+             setWaitlistStatus('success');
+           }
            currentProfile = profData;
         }
 
@@ -120,6 +136,40 @@ export default function DashboardOverview() {
     };
     fetchUser();
   }, [router, searchParams, supabase]);
+
+  const handleJoinWaitlist = async () => {
+    if (!user?.email || !supabase) return;
+
+    setWaitlistStatus("loading");
+    try {
+      const { error } = await supabase.from("waitlists").insert([{ email: user.email }]);
+      if (error && error.code !== "23505") throw error;
+      setWaitlistStatus("success");
+      setIsWaitlisted(true);
+      setToast("Successfully joined the Priority Access Queue!");
+    } catch (err) {
+      console.error(err);
+      setWaitlistStatus("error");
+      setToast("Failed to join the waitlist. Please try again.");
+    }
+  };
+
+  // Countdown Effect
+  useEffect(() => {
+    if (!isWaitlisted) return;
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        const [h, m, s] = prev.split(":").map(Number);
+        let totalSeconds = h * 3600 + m * 60 + s - 1;
+        if (totalSeconds <= 0) return "00:00:00";
+        const newH = Math.floor(totalSeconds / 3600);
+        const newM = Math.floor((totalSeconds % 3600) / 60);
+        const newS = totalSeconds % 60;
+        return `${String(newH).padStart(2, "0")}:${String(newM).padStart(2, "0")}:${String(newS).padStart(2, "0")}`;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isWaitlisted]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,6 +349,81 @@ export default function DashboardOverview() {
           </span>
         </motion.p>
       </div>
+
+      {/* Priority Access Queue Widget */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.12 }}
+        className="max-w-5xl mx-auto mb-16 relative overflow-hidden bg-[#0D1117]/80 backdrop-blur-xl border border-white/10 dark:border-white/5 rounded-[2rem] p-8 md:p-12 shadow-[0_0_80px_rgba(255,90,95,0.05)]"
+      >
+        {/* Decorative Background */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-coral/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-coral/20 border border-coral/30 flex items-center justify-center">
+                <Server className="w-5 h-5 text-coral" />
+              </div>
+              <h2 className="text-2xl font-bold font-space text-white">Priority GPU Cluster Access</h2>
+            </div>
+            <p className="text-zinc-400 text-base leading-relaxed mb-6">
+              Due to high demand for premium AI deployments, our secure cloud resources are currently at maximum capacity. Reserve your slot to unlock high-performance agent hosting.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Server Capacity</div>
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl font-black text-white">94% Full</div>
+                  <div className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">HIGH LOAD</div>
+                </div>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Next Slot Opening In</div>
+                <div className="text-2xl font-black text-coral font-mono">{timeLeft}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
+              <ShieldCheck className="w-4 h-4" /> 500+ AI Agents already active in this secure cluster.
+            </div>
+          </div>
+
+          <div className="w-full md:w-[380px] shrink-0">
+            <div className="bg-[#1A1D24]/80 border border-white/10 rounded-[2rem] p-8 text-center shadow-2xl relative overflow-hidden">
+               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-coral to-transparent opacity-50" />
+               {isWaitlisted ? (
+                 <div className="flex flex-col items-center">
+                   <div className="w-16 h-16 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
+                     <CheckCircle2 className="w-8 h-8 text-green-400" />
+                   </div>
+                   <h3 className="text-xl font-bold text-white mb-2">You re in the Queue!</h3>
+                   <div className="bg-white/5 border border-white/10 rounded-xl py-3 px-6 w-full mb-4">
+                     <div className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1">Your Rank</div>
+                     <div className="text-3xl font-black text-white">#142</div>
+                   </div>
+                   <p className="text-sm text-zinc-400">We will email you the moment your deployment slot is ready.</p>
+                 </div>
+               ) : (
+                 <div className="flex flex-col items-center">
+                   <h3 className="text-xl font-bold text-white mb-2">Secure Your Slot</h3>
+                   <p className="text-sm text-zinc-400 mb-6">Enter the priority queue to get early access to our deployment engine.</p>
+                   <button
+                     onClick={handleJoinWaitlist}
+                     disabled={waitlistStatus === 'loading'}
+                     className="w-full h-14 rounded-xl bg-coral text-white font-bold text-lg hover:bg-coral-hover transition-all shadow-[0_0_30px_rgba(255,90,95,0.3)] hover:shadow-[0_0_40px_rgba(255,90,95,0.5)] disabled:opacity-50 flex items-center justify-center gap-2 group"
+                   >
+                     {waitlistStatus === 'loading' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Join Priority Queue'}
+                     {!waitlistStatus || waitlistStatus === 'idle' ? <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /> : null}
+                   </button>
+                 </div>
+               )}
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
       {/* Deployment Widget */}
       <motion.div 
