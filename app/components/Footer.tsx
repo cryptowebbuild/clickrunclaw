@@ -71,6 +71,13 @@ export default function Footer() {
           <p className="text-zinc-600 text-xs font-bold uppercase tracking-[0.2em]">
             &copy; {new Date().getFullYear()} ClickRunClaw. Built for the future of AI Agents.
           </p>
+          <div className="flex gap-4 text-xs font-medium text-zinc-600">
+            <span>Powered by <a href="https://cryptowebbuild.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF5A5F] transition-colors">CryptoWebBuild</a></span>
+            <span className="hidden md:inline">&bull;</span>
+            <span className="hidden md:inline">
+               Developed by <a href="https://cryptowebbuild.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF5A5F] transition-colors">CryptoWebBuild Technology</a>
+            </span>
+          </div>
         </div>
       </div>
     </footer>
