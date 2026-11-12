@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
-import './globals.css'; // Global styles
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space' });
@@ -9,9 +9,9 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mon
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://clickrunclaw.com'),
-  title: "ClickRunClaw | The #1 OpenClaw AI Agent Cloud Hosting",
-  description: "Deploy, run, and scale OpenClaw AI agents in 1-click. Stop local hosting—use ClickRunClaw for 24/7 uptime, secure webhooks, and instant Telegram/Discord integration.",
-  keywords: ['OpenClaw', 'AI Agent Hosting', '1-Click OpenClaw Deployment', 'Cloud Infrastructure for Agents', 'OpenClaw AI', 'OpenClaw Agent', 'Deploy OpenClaw', 'ClickRunClaw'],
+  title: "ClickRunClaw | EU-First AI Automation Agency & Custom AI Agents",
+  description: "Custom AI agents, workflow automations, and sovereign AI pipelines for European and international businesses. 100% async delivery, zero meetings, dedicated EU infrastructure from $799.",
+  keywords: ['AI Automation Agency', 'Custom AI Agents', 'EU AI Automation', 'Sovereign AI Infrastructure', 'Workflow Automation', 'Autonomous Agents', 'GDPR Compliant AI', 'ClickRunClaw'],
   authors: [{ name: 'ClickRunClaw' }],
   creator: 'ClickRunClaw',
   publisher: 'ClickRunClaw',
@@ -24,8 +24,8 @@ export const metadata: Metadata = {
     canonical: 'https://clickrunclaw.com',
   },
   openGraph: {
-    title: 'ClickRunClaw | The #1 OpenClaw AI Agent Hosting',
-    description: 'Deploy, run, and scale OpenClaw AI agents in 1-click. Stop local hosting—use ClickRunClaw for 24/7 uptime.',
+    title: 'ClickRunClaw | EU-First AI Automation Agency',
+    description: 'Custom AI agents and sovereign workflow automations for European businesses. 100% async delivery, zero meetings, dedicated EU infrastructure from $799.',
     url: 'https://clickrunclaw.com',
     siteName: 'ClickRunClaw',
     images: [
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
         url: 'https://clickrunclaw.com/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Deploy OpenClaw AI Agents with ClickRunClaw Cloud Hosting',
+        alt: 'ClickRunClaw EU-First AI Automation Agency',
       }
     ],
     locale: 'en_US',
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ClickRunClaw | Host OpenClaw Agents in 1 Second',
-    description: 'Deploy OpenClaw AI Agents in 1 second. No terminal, Mac mini, or Linux setups required.',
+    title: 'ClickRunClaw | EU-First AI Automation Agency',
+    description: 'Custom AI agents and sovereign workflow automations. 100% async delivery, zero meetings, dedicated EU infrastructure from $799.',
     creator: '@clickrunclaw',
   },
   robots: {
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`dark ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`} style={{ colorScheme: 'dark' }}>
-      <body className="bg-[#090A0F] text-zinc-100 antialiased selection:bg-coral selection:text-white font-sans" suppressHydrationWarning>
+      <body className="bg-[#090A0F] text-zinc-100 antialiased selection:bg-[#FF5A5F] selection:text-white font-sans" suppressHydrationWarning>
         {/* Google Analytics */}
         <Script
           async
@@ -89,18 +89,52 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
             __html: JSON.stringify([
               {
                 "@context": "https://schema.org",
-                "@type": "SoftwareApplication",
-                "name": "ClickRunClaw - OpenClaw Cloud Hosting",
-                "applicationCategory": "DeveloperApplication",
-                "operatingSystem": "Web",
-                "offers": {
-                  "@type": "Offer",
-                  "price": "9.99",
-                  "priceCurrency": "USD"
-                },
-                "description": "Deploy and host your OpenClaw and Web3 AI agents instantly with our zero-configuration cloud infrastructure.",
+                "@type": "ProfessionalService",
+                "name": "ClickRunClaw",
+                "legalName": "ClickRunClaw",
+                "description": "EU-First AI automation agency building production custom agents, workflow integrations, and sovereign AI pipelines for European and international businesses. 100% async delivery with zero meetings.",
                 "url": "https://clickrunclaw.com",
-                "keywords": "openclaw, openclaw ai agent, deploy openclaw, openclaw cloud hosting, openclaw alternative"
+                "logo": "https://clickrunclaw.com/favicon.webp",
+                "email": "support@clickrunclaw.com",
+                "priceRange": "$799 - $3,499+",
+                "currenciesAccepted": "USD",
+                "paymentAccepted": "Credit Card, Wire Transfer, Crypto",
+                "hasOfferCatalog": {
+                  "@type": "OfferCatalog",
+                  "name": "AI Automation Packages",
+                  "itemListElement": [
+                    {
+                      "@type": "Offer",
+                      "name": "Starter Agent Package",
+                      "price": "799",
+                      "priceCurrency": "USD",
+                      "description": "Single-workflow custom AI agent with live interactive sandbox preview and dedicated EU container."
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "Growth Funnel Automation",
+                      "price": "1799",
+                      "priceCurrency": "USD",
+                      "description": "Multi-step agent pipeline with CRM integration, webhook automation, and EU data isolation."
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "Full AI Partner",
+                      "price": "3499",
+                      "priceCurrency": "USD",
+                      "description": "Full-stack autonomous systems, custom model routing, and dedicated maintenance."
+                    }
+                  ]
+                },
+                "areaServed": [
+                  "European Union",
+                  "Worldwide"
+                ],
+                "sameAs": [
+                  "https://x.com/clickrunclaw",
+                  "https://www.facebook.com/ClickRunClaw",
+                  "https://t.me/ClickRunClaw"
+                ]
               },
               {
                 "@context": "https://schema.org",
@@ -108,17 +142,16 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
                 "name": "ClickRunClaw",
                 "url": "https://clickrunclaw.com",
                 "logo": "https://clickrunclaw.com/favicon.webp",
+                "email": "support@clickrunclaw.com",
                 "sameAs": [
-                  "https://twitter.com/clickrunclaw"
+                  "https://x.com/clickrunclaw",
+                  "https://www.facebook.com/ClickRunClaw",
+                  "https://t.me/ClickRunClaw"
                 ]
               }
             ])
           }}
         />
-        {/* Crisp Live Chat Script */}
-        <script type="text/javascript" dangerouslySetInnerHTML={{
-          __html: `window.$crisp=[];window.CRISP_WEBSITE_ID="8d6eee13-c0a2-4089-85fd-9757256fac32";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`
-        }} />
         {children}
       </body>
     </html>

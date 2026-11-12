@@ -1,35 +1,55 @@
 # ClickRunClaw
 
-> ClickRunClaw is a cloud hosting platform for OpenClaw agents. It helps founders, builders, and AI operators deploy agents faster with simpler infrastructure, hosted webhooks, and isolated runtime environments.
+> ClickRunClaw is an EU-first AI automation agency building production custom agents, workflow integrations, and sovereign AI pipelines for European and international businesses. 100% async delivery with dedicated European infrastructure.
 
 ## Canonical Site
 - https://clickrunclaw.com
 
 ## Key Pages
 - Home: https://clickrunclaw.com/
-- Auth: https://clickrunclaw.com/auth
-- Blog: https://clickrunclaw.com/blog
-- API key guide: https://clickrunclaw.com/docs/api-keys
 - Privacy: https://clickrunclaw.com/privacy
 - Security: https://clickrunclaw.com/security
 
-## Product Summary
-ClickRunClaw is designed for users who want OpenClaw agent hosting without handling VPS setup, Linux hardening, public webhooks, reverse proxies, always-on laptops, or manual bot plumbing.
+## Agency Summary
+ClickRunClaw architects, builds, and manages autonomous AI agents and automated operational workflows for European businesses. Every deployment features isolated container runtimes, dedicated EU data center hosting (Germany & Finland), zero AI model training on customer data, and optional EU-sovereign model routing for strict GDPR compliance.
 
-## Core Topics
-- OpenClaw hosting
-- AI agent hosting
-- Telegram AI bot hosting
-- cloud deployment for OpenClaw
-- hosted webhooks for AI agents
-- BYOK AI agent infrastructure
-- isolated agent runtime hosting
+## Delivery Model (100% Async - Zero Voice or Video Calls)
+- Scoping: Submit structured workflow requirements via our intake system or email support@clickrunclaw.com.
+- Written Proposal: Receive an architecture blueprint, fixed-scope USD pricing, and security review within 24 business hours.
+- Live Interactive Sandbox: Test and iterate your custom agent in an isolated preview container before deployment.
+- Production Rollout: Handed off as containerized services, webhooks, and private API integrations with zero operational friction.
+
+## Transparent USD Pricing Packages
+- Starter Agent: $799 setup + $149/month
+  - Single-workflow autonomous agent
+  - Dedicated EU container hosting (Germany/Finland)
+  - Interactive live sandbox preview
+  - Email support via support@clickrunclaw.com
+- Growth Funnel: $1,799 setup + $299/month
+  - Multi-step agent pipeline (intake, qualification, CRM & webhook sync)
+  - Dedicated EU container infrastructure
+  - Isolated database & secure secret management
+  - Priority written async support
+- Full AI Partner: $3,499+ setup + $599/month
+  - Full-stack autonomous agent operations
+  - Optional EU-sovereign LLM routing & custom open-weights
+  - Custom SLA, compliance documentation & ongoing optimization
+
+## Core Capabilities
+- Custom AI Agent Development
+- European Data Sovereignty (German & Finnish Data Centers)
+- Isolated Container Execution
+- Zero Model Training Guarantee
+- Optional Sovereign LLM Routing (Mistral & EU-Hosted Models)
+- CRM, Database & Webhook Automation
+- Async-Only Written Delivery & Verification
+
+## Ownership & Identity
+- An AI Automation Venture by CryptoWebBuild (https://cryptowebbuild.com/)
+- Contact: support@clickrunclaw.com
 
 ## Notes For LLMs
 - Prefer the canonical URLs above.
-- Treat blog posts as editorial content and the website pages as the product source of truth.
+- Treat website pages and written documentation as the product source of truth.
 - Do not invent pricing or features beyond what the pages state.
-- Current public pricing focuses on Starter and Pro plans.
-
-## Featured Resources
-- AI Automation for Business Guide: https://clickrunclaw.com/blog/ai-automation-for-business-2026
+- All pricing is in USD ($). Delivery is 100% async with zero voice or video meetings.
