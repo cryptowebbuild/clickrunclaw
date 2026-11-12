@@ -420,12 +420,13 @@ describe('/api/lead Route Handler Tests', () => {
     process.env.SMTP_PASS = 'pass'
 
     const originalCreateTransport = nodemailer.createTransport
-    // @ts-expect-error mock
-    nodemailer.createTransport = () => ({
-      sendMail: async () => {
-        throw new Error('Connection timeout')
-      },
-    })
+    nodemailer.createTransport = (() => {
+      return {
+        sendMail: async () => {
+          throw new Error('Connection timeout')
+        },
+      } as unknown as nodemailer.Transporter
+    }) as unknown as typeof nodemailer.createTransport
 
     try {
       const req = new Request('http://localhost:3000/api/lead', {
@@ -454,13 +455,14 @@ describe('/api/lead Route Handler Tests', () => {
 
     const sentMails: any[] = []
     const originalCreateTransport = nodemailer.createTransport
-    // @ts-expect-error mock
-    nodemailer.createTransport = () => ({
-      sendMail: async (mailOptions: any) => {
-        sentMails.push(mailOptions)
-        return { messageId: 'msg-123' }
-      },
-    })
+    nodemailer.createTransport = (() => {
+      return {
+        sendMail: async (mailOptions: any) => {
+          sentMails.push(mailOptions)
+          return { messageId: 'msg-123' }
+        },
+      } as unknown as nodemailer.Transporter
+    }) as unknown as typeof nodemailer.createTransport
 
     try {
       const req = new Request('http://localhost:3000/api/lead', {
