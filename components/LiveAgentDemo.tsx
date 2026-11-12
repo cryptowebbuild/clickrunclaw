@@ -61,23 +61,29 @@ export default function LiveAgentDemo({ onSelectTier }: LiveAgentDemoProps) {
     setErrorMsg(null)
     setInput('')
 
+    // Exclude initial static greeting so history sent to /api/demo begins with a user turn
+    const firstUserIdx = messages.findIndex((m) => m.role === 'user')
+    const historyToSend = firstUserIdx >= 0 ? messages.slice(firstUserIdx) : []
+
     const updatedHistory: DemoMessage[] = [...messages, { role: 'user', content: message }]
     setMessages(updatedHistory)
     setIsLoading(true)
 
     try {
-      // Send history (excluding current message which is sent as message)
       const res = await fetch('/api/demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message,
-          history: updatedHistory.slice(0, -1),
+          history: historyToSend,
         }),
       })
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}))
+        if (res.status === 429) {
+          setErrorMsg('Rate limit reached (20 msgs / 10 min). Please wait a moment.')
+        }
         throw new Error(errorData.error || `HTTP error ${res.status}`)
       }
 

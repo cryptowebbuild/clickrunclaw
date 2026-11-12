@@ -5,6 +5,11 @@ export type DemoMessage = {
   content: string
 }
 
+export type GeminiTurn = {
+  role: 'user' | 'model'
+  parts: [{ text: string }]
+}
+
 export const DEMO_SYSTEM_PROMPT = `You are ClickRunClaw's EU AI Automation Consultant.
 Your mission is to help EU and global businesses automate repetitive workflows with sovereign, GDPR-compliant AI agents.
 
@@ -22,6 +27,131 @@ STRICT OPERATIONAL RULES:
    - Optional local EU LLM routing (e.g. Mistral / European sovereign endpoints).
 5. CONTACT: Direct all formal project briefs and inquiries to support@clickrunclaw.com.
 6. Absolutely zero Bengali text, zero BDT currency, and zero +880 numbers.`
+
+/* ==========================================================================
+   Rate Limiting (Sliding Window: 20 requests per 10 minutes per IP)
+   ========================================================================== */
+
+interface DemoRateLimitEntry {
+  timestamps: number[]
+}
+
+const demoRateLimitStore = new Map<string, DemoRateLimitEntry>()
+
+export const DEMO_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000 // 10 minutes
+export const DEMO_RATE_LIMIT_MAX_REQUESTS = 20
+
+export function checkDemoRateLimit(
+  key: string,
+  now: number = Date.now()
+): { allowed: boolean; retryAfterSec: number } {
+  const windowStart = now - DEMO_RATE_LIMIT_WINDOW_MS
+  const entry = demoRateLimitStore.get(key) || { timestamps: [] }
+
+  const validTimestamps = entry.timestamps.filter((ts) => ts > windowStart)
+
+  if (validTimestamps.length >= DEMO_RATE_LIMIT_MAX_REQUESTS) {
+    const oldest = validTimestamps[0]
+    const retryAfterSec = Math.max(
+      1,
+      Math.ceil((oldest + DEMO_RATE_LIMIT_WINDOW_MS - now) / 1000)
+    )
+    entry.timestamps = validTimestamps
+    demoRateLimitStore.set(key, entry)
+    return { allowed: false, retryAfterSec }
+  }
+
+  validTimestamps.push(now)
+  entry.timestamps = validTimestamps
+  demoRateLimitStore.set(key, entry)
+  return { allowed: true, retryAfterSec: 0 }
+}
+
+export function resetDemoRateLimitStore(): void {
+  demoRateLimitStore.clear()
+}
+
+/* ==========================================================================
+   Multi-Turn Conversation Normalization (Gemini Schema Compliance)
+   ========================================================================== */
+
+/**
+ * Normalizes multi-turn chat history so that:
+ * 1. Leading assistant/model turns are dropped (history begins with 'user').
+ * 2. Consecutive same-role turns are merged/deduplicated so roles strictly alternate ('user' -> 'model').
+ * 3. If history ends on 'user', it merges with or trims before the incoming message so the final contents array
+ *    strictly alternates user -> model -> user -> ... -> user and starts with 'user'.
+ */
+export function normalizeDemoChat(
+  history: DemoMessage[],
+  currentMessage: string
+): {
+  normalizedHistory: DemoMessage[]
+  normalizedMessage: string
+  contents: GeminiTurn[]
+} {
+  const trimmedCurrent = currentMessage.trim()
+
+  // 1. Drop leading assistant turns
+  const nonLeading = [...history]
+  while (nonLeading.length > 0 && nonLeading[0].role === 'assistant') {
+    nonLeading.shift()
+  }
+
+  // 2. Merge consecutive same-role turns in history
+  const alternated: DemoMessage[] = []
+  for (const turn of nonLeading) {
+    if (alternated.length === 0) {
+      if (turn.role === 'user') {
+        alternated.push({ role: 'user', content: turn.content })
+      }
+    } else {
+      const last = alternated[alternated.length - 1]
+      if (last.role === turn.role) {
+        last.content = `${last.content}\n\n${turn.content}`.slice(0, 800)
+      } else {
+        alternated.push({ role: turn.role, content: turn.content })
+      }
+    }
+  }
+
+  // 3. Ensure the turn right before currentMessage is 'assistant' (model).
+  // If alternated ends on 'user', merge it into currentMessage so alternated ends on assistant
+  let finalMessage = trimmedCurrent
+  if (alternated.length > 0 && alternated[alternated.length - 1].role === 'user') {
+    const trailingUser = alternated.pop()!
+    finalMessage = `${trailingUser.content}\n\n${trimmedCurrent}`.slice(0, 800)
+  }
+
+  // Build Gemini contents: alternating user -> model, ending on finalMessage
+  const contents: GeminiTurn[] = [
+    ...alternated.map((turn) => ({
+      role: (turn.role === 'assistant' ? 'model' : 'user') as 'user' | 'model',
+      parts: [{ text: turn.content }] as [{ text: string }],
+    })),
+    {
+      role: 'user',
+      parts: [{ text: finalMessage }],
+    },
+  ]
+
+  return {
+    normalizedHistory: alternated,
+    normalizedMessage: finalMessage,
+    contents,
+  }
+}
+
+export function buildGeminiContents(
+  history: DemoMessage[],
+  currentMessage: string
+): GeminiTurn[] {
+  return normalizeDemoChat(history, currentMessage).contents
+}
+
+/* ==========================================================================
+   Request Validation
+   ========================================================================== */
 
 /**
  * Validates and sanitizes incoming demo requests.
@@ -200,15 +330,23 @@ export async function generateDemoReply(input: {
   fetchFn?: (input: { message: string; history: DemoMessage[]; apiKey: string }) => Promise<string>
   timeoutMs?: number
 }): Promise<{ reply: string; mode: 'live' | 'sandbox' }> {
-  const apiKey = input.apiKey || process.env.GEMINI_API_KEY
+  // Explicit empty apiKey takes precedence over environment variable
+  const rawApiKey = input.apiKey !== undefined ? input.apiKey : process.env.GEMINI_API_KEY
+  const apiKey = typeof rawApiKey === 'string' ? rawApiKey.trim() : ''
   const timeoutLimit = input.timeoutMs ?? 8000
 
-  if (!apiKey || !apiKey.trim()) {
+  if (!apiKey) {
     return {
       mode: 'sandbox',
       reply: buildFallbackDemoReply(input.message),
     }
   }
+
+  // Normalize multi-turn chat to guarantee valid Gemini schema
+  const { normalizedHistory, normalizedMessage, contents } = normalizeDemoChat(
+    input.history,
+    input.message
+  )
 
   // If a custom fetch function is provided (e.g., in unit tests or custom integrations)
   if (input.fetchFn) {
@@ -222,9 +360,9 @@ export async function generateDemoReply(input: {
       })
 
       const callPromise = input.fetchFn({
-        message: input.message,
-        history: input.history,
-        apiKey: apiKey.trim(),
+        message: normalizedMessage,
+        history: normalizedHistory,
+        apiKey: apiKey,
       })
 
       const responseText = await Promise.race([callPromise, timeoutPromise])
@@ -251,18 +389,7 @@ export async function generateDemoReply(input: {
   // Default production integration: @google/genai with gemini-2.5-flash
   let timer: NodeJS.Timeout | undefined
   try {
-    const ai = new GoogleGenAI({ apiKey: apiKey.trim() })
-
-    const contents = [
-      ...input.history.map((turn) => ({
-        role: turn.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: turn.content }],
-      })),
-      {
-        role: 'user',
-        parts: [{ text: input.message }],
-      },
-    ]
+    const ai = new GoogleGenAI({ apiKey: apiKey })
 
     const timeoutPromise = new Promise<never>((_, reject) => {
       timer = setTimeout(

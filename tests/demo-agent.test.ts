@@ -1,14 +1,22 @@
-import test, { describe, it } from 'node:test'
+import test, { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   validateDemoRequest,
   buildFallbackDemoReply,
   generateDemoReply,
+  checkDemoRateLimit,
+  resetDemoRateLimitStore,
+  normalizeDemoChat,
+  buildGeminiContents,
   type DemoMessage,
 } from '../lib/demo-agent'
 import { POST } from '../app/api/demo/route'
 
 describe('Live Demo Agent Unit & Security Tests', () => {
+  beforeEach(() => {
+    resetDemoRateLimitStore()
+  })
+
   describe('validateDemoRequest', () => {
     it('rejects non-object payloads', () => {
       const invalidPayloads = [null, undefined, 'hello', 123, true, false, []]
@@ -121,6 +129,134 @@ describe('Live Demo Agent Unit & Security Tests', () => {
     })
   })
 
+  describe('normalizeDemoChat & buildGeminiContents', () => {
+    it('drops leading assistant turns so history begins with user', () => {
+      const historyWithLeadingAssistant: DemoMessage[] = [
+        { role: 'assistant', content: 'Initial greeting from bot' },
+        { role: 'assistant', content: 'Second greeting' },
+        { role: 'user', content: 'User question' },
+        { role: 'assistant', content: 'Bot answer' },
+      ]
+
+      const { contents, normalizedHistory } = normalizeDemoChat(
+        historyWithLeadingAssistant,
+        'Next user question'
+      )
+
+      assert.equal(contents[0].role, 'user')
+      assert.equal(contents[0].parts[0].text, 'User question')
+      assert.equal(contents[1].role, 'model')
+      assert.equal(contents[1].parts[0].text, 'Bot answer')
+      assert.equal(contents[2].role, 'user')
+      assert.equal(contents[2].parts[0].text, 'Next user question')
+      assert.equal(contents.length, 3)
+
+      assert.equal(normalizedHistory[0].role, 'user')
+    })
+
+    it('merges consecutive same-role turns so roles strictly alternate user -> model', () => {
+      const consecutiveTurns: DemoMessage[] = [
+        { role: 'user', content: 'Turn 1a' },
+        { role: 'user', content: 'Turn 1b' },
+        { role: 'assistant', content: 'Answer 1a' },
+        { role: 'assistant', content: 'Answer 1b' },
+      ]
+
+      const contents = buildGeminiContents(consecutiveTurns, 'Turn 2')
+
+      assert.equal(contents.length, 3)
+      assert.equal(contents[0].role, 'user')
+      assert.equal(contents[0].parts[0].text, 'Turn 1a\n\nTurn 1b')
+      assert.equal(contents[1].role, 'model')
+      assert.equal(contents[1].parts[0].text, 'Answer 1a\n\nAnswer 1b')
+      assert.equal(contents[2].role, 'user')
+      assert.equal(contents[2].parts[0].text, 'Turn 2')
+    })
+
+    it('merges trailing user turn in history with incoming message to preserve alternation', () => {
+      const historyEndingWithUser: DemoMessage[] = [
+        { role: 'user', content: 'First query' },
+        { role: 'assistant', content: 'First response' },
+        { role: 'user', content: 'Second query without response' },
+      ]
+
+      const contents = buildGeminiContents(historyEndingWithUser, 'Third query')
+
+      assert.equal(contents.length, 3)
+      assert.equal(contents[0].role, 'user')
+      assert.equal(contents[0].parts[0].text, 'First query')
+      assert.equal(contents[1].role, 'model')
+      assert.equal(contents[1].parts[0].text, 'First response')
+      assert.equal(contents[2].role, 'user')
+      assert.equal(contents[2].parts[0].text, 'Second query without response\n\nThird query')
+    })
+
+    it('produces valid 1-turn contents for empty history', () => {
+      const contents = buildGeminiContents([], 'Hello standalone')
+      assert.equal(contents.length, 1)
+      assert.equal(contents[0].role, 'user')
+      assert.equal(contents[0].parts[0].text, 'Hello standalone')
+    })
+  })
+
+  describe('checkDemoRateLimit & resetDemoRateLimitStore', () => {
+    it('allows up to 20 requests per 10 minutes per IP and throttles the 21st', () => {
+      const ip = '192.168.1.100'
+      const baseTime = 1_000_000
+
+      for (let i = 1; i <= 20; i++) {
+        const res = checkDemoRateLimit(ip, baseTime + i * 1000)
+        assert.equal(res.allowed, true, `Call ${i} should be allowed`)
+        assert.equal(res.retryAfterSec, 0)
+      }
+
+      // 21st call should be throttled
+      const throttled = checkDemoRateLimit(ip, baseTime + 21 * 1000)
+      assert.equal(throttled.allowed, false)
+      assert.ok(throttled.retryAfterSec > 0)
+    })
+
+    it('tracks rate limits per IP independently', () => {
+      const ipA = '10.0.0.1'
+      const ipB = '10.0.0.2'
+      const now = 2_000_000
+
+      for (let i = 0; i < 20; i++) {
+        checkDemoRateLimit(ipA, now)
+      }
+
+      assert.equal(checkDemoRateLimit(ipA, now).allowed, false)
+      assert.equal(checkDemoRateLimit(ipB, now).allowed, true)
+    })
+
+    it('resets after sliding window expires', () => {
+      const ip = '10.0.0.3'
+      const start = 3_000_000
+
+      for (let i = 0; i < 20; i++) {
+        checkDemoRateLimit(ip, start)
+      }
+      assert.equal(checkDemoRateLimit(ip, start).allowed, false)
+
+      // 10 minutes + 1 second later
+      const later = start + 10 * 60 * 1000 + 1000
+      assert.equal(checkDemoRateLimit(ip, later).allowed, true)
+    })
+
+    it('resetDemoRateLimitStore clears all throttles', () => {
+      const ip = '10.0.0.4'
+      const now = 4_000_000
+
+      for (let i = 0; i < 20; i++) {
+        checkDemoRateLimit(ip, now)
+      }
+      assert.equal(checkDemoRateLimit(ip, now).allowed, false)
+
+      resetDemoRateLimitStore()
+      assert.equal(checkDemoRateLimit(ip, now).allowed, true)
+    })
+  })
+
   describe('buildFallbackDemoReply', () => {
     it('gives contextual English answers for EU / GDPR inquiries', () => {
       const queries = [
@@ -221,6 +357,28 @@ describe('Live Demo Agent Unit & Security Tests', () => {
       assert.match(res.reply, /EU/i)
     })
 
+    it('explicit apiKey: "" triggers sandbox mode even if GEMINI_API_KEY is set in environment', async () => {
+      const originalEnv = process.env.GEMINI_API_KEY
+      process.env.GEMINI_API_KEY = 'ai-key-in-env-that-should-be-ignored'
+
+      try {
+        const res = await generateDemoReply({
+          message: 'Compare $799 vs $1,799 plans',
+          history: [],
+          apiKey: '', // explicit empty string precedence
+        })
+
+        assert.equal(res.mode, 'sandbox')
+        assert.match(res.reply, /\$799/)
+      } finally {
+        if (originalEnv !== undefined) {
+          process.env.GEMINI_API_KEY = originalEnv
+        } else {
+          delete process.env.GEMINI_API_KEY
+        }
+      }
+    })
+
     it('falls back cleanly to mode: sandbox when fetchFn throws', async () => {
       const res = await generateDemoReply({
         message: 'How do you keep data in the EU?',
@@ -316,6 +474,48 @@ describe('Live Demo Agent Unit & Security Tests', () => {
       assert.equal(res.status, 400)
       const data = await res.json()
       assert.match(data.error, /800/)
+    })
+
+    it('returns 429 with Retry-After header when rate limit is exceeded', async () => {
+      const testIp = '198.51.100.42'
+
+      // Send 20 allowed requests
+      for (let i = 0; i < 20; i++) {
+        const req = new Request('http://localhost:3000/api/demo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-forwarded-for': testIp,
+          },
+          body: JSON.stringify({
+            message: `Prompt number ${i + 1}`,
+            history: [],
+          }),
+        })
+
+        const res = await POST(req)
+        assert.equal(res.status, 200)
+      }
+
+      // 21st request from same IP must receive 429 with Retry-After
+      const throttledReq = new Request('http://localhost:3000/api/demo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-forwarded-for': testIp,
+        },
+        body: JSON.stringify({
+          message: 'Throttled message',
+          history: [],
+        }),
+      })
+
+      const throttledRes = await POST(throttledReq)
+      assert.equal(throttledRes.status, 429)
+      const retryAfter = throttledRes.headers.get('Retry-After')
+      assert.ok(retryAfter !== null && Number(retryAfter) > 0)
+      const body = await throttledRes.json()
+      assert.match(body.error, /too many requests/i)
     })
 
     it('returns 200 with mode: sandbox when GEMINI_API_KEY is unset', async () => {
