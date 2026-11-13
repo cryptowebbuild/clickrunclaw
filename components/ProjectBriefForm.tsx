@@ -6,10 +6,8 @@ import {
   AlertCircle,
   Loader2,
   ShieldCheck,
-  Sparkles,
   Send,
   Lock,
-  ArrowRight,
 } from 'lucide-react'
 
 export type PackageTier = 'starter' | 'growth' | 'enterprise' | 'custom'

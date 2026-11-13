@@ -17,13 +17,9 @@ import {
   Zap,
   Video,
   FileText,
-  Clock,
   Send,
-  Database,
   BarChart3,
-  Layers,
   Check,
-  Globe2,
 } from 'lucide-react'
 
 import StaticHeader from './components/StaticHeader'
