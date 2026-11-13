@@ -9,7 +9,7 @@ import {
   buildClientAckEmail,
 } from '@/lib/lead'
 
-export const runtime = 'nodejs'
+export const runtime = 'edge'
 
 export async function POST(req: Request): Promise<NextResponse> {
   // 1. Safely parse JSON payload
