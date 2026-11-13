@@ -91,6 +91,9 @@ export function validateLeadInput(
   if (name.length === 0) {
     return { ok: false, error: 'Name cannot be empty' }
   }
+  if (name.length > 100) {
+    return { ok: false, error: 'Name cannot exceed 100 characters' }
+  }
 
   // Email validation
   if (typeof record.email !== 'string') {
@@ -112,6 +115,9 @@ export function validateLeadInput(
     }
     const trimmed = record.company.trim()
     if (trimmed.length > 0) {
+      if (trimmed.length > 100) {
+        return { ok: false, error: 'Company cannot exceed 100 characters' }
+      }
       company = trimmed
     }
   }
@@ -134,6 +140,12 @@ export function validateLeadInput(
     return {
       ok: false,
       error: 'Please describe your workflow goal in at least 10 characters',
+    }
+  }
+  if (workflowGoal.length > 5000) {
+    return {
+      ok: false,
+      error: 'Workflow goal description cannot exceed 5000 characters',
     }
   }
 
@@ -342,6 +354,16 @@ export function checkRateLimit(
   now: number = Date.now()
 ): { allowed: boolean; retryAfterSec: number } {
   const windowStart = now - RATE_LIMIT_WINDOW_MS
+
+  // Defensive eviction: prune expired entries if map grows
+  if (rateLimitMap.size > 2000) {
+    for (const [k, timestamps] of rateLimitMap.entries()) {
+      if (!timestamps.some((ts) => ts > windowStart)) {
+        rateLimitMap.delete(k)
+      }
+    }
+  }
+
   const history = rateLimitMap.get(key) || []
 
   // Filter timestamps within current window

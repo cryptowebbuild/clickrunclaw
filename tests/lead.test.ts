@@ -145,6 +145,39 @@ describe('Lead Intake Unit & Security Tests', () => {
       })
       assert.equal(resWhitespace.ok, false)
     })
+
+    it('rejects string fields that exceed defensive length limits', () => {
+      // Name > 100 chars
+      const resName = validateLeadInput({
+        name: 'a'.repeat(101),
+        email: 'valid@example.com',
+        packageTier: 'starter',
+        workflowGoal: 'A valid workflow goal exceeding ten characters.',
+      })
+      assert.equal(resName.ok, false)
+      if (!resName.ok) assert.match(resName.error, /100 characters/)
+
+      // Company > 100 chars
+      const resCompany = validateLeadInput({
+        name: 'Valid Name',
+        email: 'valid@example.com',
+        company: 'c'.repeat(101),
+        packageTier: 'starter',
+        workflowGoal: 'A valid workflow goal exceeding ten characters.',
+      })
+      assert.equal(resCompany.ok, false)
+      if (!resCompany.ok) assert.match(resCompany.error, /100 characters/)
+
+      // WorkflowGoal > 5000 chars
+      const resGoal = validateLeadInput({
+        name: 'Valid Name',
+        email: 'valid@example.com',
+        packageTier: 'starter',
+        workflowGoal: 'w'.repeat(5001),
+      })
+      assert.equal(resGoal.ok, false)
+      if (!resGoal.ok) assert.match(resGoal.error, /5000 characters/)
+    })
   })
 
   describe('isHoneypotTriggered', () => {

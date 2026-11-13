@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: 'ClickRunClaw',
     images: [
       {
-        url: 'https://clickrunclaw.com/og-image.png',
+        url: 'https://clickrunclaw.com/mascot.webp',
         width: 1200,
         height: 630,
         alt: 'ClickRunClaw EU-First AI Automation Agency',
@@ -43,6 +43,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ClickRunClaw | EU-First AI Automation Agency',
     description: 'Custom AI agents and sovereign workflow automations. 100% async delivery, zero meetings, dedicated EU infrastructure from $799.',
+    images: ['https://clickrunclaw.com/mascot.webp'],
     creator: '@clickrunclaw',
   },
   robots: {

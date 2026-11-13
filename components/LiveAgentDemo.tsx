@@ -203,7 +203,11 @@ export default function LiveAgentDemo({ onSelectTier }: LiveAgentDemoProps) {
       </div>
 
       {/* Chat Messages Feed */}
-      <div className="p-4 sm:p-6 space-y-4 max-h-[420px] min-h-[300px] overflow-y-auto bg-gradient-to-b from-[#111318] to-[#0d0f14]">
+      <div
+        role="log"
+        aria-live="polite"
+        className="p-4 sm:p-6 space-y-4 max-h-[420px] min-h-[300px] overflow-y-auto bg-gradient-to-b from-[#111318] to-[#0d0f14]"
+      >
         {messages.map((m, idx) => {
           const isUser = m.role === 'user'
           return (

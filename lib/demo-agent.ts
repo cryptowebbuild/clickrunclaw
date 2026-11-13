@@ -46,6 +46,16 @@ export function checkDemoRateLimit(
   now: number = Date.now()
 ): { allowed: boolean; retryAfterSec: number } {
   const windowStart = now - DEMO_RATE_LIMIT_WINDOW_MS
+
+  // Defensive eviction: prune expired entries if store grows
+  if (demoRateLimitStore.size > 2000) {
+    for (const [k, v] of demoRateLimitStore.entries()) {
+      if (!v.timestamps.some((ts) => ts > windowStart)) {
+        demoRateLimitStore.delete(k)
+      }
+    }
+  }
+
   const entry = demoRateLimitStore.get(key) || { timestamps: [] }
 
   const validTimestamps = entry.timestamps.filter((ts) => ts > windowStart)
@@ -185,7 +195,10 @@ export function validateDemoRequest(
       return { ok: false, error: 'History must be an array' }
     }
 
-    for (const item of candidate.history) {
+    // Defensive clamp: only process the last 10 items before sanitizing
+    const candidateTurns = candidate.history.slice(-10)
+
+    for (const item of candidateTurns) {
       if (
         typeof item === 'object' &&
         item !== null &&
