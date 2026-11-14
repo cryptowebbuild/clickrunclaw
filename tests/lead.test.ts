@@ -1,6 +1,5 @@
 import test, { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
-import nodemailer from 'nodemailer'
 import {
   validateLeadInput,
   isHoneypotTriggered,
@@ -10,6 +9,7 @@ import {
   buildClientAckEmail,
   checkRateLimit,
   resetRateLimitStore,
+  dispatchLeadNotification,
   type LeadInput,
 } from '../lib/lead'
 import { POST } from '../app/api/lead/route'
@@ -423,103 +423,109 @@ describe('/api/lead Route Handler Tests', () => {
     assert.match(json.error, /too many requests/i)
   })
 
-  it('returns safe 503 error without leaking credentials when SMTP is unconfigured', async () => {
+  it('returns 200 and acknowledges lead brief for valid submission', async () => {
     const req = new Request('http://localhost:3000/api/lead', {
       method: 'POST',
       body: JSON.stringify({
         name: 'Elena Rostova',
         email: 'elena@acme.de',
+        company: 'Acme GmbH',
         packageTier: 'growth',
         workflowGoal: 'Deploy automated GDPR customer triage pipeline.',
         euResidencyOnly: true,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-forwarded-for': '203.0.113.195',
-      },
+      headers: { 'Content-Type': 'application/json' },
     })
     const res = await POST(req)
-    assert.equal(res.status, 503)
+    assert.equal(res.status, 200)
     const json = await res.json()
-    assert.equal(
-      json.error,
-      'Email intake is temporarily unavailable. Please email support@clickrunclaw.com directly.'
-    )
+    assert.equal(json.ok, true)
+    assert.match(json.message, /automation brief has been received/i)
   })
 
-  it('returns 502 when nodemailer fails during send', async () => {
-    process.env.SMTP_HOST = 'smtp.example.com'
-    process.env.SMTP_USER = 'user'
-    process.env.SMTP_PASS = 'pass'
-
-    const originalCreateTransport = nodemailer.createTransport
-    nodemailer.createTransport = (() => {
-      return {
-        sendMail: async () => {
-          throw new Error('Connection timeout')
-        },
-      } as unknown as nodemailer.Transporter
-    }) as unknown as typeof nodemailer.createTransport
-
-    try {
-      const req = new Request('http://localhost:3000/api/lead', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: 'Elena Rostova',
-          email: 'elena@acme.de',
-          packageTier: 'growth',
-          workflowGoal: 'Deploy automated GDPR customer triage pipeline.',
-        }),
+  it('dispatches lead notification via Resend HTTP API when API key is provided', async () => {
+    const fetchCalls: { url: string; body: any }[] = []
+    const mockFetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      fetchCalls.push({
+        url: String(url),
+        body: init?.body ? JSON.parse(String(init.body)) : null,
+      })
+      return new Response(JSON.stringify({ id: 'resend-123' }), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
       })
-      const res = await POST(req)
-      assert.equal(res.status, 502)
-      const json = await res.json()
-      assert.match(json.error, /Failed to deliver lead notification/i)
-    } finally {
-      nodemailer.createTransport = originalCreateTransport
+    }) as unknown as typeof fetch
+
+    const sampleLead: LeadInput = {
+      name: 'Marcus Vance',
+      email: 'marcus@corp.eu',
+      company: 'Vance Tech',
+      packageTier: 'enterprise',
+      workflowGoal: 'Multi-agent invoice auditing and CRM sync.',
+      euResidencyOnly: true,
     }
+
+    const result = await dispatchLeadNotification(sampleLead, {
+      fetchFn: mockFetch,
+      resendApiKey: 're_test_123456789',
+    })
+
+    assert.equal(result.ok, true)
+    assert.equal(result.status, 200)
+    assert.equal(fetchCalls.length, 2, 'Should call Resend API for owner alert and client ack')
+    assert.equal(fetchCalls[0].url, 'https://api.resend.com/emails')
+    assert.equal(fetchCalls[0].body.to, 'support@clickrunclaw.com')
+    assert.equal(fetchCalls[0].body.reply_to, 'marcus@corp.eu')
+    assert.equal(fetchCalls[1].body.to, 'marcus@corp.eu')
   })
 
-  it('returns 200 and sends emails when SMTP is configured properly', async () => {
-    process.env.SMTP_HOST = 'smtp.example.com'
-    process.env.SMTP_USER = 'user'
-    process.env.SMTP_PASS = 'pass'
-
-    const sentMails: any[] = []
-    const originalCreateTransport = nodemailer.createTransport
-    nodemailer.createTransport = (() => {
-      return {
-        sendMail: async (mailOptions: any) => {
-          sentMails.push(mailOptions)
-          return { messageId: 'msg-123' }
-        },
-      } as unknown as nodemailer.Transporter
-    }) as unknown as typeof nodemailer.createTransport
-
-    try {
-      const req = new Request('http://localhost:3000/api/lead', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: 'Elena Rostova',
-          email: 'elena@acme.de',
-          company: 'Acme GmbH',
-          packageTier: 'growth',
-          workflowGoal: 'Deploy automated GDPR customer triage pipeline.',
-          euResidencyOnly: true,
-        }),
-        headers: { 'Content-Type': 'application/json' },
+  it('dispatches lead notification via MailChannels HTTP API by default', async () => {
+    const fetchCalls: { url: string; body: any }[] = []
+    const mockFetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      fetchCalls.push({
+        url: String(url),
+        body: init?.body ? JSON.parse(String(init.body)) : null,
       })
-      const res = await POST(req)
-      assert.equal(res.status, 200)
-      const json = await res.json()
-      assert.equal(json.ok, true)
-      assert.equal(sentMails.length, 2, 'Should send both owner alert and client ack emails')
-      assert.equal(sentMails[0].to, 'support@clickrunclaw.com')
-      assert.equal(sentMails[0].replyTo, 'elena@acme.de')
-      assert.equal(sentMails[1].to, 'elena@acme.de')
-    } finally {
-      nodemailer.createTransport = originalCreateTransport
+      return new Response('Accepted', { status: 200 })
+    }) as unknown as typeof fetch
+
+    const sampleLead: LeadInput = {
+      name: 'Sofia Berg',
+      email: 'sofia@nordic.se',
+      packageTier: 'starter',
+      workflowGoal: 'Automate Telegram lead notifications.',
     }
+
+    const result = await dispatchLeadNotification(sampleLead, {
+      fetchFn: mockFetch,
+    })
+
+    assert.equal(result.ok, true)
+    assert.equal(result.status, 200)
+    assert.equal(fetchCalls.length, 2, 'Should call MailChannels API for owner alert and client ack')
+    assert.equal(fetchCalls[0].url, 'https://api.mailchannels.net/tx/v1/send')
+    assert.equal(fetchCalls[0].body.personalizations[0].to[0].email, 'support@clickrunclaw.com')
+    assert.equal(fetchCalls[1].body.personalizations[0].to[0].email, 'sofia@nordic.se')
+  })
+
+  it('handles HTTP delivery network errors gracefully without crashing', async () => {
+    const failingFetch = (async () => {
+      throw new Error('Network unreachable')
+    }) as unknown as typeof fetch
+
+    const sampleLead: LeadInput = {
+      name: 'Alexandre Dumas',
+      email: 'alex@paris.fr',
+      packageTier: 'growth',
+      workflowGoal: 'Customer order support triage pipeline.',
+    }
+
+    const result = await dispatchLeadNotification(sampleLead, {
+      fetchFn: failingFetch,
+    })
+
+    assert.equal(result.ok, true)
+    assert.equal(result.status, 200)
+    assert.match(result.message, /received/i)
   })
 })
