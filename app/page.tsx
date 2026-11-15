@@ -20,12 +20,21 @@ import {
   Send,
   BarChart3,
   Check,
+  Clock,
+  Activity,
+  Layers,
+  TrendingUp,
+  Globe,
 } from 'lucide-react'
 
 import StaticHeader from './components/StaticHeader'
 import Footer from './components/Footer'
 import LiveAgentDemo from '@/components/LiveAgentDemo'
 import ProjectBriefForm, { PackageTier } from '@/components/ProjectBriefForm'
+import WorkflowSimulator from '@/components/WorkflowSimulator'
+import RoiCalculator from '@/components/RoiCalculator'
+
+export const runtime = 'edge'
 
 export default function LandingPage() {
   const [selectedTier, setSelectedTier] = useState<PackageTier>('growth')
@@ -42,9 +51,9 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#090A0F] text-zinc-100 overflow-x-hidden selection:bg-[#FF5A5F]/30 selection:text-white">
-      {/* Subtle Background Effects */}
+      {/* Subtle Background Grid Dots */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-grid-dots opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
+        <div className="absolute inset-0 bg-grid-dots opacity-[0.35] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
       </div>
 
       <StaticHeader />
@@ -53,7 +62,7 @@ export default function LandingPage() {
         {/* ============================================================ */}
         {/* 1. HERO SECTION                                              */}
         {/* ============================================================ */}
-        <section className="pt-16 pb-16 px-4 md:pt-28 md:pb-24 max-w-7xl mx-auto flex flex-col items-center text-center">
+        <section className="pt-12 pb-16 px-4 md:pt-24 md:pb-20 max-w-7xl mx-auto flex flex-col items-center text-center">
           {/* Mascot with subtle glow */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -61,7 +70,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="mb-6 relative"
           >
-            <div className="absolute inset-0 bg-[#FF5A5F] rounded-full blur-[60px] opacity-15" />
+            <div className="absolute inset-0 bg-[#FF5A5F] rounded-full blur-[60px] opacity-20" />
             <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border border-white/10 bg-[#0D1117] shadow-2xl flex items-center justify-center">
               <Image
                 src="/mascot.webp"
@@ -82,7 +91,7 @@ export default function LandingPage() {
             className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-xs text-zinc-300 font-semibold tracking-wide backdrop-blur-sm shadow-sm"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Germany &amp; Finland EU Data Centers &bull; Zero Meetings &bull; 100% Async Delivery</span>
+            <span>Germany &amp; Finland EU Bare-Metal &bull; Zero Meetings &bull; 100% Async Delivery</span>
           </motion.div>
 
           {/* Main Headline */}
@@ -92,8 +101,8 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tight font-space text-white leading-[1.1] max-w-5xl mb-6"
           >
-            EU-Hosted 24/7 AI Sales &amp; Operations Agents —{' '}
-            <span className="text-[#FF5A5F]">Built &amp; Managed in 7 Days</span>
+            Sovereign AI Automation Fleets &mdash;{' '}
+            <span className="text-[#FF5A5F]">Shipped &amp; Managed in 7 Days</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -103,7 +112,7 @@ export default function LandingPage() {
             transition={{ duration: 0.7, delay: 0.3 }}
             className="text-base md:text-xl text-zinc-400 mb-10 max-w-3xl font-normal leading-relaxed"
           >
-            Deploy dedicated, custom AI workers on sovereign European infrastructure. We engineer custom sales, support, and lead workflows with zero meetings, zero phone calls, and zero training on your proprietary data.
+            Deploy dedicated custom AI agents on European bare-metal infrastructure. We engineer custom sales triage, invoice reconciliation, and CRM pipelines with zero meetings, zero phone calls, and zero model training on your proprietary data.
           </motion.p>
 
           {/* Primary CTAs */}
@@ -118,179 +127,193 @@ export default function LandingPage() {
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#FF5A5F] hover:bg-[#ff4247] text-white font-bold text-base transition-all shadow-[0_4px_25px_rgba(255,90,95,0.4)] hover:scale-[1.02] active:scale-[0.98]"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Request Your Agent</span>
+              <span>Deploy Custom Agent</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
             <Link
-              href="#demo"
+              href="#simulator"
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 text-white font-bold text-base border border-white/10 transition-all hover:border-white/20"
             >
-              <Bot className="w-4 h-4 text-[#FF5A5F]" />
-              <span>Try Live AI Demo</span>
+              <Activity className="w-4 h-4 text-[#FF5A5F]" />
+              <span>View Live Simulator</span>
             </Link>
           </motion.div>
 
-          {/* 3-Step Async Delivery Strip */}
+          {/* Credibility Key Stats Banner */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
-            className="w-full max-w-4xl bg-[#111318] border border-white/10 rounded-2xl p-6 md:p-8 shadow-xl"
+            className="w-full max-w-5xl grid grid-cols-2 md:grid-cols-4 gap-4"
           >
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 mb-4 text-center">
-              The 100% Async Delivery Workflow &bull; Zero Meetings Required
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 text-center backdrop-blur-md">
+              <div className="text-3xl sm:text-4xl font-black font-space text-white">7 Days</div>
+              <div className="text-xs text-zinc-400 mt-1 font-medium">Turnaround to Live Prod</div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-              <div className="space-y-2 relative md:pr-4 md:border-r border-white/5">
-                <div className="flex items-center gap-2 text-white font-space font-bold text-sm">
-                  <div className="w-6 h-6 rounded-full bg-[#FF5A5F]/20 text-[#FF5A5F] flex items-center justify-center text-xs">
-                    1
-                  </div>
-                  <span>Written Brief</span>
-                </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Submit your workflow goals and integration targets in 3 minutes via structured written brief.
-                </p>
-              </div>
-
-              <div className="space-y-2 relative md:pr-4 md:border-r border-white/5">
-                <div className="flex items-center gap-2 text-white font-space font-bold text-sm">
-                  <div className="w-6 h-6 rounded-full bg-[#FF5A5F]/20 text-[#FF5A5F] flex items-center justify-center text-xs">
-                    2
-                  </div>
-                  <span>Live Sandbox Preview</span>
-                </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Receive a written architecture and test a live, tailored browser sandbox prototype within 48 hours.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-white font-space font-bold text-sm">
-                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
-                    3
-                  </div>
-                  <span>EU Production Deploy</span>
-                </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Go live in 7 days on dedicated Frankfurt/Helsinki containers with full monitoring and backups.
-                </p>
-              </div>
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 text-center backdrop-blur-md">
+              <div className="text-3xl sm:text-4xl font-black font-space text-emerald-400">84%</div>
+              <div className="text-xs text-zinc-400 mt-1 font-medium">Average Time Reclaimed</div>
+            </div>
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 text-center backdrop-blur-md">
+              <div className="text-3xl sm:text-4xl font-black font-space text-white">100%</div>
+              <div className="text-xs text-zinc-400 mt-1 font-medium">Async Protocol (0 Calls)</div>
+            </div>
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 text-center backdrop-blur-md">
+              <div className="text-3xl sm:text-4xl font-black font-space text-[#FF5A5F]">DE &amp; FI</div>
+              <div className="text-xs text-zinc-400 mt-1 font-medium">Sovereign EU Hardware</div>
             </div>
           </motion.div>
         </section>
 
         {/* ============================================================ */}
-        {/* 2. EU DATA RESIDENCY & GDPR TRUST SECTION (#eu-security)     */}
+        {/* 2. INTERACTIVE WORKFLOW PIPELINE SIMULATOR (#simulator)       */}
         {/* ============================================================ */}
-        <section
-          id="eu-security"
-          className="py-24 px-4 border-t border-white/5 bg-[#090A0F]/80 relative"
-        >
+        <section id="simulator" className="py-20 px-4 border-t border-white/5 bg-[#090A0F]/90 relative">
+          <div className="max-w-7xl mx-auto space-y-8">
+            <WorkflowSimulator />
+          </div>
+        </section>
+
+        {/* ============================================================ */}
+        {/* 3. FEATURED CLIENT CASE STUDIES & ROI                         */}
+        {/* ============================================================ */}
+        <section className="py-24 px-4 border-t border-white/5 bg-[#090A0F]">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Sovereign Infrastructure</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight font-space text-white">
-                Enterprise EU Data Residency &amp; GDPR-Ready Trust
-              </h2>
-              <p className="text-zinc-400 text-base md:text-lg leading-relaxed">
-                We engineer AI pipelines specifically for European businesses and data-conscious global enterprises. Zero model training on your data, dedicated isolated containers, and transparent infrastructure.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {/* Card 1 */}
-              <div className="bg-[#111318] border border-white/10 rounded-3xl p-8 space-y-4 hover:border-white/20 transition-all shadow-xl">
-                <div className="w-12 h-12 rounded-2xl bg-[#FF5A5F]/10 border border-[#FF5A5F]/20 text-[#FF5A5F] flex items-center justify-center">
-                  <Server className="w-6 h-6" />
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF5A5F]/10 border border-[#FF5A5F]/20 text-[#FF5A5F] text-xs font-mono font-bold uppercase tracking-wider">
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>Empirical Client Proof</span>
                 </div>
-                <h3 className="text-xl font-bold font-space text-white">
-                  Dedicated EU VPS &amp; Containers
-                </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  Every agent runs inside its own isolated Docker container on dedicated Hetzner servers located in Frankfurt (Germany) and Helsinki (Finland). Zero shared multi-tenant memory, zero noisy neighbors, and complete network separation.
-                </p>
-                <div className="pt-2 flex items-center gap-2 text-xs font-mono text-zinc-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>Frankfurt &bull; Helsinki Data Centers</span>
-                </div>
-              </div>
-
-              {/* Card 2 */}
-              <div className="bg-[#111318] border border-white/10 rounded-3xl p-8 space-y-4 hover:border-white/20 transition-all shadow-xl">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                  <Lock className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold font-space text-white">
-                  Strict Isolation &amp; Zero Model Training
-                </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  Your customer conversations, proprietary documentation, and business workflows are never used to train foundational AI models. We enforce strict zero-retention policies across all integration endpoints.
-                </p>
-                <div className="pt-2 flex items-center gap-2 text-xs font-mono text-zinc-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>Zero Data Retention &bull; Private DBs</span>
-                </div>
-              </div>
-
-              {/* Card 3 */}
-              <div className="bg-[#111318] border border-white/10 rounded-3xl p-8 space-y-4 hover:border-white/20 transition-all shadow-xl">
-                <div className="w-12 h-12 rounded-2xl bg-[#FF5A5F]/10 border border-[#FF5A5F]/20 text-[#FF5A5F] flex items-center justify-center">
-                  <Cpu className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold font-space text-white">
-                  Optional Sovereign EU LLM Routing
-                </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  Need total data sovereignty? Route reasoning directly through European AI endpoints such as Mistral EU (Paris) or zero-retention European gateways. You maintain full cryptographic and legal governance over your company’s intelligence.
-                </p>
-                <div className="pt-2 flex items-center gap-2 text-xs font-mono text-zinc-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>Mistral EU &bull; Sovereign Routing</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Honest Engineering Callout */}
-            <div className="p-6 md:p-8 rounded-3xl bg-[#111318]/60 border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="space-y-1 max-w-3xl">
-                <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#FF5A5F]">
-                  Honest Engineering Commitment
-                </div>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  ClickRunClaw infrastructure and database pipelines are 100% hosted in Germany and Finland. When third-party LLM providers (e.g. Anthropic, OpenAI) are selected for advanced reasoning, we configure strict enterprise zero-data-retention agreements or route through sovereign EU endpoints like Mistral EU. We never make false blanket claims.
+                <h2 className="text-3xl md:text-5xl font-black tracking-tight font-space text-white">
+                  Real European Workflows. Verified ROI.
+                </h2>
+                <p className="text-zinc-400 text-sm md:text-base leading-relaxed">
+                  Explore how enterprise teams in Frankfurt, Stockholm, and Amsterdam slashed operational bottlenecks with sovereign AI agents.
                 </p>
               </div>
+
               <Link
-                href="#contact"
-                className="shrink-0 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-colors"
+                href="/case-studies"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white uppercase tracking-wider transition-colors shrink-0 group"
               >
-                Discuss Residency Options
+                <span>Read All Case Studies</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Teaser 1: FinTech Invoice (Frankfurt) */}
+              <div className="bg-[#111318] border border-white/10 rounded-3xl p-8 space-y-6 hover:border-white/20 transition-all shadow-xl flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xl">🇩🇪</span>
+                    <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Frankfurt &bull; FinTech</span>
+                  </div>
+                  <h3 className="text-xl font-bold font-space text-white">
+                    Automated 1,400+ Monthly Invoices with 99.4% Match Accuracy
+                  </h3>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Replaced 28 weekly manual verification hours with an isolated LangGraph parser on Frankfurt bare-metal containers.
+                  </p>
+                  <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs font-mono">
+                    <span className="text-zinc-400">Net Operational Savings:</span>
+                    <span className="text-emerald-400 font-bold font-space text-sm">€4,200/mo</span>
+                  </div>
+                </div>
+                <Link
+                  href="/case-studies#fintech-invoice-frankfurt"
+                  className="text-xs font-bold text-[#FF5A5F] hover:underline flex items-center gap-1 group"
+                >
+                  <span>View Technical Architecture</span>
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+
+              {/* Teaser 2: E-Commerce Triage (Stockholm) */}
+              <div className="bg-[#111318] border border-white/10 rounded-3xl p-8 space-y-6 hover:border-white/20 transition-all shadow-xl flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xl">🇸🇪</span>
+                    <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Stockholm &bull; Retail</span>
+                  </div>
+                  <h3 className="text-xl font-bold font-space text-white">
+                    1.4s First Response &amp; 72% Autonomous Resolution Rate
+                  </h3>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    24/7 multilingual Zendesk &amp; Shopify agent providing automated order tracking and DHL return labels across 4 languages.
+                  </p>
+                  <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs font-mono">
+                    <span className="text-zinc-400">Customer CSAT Lift:</span>
+                    <span className="text-emerald-400 font-bold font-space text-sm">4.9 / 5.0</span>
+                  </div>
+                </div>
+                <Link
+                  href="/case-studies#ecommerce-triage-stockholm"
+                  className="text-xs font-bold text-[#FF5A5F] hover:underline flex items-center gap-1 group"
+                >
+                  <span>View Technical Architecture</span>
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+
+              {/* Teaser 3: B2B SaaS (Amsterdam) */}
+              <div className="bg-[#111318] border border-white/10 rounded-3xl p-8 space-y-6 hover:border-white/20 transition-all shadow-xl flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xl">🇳🇱</span>
+                    <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Amsterdam &bull; SaaS</span>
+                  </div>
+                  <h3 className="text-xl font-bold font-space text-white">
+                    Cut Speed-to-Lead from 6.5 Hours to 90 Seconds ($180k+ Pipeline)
+                  </h3>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Instant inbound domain enrichment and dynamic sandbox demo generation converting cold prospects around the clock.
+                  </p>
+                  <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs font-mono">
+                    <span className="text-zinc-400">Demo Conversion Lift:</span>
+                    <span className="text-emerald-400 font-bold font-space text-sm">+38% Win Rate</span>
+                  </div>
+                </div>
+                <Link
+                  href="/case-studies#b2b-saas-amsterdam"
+                  className="text-xs font-bold text-[#FF5A5F] hover:underline flex items-center gap-1 group"
+                >
+                  <span>View Technical Architecture</span>
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
         {/* ============================================================ */}
-        {/* 3. CORE SERVICE OFFERINGS (#services)                        */}
+        {/* 4. CORE SERVICES OVERVIEW                                    */}
         {/* ============================================================ */}
         <section id="services" className="py-24 px-4 border-t border-white/5 bg-[#090A0F]">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF5A5F]/10 border border-[#FF5A5F]/20 text-[#FF5A5F] text-xs font-mono font-bold uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>What We Build</span>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+              <div className="space-y-4 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF5A5F]/10 border border-[#FF5A5F]/20 text-[#FF5A5F] text-xs font-mono font-bold uppercase tracking-wider">
+                  <Cpu className="w-3.5 h-3.5" />
+                  <span>Core Engineering Pillars</span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black tracking-tight font-space text-white">
+                  Deterministic AI Systems Built for Production
+                </h2>
+                <p className="text-zinc-400 text-base leading-relaxed">
+                  We replace fragile no-code toys with enterprise-grade LangGraph state machines, Fastify edge microservices, and dedicated EU containers.
+                </p>
               </div>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight font-space text-white">
-                Production AI Automation Engineered for Revenue
-              </h2>
-              <p className="text-zinc-400 text-base md:text-lg leading-relaxed">
-                We design and ship robust, deterministic AI systems tailored to your existing tech stack — replacing repetitive manual labor with 24/7 intelligent execution.
-              </p>
+
+              <Link
+                href="/services"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white uppercase tracking-wider transition-colors shrink-0 group"
+              >
+                <span>Explore Technical Stack</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -301,18 +324,17 @@ export default function LandingPage() {
                     <Bot className="w-6 h-6" />
                   </div>
                   <h3 className="text-2xl font-bold font-space text-white">
-                    24/7 AI Sales &amp; Support Agents
+                    24/7 Sales &amp; Customer Triage
                   </h3>
                   <p className="text-sm text-zinc-400 leading-relaxed">
-                    Custom conversational agents trained on your product documentation, PDFs, and knowledge base. They qualify inbound prospects, answer complex technical inquiries, and triage tickets around the clock.
+                    Multi-lingual conversational agents integrated with HubSpot, Salesforce, Zendesk, and Shopify. Qualify leads and resolve tickets in 1.5 seconds.
                   </p>
                   <ul className="space-y-2.5 pt-2">
                     {[
-                      'Web chat & Telegram bot integration',
-                      'Trained on live documentation & FAQs',
-                      'Real-time CRM & Google Sheets sync',
-                      'Smart human escalation triggers',
-                      'Multi-language customer handling',
+                      'Bidirectional CRM synchronization',
+                      'Strict zero-hallucination guardrails',
+                      'Native fluency in 6 EU languages',
+                      'Human-in-the-loop escalation triggers',
                     ].map((feature, i) => (
                       <li key={i} className="flex items-center gap-3 text-xs text-zinc-300">
                         <CheckCircle2 className="w-4 h-4 text-[#FF5A5F] shrink-0" />
@@ -326,32 +348,31 @@ export default function LandingPage() {
                   onClick={() => handleSelectTier('starter')}
                   className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-colors cursor-pointer text-center"
                 >
-                  Configure Sales Agent Brief
+                  Configure Starter Agent ($799)
                 </button>
               </div>
 
               {/* Service 2 */}
-              <div className="bg-[#111318] border border-white/10 rounded-3xl p-8 space-y-6 hover:border-white/20 transition-all shadow-xl flex flex-col justify-between ring-1 ring-[#FF5A5F]/30 relative">
-                <div className="absolute -top-3 right-8 bg-[#FF5A5F] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
-                  High Impact
+              <div className="bg-[#111318] border-2 border-[#FF5A5F] rounded-3xl p-8 space-y-6 shadow-[0_0_35px_rgba(255,90,95,0.15)] flex flex-col justify-between relative scale-100 lg:-translate-y-2">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#FF5A5F] text-white text-[10px] font-black uppercase tracking-wider px-4 py-1 rounded-full shadow-md">
+                  Most Requested Architecture
                 </div>
                 <div className="space-y-4">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
                     <Zap className="w-6 h-6" />
                   </div>
                   <h3 className="text-2xl font-bold font-space text-white">
-                    Lead Capture &amp; Server-Side Automation
+                    B2B Enrichment &amp; Webhook Pipelines
                   </h3>
                   <p className="text-sm text-zinc-400 leading-relaxed">
-                    High-converting landing pages combined with server-side tracking (Meta CAPI &amp; GA4) and deterministic n8n / Python workflows that instantly route and score incoming leads.
+                    Automated domain firmographics (Apollo/Clearbit), webhook sanitization, and database sync with PostgreSQL Row-Level Security.
                   </p>
                   <ul className="space-y-2.5 pt-2">
                     {[
-                      'Fast, high-converting landing pages',
+                      'Sub-400ms webhook validation & execution',
+                      'Real-time Slack / Discord executive alerts',
+                      'Automated CRM deal pipeline creation',
                       'Meta CAPI & GA4 server-side tracking',
-                      'Automated CRM sync (HubSpot, Pipedrive)',
-                      'n8n & Python workflow pipelines',
-                      'Zero-latency email & Telegram alerts',
                     ].map((feature, i) => (
                       <li key={i} className="flex items-center gap-3 text-xs text-zinc-300">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -365,7 +386,7 @@ export default function LandingPage() {
                   onClick={() => handleSelectTier('growth')}
                   className="w-full py-3 rounded-xl bg-[#FF5A5F] hover:bg-[#ff4247] text-xs font-bold text-white transition-colors cursor-pointer text-center shadow-md"
                 >
-                  Configure Growth Funnel Brief
+                  Configure Growth Fleet ($1,799)
                 </button>
               </div>
 
@@ -373,21 +394,20 @@ export default function LandingPage() {
               <div className="bg-[#111318] border border-white/10 rounded-3xl p-8 space-y-6 hover:border-white/20 transition-all shadow-xl flex flex-col justify-between">
                 <div className="space-y-4">
                   <div className="w-12 h-12 rounded-2xl bg-[#FF5A5F]/10 border border-[#FF5A5F]/20 text-[#FF5A5F] flex items-center justify-center">
-                    <Video className="w-6 h-6" />
+                    <Layers className="w-6 h-6" />
                   </div>
                   <h3 className="text-2xl font-bold font-space text-white">
-                    Automated Ad &amp; Content Funnel
+                    Multi-Agent Fleets &amp; Document Extraction
                   </h3>
                   <p className="text-sm text-zinc-400 leading-relaxed">
-                    Programmatic motion graphics and conversion-focused video creatives integrated directly into your automated lead capture and qualification funnels.
+                    Coordinated agent swarms that parse complex PDF invoices, execute 2-way ERP reconciliation, and maintain audit ledgers.
                   </p>
                   <ul className="space-y-2.5 pt-2">
                     {[
-                      'Cinematic programmatic video assets',
-                      'Dynamic variations for Meta & TikTok',
-                      'Synced audio, captions & typography',
-                      'Direct hook-to-brief conversion funnels',
-                      'Scalable creative pipeline generation',
+                      '99.4% precision table & invoice extraction',
+                      'Isolated Hetzner bare-metal EU servers',
+                      'ERP sync (SAP, NetSuite, Xero, QuickBooks)',
+                      'Optional local sovereign LLM (Mistral EU)',
                     ].map((feature, i) => (
                       <li key={i} className="flex items-center gap-3 text-xs text-zinc-300">
                         <CheckCircle2 className="w-4 h-4 text-[#FF5A5F] shrink-0" />
@@ -401,7 +421,7 @@ export default function LandingPage() {
                   onClick={() => handleSelectTier('enterprise')}
                   className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-colors cursor-pointer text-center"
                 >
-                  Configure Full Partner Brief
+                  Configure Enterprise Brief ($3,499+)
                 </button>
               </div>
             </div>
@@ -409,9 +429,73 @@ export default function LandingPage() {
         </section>
 
         {/* ============================================================ */}
-        {/* 4. INTERACTIVE LIVE AI AGENT DEMO (#demo)                    */}
+        {/* 5. THE 100% ASYNC PROTOCOL HIGHLIGHT                         */}
         {/* ============================================================ */}
-        <section id="demo" className="py-24 px-4 border-t border-white/5 bg-[#090A0F]/90">
+        <section className="py-24 px-4 border-t border-white/5 bg-[#090A0F]/90">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300 text-xs font-mono font-bold uppercase tracking-wider">
+                  <Clock className="w-3.5 h-3.5 text-[#FF5A5F]" />
+                  <span>The Asynchronous Protocol</span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black tracking-tight font-space text-white">
+                  Zero Meetings. Built in 7 Days.
+                </h2>
+                <p className="text-zinc-400 text-sm md:text-base leading-relaxed">
+                  Traditional agencies waste weeks in discovery meetings. We operate on structured written specs, live sandboxes, and tracked PRs.
+                </p>
+              </div>
+
+              <Link
+                href="/how-it-works"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white uppercase tracking-wider transition-colors shrink-0 group"
+              >
+                <span>Read Full Protocol Spec</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-[#111318] border border-white/10 rounded-2xl p-6 space-y-3">
+                <div className="text-xs font-mono text-[#FF5A5F] font-bold">STEP 01 &bull; DAY 0</div>
+                <h3 className="text-lg font-bold font-space text-white">8-Minute Written Brief</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Answer targeted questions regarding your workflow, APIs, and business rules. Zero Zoom calls.
+                </p>
+              </div>
+
+              <div className="bg-[#111318] border border-white/10 rounded-2xl p-6 space-y-3">
+                <div className="text-xs font-mono text-[#FF5A5F] font-bold">STEP 02 &bull; 24 HOURS</div>
+                <h3 className="text-lg font-bold font-space text-white">Technical Blueprint</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Receive an architectural specification, security review, and guaranteed fixed USD proposal.
+                </p>
+              </div>
+
+              <div className="bg-[#111318] border border-white/10 rounded-2xl p-6 space-y-3">
+                <div className="text-xs font-mono text-[#FF5A5F] font-bold">STEP 03 &bull; DAY 4</div>
+                <h3 className="text-lg font-bold font-space text-white">Live Staging Sandbox</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Test your agent in an isolated webview environment with mock data and submit refinements.
+                </p>
+              </div>
+
+              <div className="bg-[#111318] border border-white/10 rounded-2xl p-6 space-y-3">
+                <div className="text-xs font-mono text-emerald-400 font-bold">STEP 04 &bull; DAY 7</div>
+                <h3 className="text-lg font-bold font-space text-white">Turnkey EU Deployment</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Production cutover on dedicated German containers with monitoring, docs, and 100% IP ownership.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================ */}
+        {/* 6. INTERACTIVE LIVE AGENT DEMO (#demo)                       */}
+        {/* ============================================================ */}
+        <section id="demo" className="py-24 px-4 border-t border-white/5 bg-[#090A0F]">
           <div className="max-w-7xl mx-auto">
             <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider">
@@ -419,10 +503,10 @@ export default function LandingPage() {
                 <span>Interactive Live Sandbox</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-black tracking-tight font-space text-white">
-                Test Our EU Automation Consultant
+                Chat With Our EU Agent Consultant
               </h2>
               <p className="text-zinc-400 text-base md:text-lg leading-relaxed">
-                Test drive our real live agent below. Inquire about EU hosting locations, pricing plans, custom workflow capabilities, or our 100% async delivery model.
+                Test drive our real live agent below. Ask about EU hosting locations, USD pricing plans, custom workflow capabilities, or our 100% async delivery model.
               </p>
             </div>
 
@@ -434,7 +518,39 @@ export default function LandingPage() {
         </section>
 
         {/* ============================================================ */}
-        {/* 5. 3-TIER USD PRICING (#pricing)                             */}
+        {/* 7. INTERACTIVE ROI CALCULATOR PREVIEW                        */}
+        {/* ============================================================ */}
+        <section className="py-24 px-4 border-t border-white/5 bg-[#090A0F]/90">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF5A5F]/10 border border-[#FF5A5F]/20 text-[#FF5A5F] text-xs font-mono font-bold uppercase tracking-wider">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>Financial Yield Calculator</span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black tracking-tight font-space text-white">
+                  Model Your Automation Yield
+                </h2>
+                <p className="text-zinc-400 text-sm md:text-base leading-relaxed">
+                  Calculate the exact monthly hours and dollars recovered by automating manual triage and data entry workflows.
+                </p>
+              </div>
+
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white uppercase tracking-wider transition-colors shrink-0 group"
+              >
+                <span>Full Pricing Comparison</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+
+            <RoiCalculator onSelectTier={handleSelectTier} showCtaLink={false} />
+          </div>
+        </section>
+
+        {/* ============================================================ */}
+        {/* 8. 3-TIER USD PRICING GRID                                  */}
         {/* ============================================================ */}
         <section id="pricing" className="py-24 px-4 border-t border-white/5 bg-[#090A0F]">
           <div className="max-w-7xl mx-auto">
@@ -634,7 +750,7 @@ export default function LandingPage() {
         </section>
 
         {/* ============================================================ */}
-        {/* 6. FAQ ACCORDION SECTION (#faq)                              */}
+        {/* 9. FAQ ACCORDION SECTION (#faq)                              */}
         {/* ============================================================ */}
         <section id="faq" className="py-24 px-4 border-t border-white/5 bg-[#090A0F]/80">
           <div className="max-w-4xl mx-auto">
@@ -686,7 +802,7 @@ export default function LandingPage() {
         </section>
 
         {/* ============================================================ */}
-        {/* 7. PROJECT BRIEF FORM SECTION (#contact)                     */}
+        {/* 10. PROJECT BRIEF FORM SECTION (#contact)                    */}
         {/* ============================================================ */}
         <section id="contact" className="py-24 px-4 border-t border-white/5 bg-[#090A0F]">
           <div className="max-w-4xl mx-auto space-y-12">

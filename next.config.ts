@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  output: 'standalone',
+  ...(process.env.NEXT_STANDALONE === 'true' ? { output: 'standalone' as const } : {}),
   transpilePackages: ['framer-motion'],
   webpack: (config, {dev}) => {
     // HMR is disabled in AI Studio via DISABLE_HMR env var.

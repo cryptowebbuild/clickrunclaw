@@ -49,24 +49,24 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Col 2: Solutions */}
+          {/* Col 2: Services & Proof */}
           <div className="col-span-1 md:col-span-1 space-y-4">
-            <h4 className="text-white font-bold font-space text-sm uppercase tracking-wider">Solutions</h4>
+            <h4 className="text-white font-bold font-space text-sm uppercase tracking-wider">Solutions &amp; Proof</h4>
             <ul className="space-y-3 text-sm">
-              <li><Link href="/#services" className="hover:text-[#FF5A5F] transition-colors">Custom AI Agents</Link></li>
-              <li><Link href="/#eu-security" className="hover:text-[#FF5A5F] transition-colors">EU Sovereign Security</Link></li>
+              <li><Link href="/services" className="hover:text-[#FF5A5F] transition-colors">Services Hub &amp; Architectures</Link></li>
+              <li><Link href="/case-studies" className="hover:text-[#FF5A5F] transition-colors">Client Case Studies &amp; ROI</Link></li>
               <li><Link href="/#demo" className="hover:text-[#FF5A5F] transition-colors">Live Interactive Demo</Link></li>
-              <li><Link href="/#pricing" className="hover:text-[#FF5A5F] transition-colors">Transparent Pricing</Link></li>
+              <li><Link href="/pricing" className="hover:text-[#FF5A5F] transition-colors">Pricing &amp; ROI Calculator</Link></li>
             </ul>
           </div>
 
-          {/* Col 3: Trust & Legal */}
+          {/* Col 3: Protocol & Legal */}
           <div className="col-span-1 md:col-span-1 space-y-4">
-            <h4 className="text-white font-bold font-space text-sm uppercase tracking-wider">Trust &amp; Legal</h4>
+            <h4 className="text-white font-bold font-space text-sm uppercase tracking-wider">Protocol &amp; Security</h4>
             <ul className="space-y-3 text-sm">
+              <li><Link href="/how-it-works" className="hover:text-[#FF5A5F] transition-colors">The 100% Async Protocol</Link></li>
+              <li><Link href="/security" className="hover:text-[#FF5A5F] transition-colors">EU Security Architecture</Link></li>
               <li><Link href="/privacy" className="hover:text-[#FF5A5F] transition-colors">Privacy Policy &amp; GDPR</Link></li>
-              <li><Link href="/security" className="hover:text-[#FF5A5F] transition-colors">Security Architecture</Link></li>
-              <li><Link href="/#contact" className="hover:text-[#FF5A5F] transition-colors">Request Written Proposal</Link></li>
               <li>
                 <span className="text-xs text-zinc-500 block">Zero AI Model Training Guarantee</span>
               </li>
