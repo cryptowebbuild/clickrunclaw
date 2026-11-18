@@ -1,0 +1,31 @@
+# ClickRunClaw
+
+> EU-first AI automation studio. We build custom AI agents for sales triage, customer support, invoice reconciliation and back-office workflows, then run them on dedicated German and Finnish infrastructure. Fixed price, written delivery, no meetings.
+
+## What we do
+
+- **Single workflow agent** ($799 setup, $149/month): one production agent for support or sales triage, one channel, CRM or sheet sync, live in seven days.
+- **Revenue pipeline** ($1,799 setup, $299/month): multi-step inbound pipeline with enrichment, scoring, routing, a conversion landing page and server-side tracking.
+- **Operations fleet** ($3,499+ setup, $599/month): multi-agent document extraction and reconciliation with ERP sync and human review gates.
+
+## How delivery works
+
+Day 0: written brief. Day 1: architecture and fixed price. Day 4: staging sandbox. Day 7: production handover on client-owned EU infrastructure. No discovery calls, no video meetings, every decision in writing.
+
+## Key pages
+
+- Home: https://clickrunclaw.com
+- Services: https://clickrunclaw.com/services
+- Pricing: https://clickrunclaw.com/pricing
+- Case studies: https://clickrunclaw.com/case-studies
+- Process: https://clickrunclaw.com/how-it-works
+- Security and data residency: https://clickrunclaw.com/security
+- Engineering notes: https://clickrunclaw.com/blog
+
+## Facts
+
+- Infrastructure: dedicated containers in Frankfurt, Germany and Helsinki, Finland.
+- Data: no client data is used to train models. Optional Mistral EU inference for residency-sensitive work.
+- Ownership: code, prompts and infrastructure config transfer to the client on handover.
+- Contact: support@clickrunclaw.com
+- Studio: CryptoWebBuild (https://cryptowebbuild.com)

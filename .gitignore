@@ -1,0 +1,17 @@
+node_modules/
+.next/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+sqlite/*.db
+sqlite/*.db-*
+.superpowers/
+.config/
+outreach/sent_history.json
+outreach/outreach.log
+*.tsbuildinfo
+__pycache__/
+*.pyc
+public/screenshots/

@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-space: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Brand Color: Soft Coral Red */
+  --color-coral: #FF5A5F;
+  --color-coral-hover: #fa4a4a;
+  --color-zinc-950: #0a0a0a;
+
+  /* Surface scale used across cards and section bands */
+  --color-ink: #090A0F;
+  --color-panel: #111318;
+  --color-hairline: rgba(255, 255, 255, 0.09);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  * {
+    @apply border-zinc-800;
+  }
+
+  body {
+    @apply bg-[#090A0F] text-zinc-100 antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(255, 90, 95, 0.35);
+    color: #fff;
+  }
+
+  /* One visible focus treatment for every interactive element. */
+  :focus-visible {
+    outline: 2px solid #FF5A5F;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Sticky header plus announcement bar clearance for anchor links. */
+  [id] {
+    scroll-margin-top: 104px;
+  }
+
+  /* Scrollbar: subtle, matches the dark shell. */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #090A0F;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #26272e;
+    border: 2px solid #090A0F;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3b43;
+  }
+}
+
+@layer utilities {
+  .bg-grid-dots {
+    background-image: radial-gradient(circle, rgba(255, 90, 95, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .text-glow-coral {
+    text-shadow: 0 0 20px rgba(255, 90, 95, 0.4);
+  }
+
+  .glass-card {
+    @apply bg-white/50 dark:bg-[#111318]/50 backdrop-blur-xl border border-gray-200 dark:border-white/5 shadow-2xl;
+  }
+
+  .terminal-shadow {
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Consistent card interaction, replaces the per-section hover one-offs. */
+  .surface {
+    background-color: #111318;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    transition: border-color 200ms ease, background-color 200ms ease, transform 200ms ease;
+  }
+
+  .surface:hover {
+    border-color: rgba(255, 255, 255, 0.19);
+  }
+
+  .rise {
+    animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .rise-1 { animation-delay: 0.06s; }
+  .rise-2 { animation-delay: 0.12s; }
+  .rise-3 { animation-delay: 0.18s; }
+  .rise-4 { animation-delay: 0.24s; }
+  .rise-5 { animation-delay: 0.3s; }
+
+  .panel-in {
+    animation: panel-in 0.22s ease-out both;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Anyone who asks for less motion gets a static page, instantly. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
